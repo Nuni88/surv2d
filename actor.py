@@ -52,6 +52,8 @@ class Player(Actor):
         self.jumping = False
         self.midair_jumping = False
         self.invincible = False
+        self.invul_dur = 2000
+        self.invul_timer = 0
         self.health = 1000
         self.shooters = []
         shooter1 = Emitter('Fireball', self.rect.center, vec(0.1, 0))
@@ -115,17 +117,12 @@ class Player(Actor):
         if self.jumping and self.vel.y < -3:
             self.vel.y = -3
 
-    def take_damage(self, amt) -> bool:
-        if amt > 0:
+    def take_hit(self, enemy):
+        if enemy.damage > 0:
             if not self.invincible:
-                print(f'Took {amt} damage.')
-                self.health -= amt
+                print(f'Took {enemy.damage} damage.')
+                self.health -= enemy.damage
                 self.invincible = True
-                return True
-            return False
-
-    def vulnerable(self):
-        self.invincible = False
 
     def get_bullets(self) -> list:
         bullets = []
@@ -136,6 +133,13 @@ class Player(Actor):
         # return self.shooter1.get_bullets()
 
     def update(self, ms):
+        # Invincibility wears off after invul_dur time
+        # Turn player invincibility off and reset invulnerability tracking
+        if self.invincible:
+            self.invul_timer += ms
+            if self.invul_timer >= self.invul_dur:
+                self.invincible = False
+                self.invul_timer = 0
         for shooter in self.shooters:
             shooter.update(ms)
 
@@ -173,9 +177,6 @@ class Enemy(Actor):
         else:
             self.acc.x = ACC * self.speed_mod
             self.surf = pygame.image.load(os.path.join('images\\enemy1', 'enemy_right.gif'))
-
-    def get_damage(self) -> int:
-        return self.damage
 
     def take_damage(self, amt):
         if amt > 0:
