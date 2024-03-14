@@ -18,8 +18,9 @@ class SurvGame:
         self.displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont('Arial', 24)
+        # self.camera_offset = 0
 
-        self.floor = Platform((WIDTH / 2, HEIGHT))
+        self.floor = Platform(vec(WIDTH / 2, HEIGHT))
         self.P1 = Player()
         self.enemy1 = Enemy()
         self.enemy2 = Enemy()
@@ -59,6 +60,7 @@ class SurvGame:
     def run(self):
         invul = False
         invul_timer = 0
+        camera_pos = vec(0, HEIGHT - 100)
 
         while True:
             if self.P1.get_health() <= 0:
@@ -78,11 +80,16 @@ class SurvGame:
                 invul_timer = 0
 
             self.P1.move()
+            for enemy in self.enemies:
+                enemy.move()
+            if self.P1.out_of_bounds():
+                for enemy in self.enemies:
+                    enemy.scroll(self.P1.vel.x + 0.5 * self.P1.acc.x)
+                self.floor.scroll(self.P1.vel.x + 0.5 * self.P1.acc.x)
+            # camera_pos = self.P1.move_player(camera_pos)
+            # self.floor.move(self.P1.rect.centerx)
 
-            '''
-            for actor in self.actors:
-                actor.move()
-            '''
+            # self.camera_offset = WIDTH // 2 - self.P1.acc.x - self.P1.rect.width // 2
 
             # Handle player landing
             plat_hits = pygame.sprite.spritecollide(self.P1, self.platforms, False)
@@ -144,7 +151,7 @@ class SurvGame:
             for entity in self.all_sprites:
                 self.displaysurface.blit(entity.surf, entity.rect)
             for bullet in bullets:
-                self.displaysurface.blit(bullet.surf, bullet.rect)
+                self.displaysurface.blit(bullet.surf, entity.rect)
             self.displaysurface.blit(text_time, (0, 0))
             self.displaysurface.blit(text_health, (0, 30))
 

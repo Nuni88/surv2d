@@ -27,21 +27,27 @@ class Actor(pygame.sprite.Sprite):
         self.vel += self.acc
         self.pos += self.vel + 0.5 * self.acc
 
+        '''
         if self.pos.x > WIDTH:
             self.pos.x = 0
         if self.pos.x < 0:
             self.pos.x = WIDTH
+        '''
 
         self.rect.midbottom = self.pos
 
     def get_health(self) -> int:
         return self.health
 
+    def scroll(self, offset):
+        self.pos.x -= offset
+        self.rect.midbottom = self.pos
+
 
 class Player(Actor):
     def __init__(self):
         super().__init__(pygame.image.load(os.path.join('images\\player', 'player_right.gif')))
-        self.pos = vec((10, HEIGHT - 25))
+        self.pos = vec((WIDTH / 2, HEIGHT - 25))
         self.rect.midbottom = self.pos
         self.jumping = False
         self.midair_jumping = False
@@ -71,7 +77,16 @@ class Player(Actor):
         self.shooters[1].move(self.rect.topright)
         self.shooters[2].move(self.rect.bottomright)
 
-        super().move()
+        self.acc.x += self.vel.x * FRIC
+        self.vel += self.acc
+        self.pos += self.vel + 0.5 * self.acc
+
+        if self.scroll_left():
+            self.pos.x = WIDTH * 0.2
+        elif self.scroll_right():
+            self.pos.x = WIDTH * 0.8
+
+        self.rect.midbottom = self.pos
 
     def shoot(self):
         for shooter in self.shooters:
@@ -124,11 +139,29 @@ class Player(Actor):
         for shooter in self.shooters:
             shooter.update(ms)
 
+    def scroll_left(self) -> bool:
+        if self.pos.x < WIDTH * 0.2:
+            return True
+        return False
+
+    def scroll_right(self) -> bool:
+        if self.pos.x > WIDTH * 0.8:
+            return True
+        return False
+
+    def out_of_bounds(self) -> bool:
+        if WIDTH * 0.8 > self.pos.x > WIDTH * 0.2:
+            return False
+        return True
+
+    def get_vel(self) -> (float, float):
+        return self.vel
+
 
 class Enemy(Actor):
     def __init__(self):
         super().__init__(pygame.image.load(os.path.join('images\\enemy1', 'enemy_left.gif')))
-        self.pos = vec(random.randint(WIDTH / 2, WIDTH - 10), HEIGHT - 25)
+        self.pos = vec(random.randint(int(2 * WIDTH / 3), WIDTH - 10), HEIGHT - 25)
         self.rect.midbottom = self.pos
         self.damage = 10
         self.speed_mod = 0.8
