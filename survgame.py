@@ -27,10 +27,10 @@ class SurvGame:
 
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites.add(self.floor)
-        self.all_sprites.add(self.P1)
         self.all_sprites.add(self.enemy1)
         self.all_sprites.add(self.enemy2)
         self.all_sprites.add(self.enemy3)
+        self.all_sprites.add(self.P1)
 
         self.actors = pygame.sprite.Group()
         self.actors.add(self.P1)
@@ -63,6 +63,11 @@ class SurvGame:
         while True:
             if self.P1.get_health() <= 0:
                 return
+            for enemy in self.enemies:
+                if enemy.get_health() <= 0:
+                    enemy.kill()
+
+            bullets = self.P1.get_bullets()
 
             # Invincibility wears off after 2 seconds
             # Turn player invincibility off and reset invulnerability tracking
@@ -72,8 +77,12 @@ class SurvGame:
                 invul = False
                 invul_timer = 0
 
+            self.P1.move()
+
+            '''
             for actor in self.actors:
                 actor.move()
+            '''
 
             # Handle player landing
             plat_hits = pygame.sprite.spritecollide(self.P1, self.platforms, False)
@@ -85,6 +94,12 @@ class SurvGame:
             if enemy_hits:
                 invul = not self.P1.take_damage(enemy_hits[0].get_damage())
 
+            # Handle player shooting enemies
+            for bullet in bullets:
+                proj_hits = pygame.sprite.spritecollide(bullet, self.enemies, False)
+                for enemy in proj_hits:
+                    enemy.take_damage(5)
+
             for event in pygame.event.get():
                 if event.type == QUIT:
                     pygame.quit()
@@ -95,6 +110,11 @@ class SurvGame:
                             self.P1.jump()
                         else:
                             self.P1.midair_jump()
+                '''
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_f:
+                        self.P1.shoot()
+                '''
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_SPACE:
                         self.P1.cancel_jump()
@@ -123,11 +143,14 @@ class SurvGame:
 
             for entity in self.all_sprites:
                 self.displaysurface.blit(entity.surf, entity.rect)
+            for bullet in bullets:
+                self.displaysurface.blit(bullet.surf, bullet.rect)
             self.displaysurface.blit(text_time, (0, 0))
             self.displaysurface.blit(text_health, (0, 30))
 
             pygame.display.update()
             time_update = self.clock.tick(FPS)
+            self.P1.update(time_update)
             if invul:
                 invul_timer += time_update
 

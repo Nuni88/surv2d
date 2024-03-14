@@ -2,20 +2,21 @@ import pygame
 import os
 import random
 from pygame.locals import *
+from emitter import Emitter
 from constants import ACC, FRIC, WIDTH, HEIGHT
 
 vec = pygame.math.Vector2
 
 
 class Actor(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, surf):
         super().__init__()
-        self.surf = None
-        self.rect = None
+        self.surf = surf
+        self.rect = self.surf.get_rect()
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
         self.pos = vec(0, 0)
-        self.health = 20
+        self.health = 5000
         self.speed_mod = 1
 
     def pos_greater_x(self, other):
@@ -39,14 +40,20 @@ class Actor(pygame.sprite.Sprite):
 
 class Player(Actor):
     def __init__(self):
-        super().__init__()
-        self.surf = pygame.image.load(os.path.join('images\\player', 'player_right.gif'))
-        self.rect = self.surf.get_rect()
+        super().__init__(pygame.image.load(os.path.join('images\\player', 'player_right.gif')))
         self.pos = vec((10, HEIGHT - 25))
+        self.rect.midbottom = self.pos
         self.jumping = False
         self.midair_jumping = False
         self.invincible = False
-        self.health = 50
+        self.health = 1000
+        self.shooters = []
+        shooter1 = Emitter('Fireball', self.rect.center, vec(0.1, 0))
+        shooter2 = Emitter('Iceball', self.rect.topright, vec(0.1, -0.1))
+        shooter3 = Emitter('Lightning', self.rect.bottomright, vec(0.1, 0.1))
+        self.shooters.append(shooter1)
+        self.shooters.append(shooter2)
+        self.shooters.append(shooter3)
 
         # self.jump_sfx = pygame.mixer.Sound(os.path.join('sound', 'jump.wav'))
         # self.jump_sfx.set_volume(0.1)
@@ -60,8 +67,15 @@ class Player(Actor):
         if pressed_keys[K_RIGHT]:
             self.acc.x = ACC * self.speed_mod
             self.surf = pygame.image.load(os.path.join('images\\player', 'player_right.gif'))
+        self.shooters[0].move(self.rect.center)
+        self.shooters[1].move(self.rect.topright)
+        self.shooters[2].move(self.rect.bottomright)
 
         super().move()
+
+    def shoot(self):
+        for shooter in self.shooters:
+            shooter.shoot()
 
     def land(self, floor):
         if self.vel.y > 0:
@@ -87,23 +101,35 @@ class Player(Actor):
             self.vel.y = -3
 
     def take_damage(self, amt) -> bool:
-        if not self.invincible:
-            print(f'Took {amt} damage.')
-            self.health -= amt
-            self.invincible = True
-            return True
-        return False
+        if amt > 0:
+            if not self.invincible:
+                print(f'Took {amt} damage.')
+                self.health -= amt
+                self.invincible = True
+                return True
+            return False
 
     def vulnerable(self):
         self.invincible = False
 
+    def get_bullets(self) -> list:
+        bullets = []
+        for shooter in self.shooters:
+            for bullet in shooter.get_bullets():
+                bullets.append(bullet)
+        return bullets
+        # return self.shooter1.get_bullets()
+
+    def update(self, ms):
+        for shooter in self.shooters:
+            shooter.update(ms)
+
 
 class Enemy(Actor):
     def __init__(self):
-        super().__init__()
-        self.surf = pygame.image.load(os.path.join('images\\enemy1', 'enemy_left.gif'))
-        self.rect = self.surf.get_rect()
+        super().__init__(pygame.image.load(os.path.join('images\\enemy1', 'enemy_left.gif')))
         self.pos = vec(random.randint(WIDTH / 2, WIDTH - 10), HEIGHT - 25)
+        self.rect.midbottom = self.pos
         self.damage = 10
         self.speed_mod = 0.8
 
@@ -117,3 +143,8 @@ class Enemy(Actor):
 
     def get_damage(self) -> int:
         return self.damage
+
+    def take_damage(self, amt):
+        if amt > 0:
+            print(f'Enemy took {amt} damage.')
+            self.health -= amt
