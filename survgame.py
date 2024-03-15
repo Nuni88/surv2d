@@ -4,6 +4,7 @@ import pygame
 from pygame.locals import *
 from actor import Player, Enemy
 from platform import Platform
+from pickup import ExpPickup
 from constants import WIDTH, HEIGHT, FPS, MAX_TIME
 
 vec = pygame.math.Vector2
@@ -46,6 +47,8 @@ class SurvGame:
         self.platforms = pygame.sprite.Group()
         self.platforms.add(self.floor)
 
+        self.pickups = pygame.sprite.Group()
+
     def end_game(self):
         for entity in self.all_sprites:
             entity.kill()
@@ -60,23 +63,37 @@ class SurvGame:
         while True:
             if self.P1.get_health() <= 0:
                 return
+            '''
             for enemy in self.enemies:
                 if enemy.get_health() <= 0:
                     print('Enemy killed!')
                     enemy.kill()
+            '''
 
             bullets = self.P1.get_bullets()
 
             self.P1.move()
-            self.floor.scroll(-(self.P1.get_scroll_modifier()))
+            self.floor.scroll(-(self.P1.get_scroll_dist()))
             for enemy in self.enemies:
                 enemy.move()
 
             # Scroll the screen
             if self.P1.out_of_bounds():
+                mod = self.P1.get_scroll_dist()
                 for enemy in self.enemies:
-                    enemy.scroll(self.P1.get_scroll_modifier())
-                self.floor.scroll(self.P1.get_scroll_modifier())
+                    enemy.scroll(mod)
+                for bullet in bullets:
+                    bullet.scroll(mod)
+                for pickup in self.pickups:
+                    pickup.scroll(mod)
+                self.floor.scroll(mod)
+
+            # Handle player grabbing pickups
+            pickup_hits = pygame.sprite.spritecollide(self.P1, self.pickups, False)
+            if pickup_hits:
+                for pickup in pickup_hits:
+                    self.P1.gain_exp(5)
+                    pickup.kill()
 
             # Handle player landing
             plat_hits = pygame.sprite.spritecollide(self.P1, self.platforms, False)
@@ -92,7 +109,12 @@ class SurvGame:
             for bullet in bullets:
                 proj_hits = pygame.sprite.spritecollide(bullet, self.enemies, False)
                 for enemy in proj_hits:
-                    enemy.take_damage(bullet.get_damage())
+                    if enemy.take_damage(bullet.get_damage()):
+                        print('Enemy killed!')
+                        drop = ExpPickup(enemy.get_pos())
+                        self.all_sprites.add(drop)
+                        self.pickups.add(drop)
+                        enemy.kill()
 
             for event in pygame.event.get():
                 if event.type == QUIT:

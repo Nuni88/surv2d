@@ -3,6 +3,7 @@ import pygame
 from projectile import Fireball, Iceball, Lightning
 from constants import SHOOTING_DELAY
 
+vec = pygame.math.Vector2
 '''
 WEAPONTYPES = {
     'Fireball': Fireball,
@@ -51,7 +52,7 @@ class FireShooter(Emitter):
         super().__init__(pos, acc_mod)
 
     def shoot(self):
-        bullet = Fireball(self.rect.center, self.acc_mod)
+        bullet = Fireball(self.rect.center + vec(-50, 0), self.acc_mod)
         self.bullets.append(bullet)
         print(f'Fire! Bullets fired: {len(self.bullets)}')
 

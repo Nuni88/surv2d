@@ -16,7 +16,7 @@ class Actor(pygame.sprite.Sprite):
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
         self.pos = vec(0, 0)
-        self.health = 5000
+        self.health = 2500
         self.speed_mod = 1
 
     def pos_greater_x(self, other):
@@ -35,6 +35,9 @@ class Actor(pygame.sprite.Sprite):
         self.pos.x -= offset
         self.rect.midbottom = self.pos
 
+    def get_pos(self) -> (float, float):
+        return self.rect.center
+
 
 class Player(Actor):
     def __init__(self):
@@ -46,7 +49,8 @@ class Player(Actor):
         self.invincible = False
         self.invul_dur = 2000
         self.invul_timer = 0
-        self.health = 1000
+        self.health = 100
+        self.exp = 0
         self.shooters = []
         shooter1 = FireShooter(self.rect.center, vec(1, 1))
         shooter2 = LitShooter(self.rect.topright, vec(1, 1))
@@ -149,8 +153,12 @@ class Player(Actor):
             return False
         return True
 
-    def get_scroll_modifier(self) -> float:
+    def get_scroll_dist(self) -> float:
         return self.vel.x + 0.5 * self.acc.x
+
+    def gain_exp(self, amt):
+        self.exp += amt
+        print(f'Player XP: {self.exp}')
 
 
 class Enemy(Actor):
@@ -160,6 +168,7 @@ class Enemy(Actor):
         self.rect.midbottom = self.pos
         self.damage = 10
         self.speed_mod = 0.8
+        self.health = 500
 
     def set_facing(self, direction):
         if direction:
@@ -169,7 +178,10 @@ class Enemy(Actor):
             self.acc.x = ACC * self.speed_mod
             self.surf = pygame.image.load(os.path.join('images\\enemy1', 'enemy_right.gif'))
 
-    def take_damage(self, amt):
+    def take_damage(self, amt) -> bool:
         if amt > 0:
             print(f'Enemy took {amt} damage.')
             self.health -= amt
+            if self.health <= 0:
+                return True
+        return False

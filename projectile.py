@@ -1,7 +1,7 @@
 import os
 import math
 import pygame
-from constants import WIDTH, HEIGHT
+from constants import WIDTH, HEIGHT, ACC_ANGLE
 
 vec = pygame.math.Vector2
 
@@ -12,7 +12,7 @@ class Projectile(pygame.sprite.Sprite):
         self.surf = surf
         self.rect = self.surf.get_rect(center=pos)
         self.vel = vec(0, 0)
-        self.acc = vec(0.1, 0)
+        self.acc = vec(0, 0)
         self.acc.x *= acc_mod.x
         self.acc.y *= acc_mod.y
         self.timer = 0
@@ -35,12 +35,42 @@ class Projectile(pygame.sprite.Sprite):
     def get_damage(self) -> int:
         return self.damage
 
+    def scroll(self, offset):
+        self.rect.centerx -= offset
+
 
 class Fireball(Projectile):
     def __init__(self, pos, acc_mod):
         super().__init__(pos, acc_mod, pygame.image.load(os.path.join('images\\projectiles', 'fire.png')))
+        self.acc_angle = ACC_ANGLE
+        self.acc = vec(0, -0.1)
+        self.vel = vec(0, -0.1)
         self.damage = 1
+        self.speed_mod = 0.001
+        self.rot_delay = 20
+        self.degrees = 0
 
+    def update_timers(self, ms):
+        super().update_timers(ms)
+        while self.timer >= self.rot_delay:
+            self.degrees += 4
+            self.timer -= self.rot_delay
+        self.vel.rotate_ip(self.degrees)
+        self.degrees = 0
+        '''
+        while self.timer >= self.rot_delay:
+            self.acc_angle += ACC_ANGLE
+            self.timer -= self.rot_delay
+        self.acc.x += self.speed_mod * math.cos(self.acc_angle)
+        self.acc.y += -self.speed_mod * math.sin(self.acc_angle)
+        '''
+
+    def move(self):
+        self.rect.center += self.vel
+
+    def move(self):
+        self.vel += self.acc
+        self.rect.center += self.vel
 
 class Iceball(Projectile):
     def __init__(self, pos, acc_mod):
