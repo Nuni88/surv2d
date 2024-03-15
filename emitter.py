@@ -1,6 +1,7 @@
 from enum import Enum
 import pygame
 from projectile import Fireball, Iceball, Lightning
+from constants import SHOOTING_DELAY
 
 WEAPONTYPES = {
     'Fireball': Fireball,
@@ -18,7 +19,7 @@ class Emitter(pygame.sprite.Sprite):
         self.rect = self.surf.get_rect(center=pos)
         self.bullets = []
         self.shot_timer = 0
-        self.delay = 2000
+        self.delay = SHOOTING_DELAY
         self.acc = acc
         self.proj_type = WEAPONTYPES[proj_type]
 

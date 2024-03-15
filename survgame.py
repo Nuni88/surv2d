@@ -67,12 +67,15 @@ class SurvGame:
             bullets = self.P1.get_bullets()
 
             self.P1.move()
+            self.floor.scroll(-(self.P1.get_scroll_modifier()))
             for enemy in self.enemies:
                 enemy.move()
+
+            # Scroll the screen
             if self.P1.out_of_bounds():
                 for enemy in self.enemies:
-                    enemy.scroll(self.P1.vel.x + 0.5 * self.P1.acc.x)
-                self.floor.scroll(self.P1.vel.x + 0.5 * self.P1.acc.x)
+                    enemy.scroll(self.P1.get_scroll_modifier())
+                self.floor.scroll(self.P1.get_scroll_modifier())
 
             # Handle player landing
             plat_hits = pygame.sprite.spritecollide(self.P1, self.platforms, False)

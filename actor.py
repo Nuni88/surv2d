@@ -3,7 +3,7 @@ import os
 import random
 from pygame.locals import *
 from emitter import Emitter
-from constants import ACC, FRIC, WIDTH, HEIGHT
+from constants import ACC, FRIC, WIDTH, HEIGHT, MOVE_EDGE_LEFT, MOVE_EDGE_RIGHT, GRAVITY
 
 vec = pygame.math.Vector2
 
@@ -26,14 +26,6 @@ class Actor(pygame.sprite.Sprite):
         self.acc.x += self.vel.x * FRIC
         self.vel += self.acc
         self.pos += self.vel + 0.5 * self.acc
-
-        '''
-        if self.pos.x > WIDTH:
-            self.pos.x = 0
-        if self.pos.x < 0:
-            self.pos.x = WIDTH
-        '''
-
         self.rect.midbottom = self.pos
 
     def get_health(self) -> int:
@@ -67,7 +59,7 @@ class Player(Actor):
         # self.jump_sfx.set_volume(0.1)
 
     def move(self):
-        self.acc = vec(0, 0.5)
+        self.acc = vec(0, GRAVITY)
         pressed_keys = pygame.key.get_pressed()
         if pressed_keys[K_LEFT]:
             self.acc.x = -ACC * self.speed_mod
@@ -84,9 +76,9 @@ class Player(Actor):
         self.pos += self.vel + 0.5 * self.acc
 
         if self.scroll_left():
-            self.pos.x = WIDTH * 0.2
+            self.pos.x = MOVE_EDGE_LEFT
         elif self.scroll_right():
-            self.pos.x = WIDTH * 0.8
+            self.pos.x = MOVE_EDGE_RIGHT
 
         self.rect.midbottom = self.pos
 
@@ -144,22 +136,22 @@ class Player(Actor):
             shooter.update(ms)
 
     def scroll_left(self) -> bool:
-        if self.pos.x < WIDTH * 0.2:
+        if self.pos.x < MOVE_EDGE_LEFT:
             return True
         return False
 
     def scroll_right(self) -> bool:
-        if self.pos.x > WIDTH * 0.8:
+        if self.pos.x > MOVE_EDGE_RIGHT:
             return True
         return False
 
     def out_of_bounds(self) -> bool:
-        if WIDTH * 0.8 > self.pos.x > WIDTH * 0.2:
+        if MOVE_EDGE_LEFT < self.pos.x < MOVE_EDGE_RIGHT:
             return False
         return True
 
-    def get_vel(self) -> (float, float):
-        return self.vel
+    def get_scroll_modifier(self) -> float:
+        return self.vel.x + 0.5 * self.acc.x
 
 
 class Enemy(Actor):
