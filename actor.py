@@ -2,7 +2,7 @@ import pygame
 import os
 import random
 from pygame.locals import *
-from emitter import Emitter
+from emitter import FireShooter, LitShooter, IceShooter
 from constants import ACC, FRIC, WIDTH, HEIGHT, MOVE_EDGE_LEFT, MOVE_EDGE_RIGHT, GRAVITY
 
 vec = pygame.math.Vector2
@@ -48,9 +48,9 @@ class Player(Actor):
         self.invul_timer = 0
         self.health = 1000
         self.shooters = []
-        shooter1 = Emitter('Fireball', self.rect.center, vec(0.1, 0))
-        shooter2 = Emitter('Iceball', self.rect.topright, vec(0.1, -0.1))
-        shooter3 = Emitter('Lightning', self.rect.bottomright, vec(0.1, 0.1))
+        shooter1 = FireShooter(self.rect.center, vec(1, 1))
+        shooter2 = LitShooter(self.rect.topright, vec(1, 1))
+        shooter3 = IceShooter(self.rect.bottomright, vec(1, 1))
         self.shooters.append(shooter1)
         self.shooters.append(shooter2)
         self.shooters.append(shooter3)
@@ -122,9 +122,8 @@ class Player(Actor):
             for bullet in shooter.get_bullets():
                 bullets.append(bullet)
         return bullets
-        # return self.shooter1.get_bullets()
 
-    def update(self, ms):
+    def update_timers(self, ms):
         # Invincibility wears off after invul_dur time
         # Turn player invincibility off and reset invulnerability tracking
         if self.invincible:
@@ -133,7 +132,7 @@ class Player(Actor):
                 self.invincible = False
                 self.invul_timer = 0
         for shooter in self.shooters:
-            shooter.update(ms)
+            shooter.update_timers(ms)
 
     def scroll_left(self) -> bool:
         if self.pos.x < MOVE_EDGE_LEFT:

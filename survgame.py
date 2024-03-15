@@ -62,6 +62,7 @@ class SurvGame:
                 return
             for enemy in self.enemies:
                 if enemy.get_health() <= 0:
+                    print('Enemy killed!')
                     enemy.kill()
 
             bullets = self.P1.get_bullets()
@@ -91,7 +92,7 @@ class SurvGame:
             for bullet in bullets:
                 proj_hits = pygame.sprite.spritecollide(bullet, self.enemies, False)
                 for enemy in proj_hits:
-                    enemy.take_damage(5)
+                    enemy.take_damage(bullet.get_damage())
 
             for event in pygame.event.get():
                 if event.type == QUIT:
@@ -143,7 +144,7 @@ class SurvGame:
 
             pygame.display.update()
             time_update = self.clock.tick(FPS)
-            self.P1.update(time_update)
+            self.P1.update_timers(time_update)
 
 
 if __name__ == '__main__':
