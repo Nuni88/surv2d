@@ -36,7 +36,7 @@ class Actor(pygame.sprite.Sprite):
         self.rect.midbottom = self.pos
 
     def get_pos(self) -> (float, float):
-        return self.rect.center
+        return self.rect.midbottom
 
 
 class Player(Actor):
@@ -47,9 +47,10 @@ class Player(Actor):
         self.jumping = False
         self.midair_jumping = False
         self.invincible = False
-        self.invul_dur = 2000
+        self.invul_dur = 400
         self.invul_timer = 0
         self.health = 100
+        self.level = 1
         self.exp = 0
         self.shooters = []
         shooter1 = FireShooter(self.rect.center, vec(1, 1))
@@ -159,24 +160,41 @@ class Player(Actor):
     def gain_exp(self, amt):
         self.exp += amt
         print(f'Player XP: {self.exp}')
+        if self.exp >= 100:
+            print('Level up!')
+            self.level += 1
+            self.exp -= 100
+
+    def get_level(self) -> int:
+        return self.level
+
+    def get_exp(self) -> int:
+        return self.exp
 
 
 class Enemy(Actor):
-    def __init__(self):
-        super().__init__(pygame.image.load(os.path.join('images\\enemy1', 'enemy_left.gif')))
-        self.pos = vec(random.randint(int(2 * WIDTH / 3), WIDTH - 10), HEIGHT - 25)
-        self.rect.midbottom = self.pos
-        self.damage = 10
-        self.speed_mod = 0.8
-        self.health = 500
+    def __init__(self, surf):
+        super().__init__(surf)
 
-    def set_facing(self, direction):
-        if direction:
+        # Spawn randomly on left or right side
+        side = random.randint(0, 1)
+        if side:
+            x = random.randint(int(WIDTH * 1.5), int(WIDTH * 2))
+        else:
+            x = random.randint(int(WIDTH * -1), int(WIDTH * -0.5))
+        self.pos = vec(x, HEIGHT - 25)
+        self.rect.midbottom = self.pos
+        self.name = ''
+
+    def move_to(self, player):
+        super().move()
+        # Sets enemy movement and sprite relative to player position
+        if self.pos.x > player.pos.x:
             self.acc.x = -ACC * self.speed_mod
-            self.surf = pygame.image.load(os.path.join('images\\enemy1', 'enemy_left.gif'))
+            self.surf = self.spr_left
         else:
             self.acc.x = ACC * self.speed_mod
-            self.surf = pygame.image.load(os.path.join('images\\enemy1', 'enemy_right.gif'))
+            self.surf = self.spr_right
 
     def take_damage(self, amt) -> bool:
         if amt > 0:
@@ -185,3 +203,39 @@ class Enemy(Actor):
             if self.health <= 0:
                 return True
         return False
+
+    def get_name(self) -> str:
+        return self.name
+
+
+class EnemyOne(Enemy):
+    def __init__(self):
+        self.spr_left = pygame.image.load(os.path.join('images\\enemy1', 'enemy_left.gif'))
+        self.spr_right = pygame.image.load(os.path.join('images\\enemy1', 'enemy_right.gif'))
+        super().__init__(self.spr_left)
+        self.name = 'EnemyOne'
+        self.damage = 8
+        self.speed_mod = round(random.uniform(0.35, 0.45), 2)
+        self.health = 2000
+
+
+class EnemyTwo(Enemy):
+    def __init__(self):
+        self.spr_left = pygame.image.load(os.path.join('images\\enemy2', 'enemy_left.gif'))
+        self.spr_right = pygame.image.load(os.path.join('images\\enemy2', 'enemy_right.gif'))
+        super().__init__(self.spr_left)
+        self.name = 'EnemyTwo'
+        self.damage = 3
+        self.speed_mod = round(random.uniform(0.5, 0.6), 2)
+        self.health = 1000
+
+
+class EnemyThree(Enemy):
+    def __init__(self):
+        self.spr_left = pygame.image.load(os.path.join('images\\enemy3', 'enemy_left.gif'))
+        self.spr_right = pygame.image.load(os.path.join('images\\enemy3', 'enemy_right.gif'))
+        super().__init__(self.spr_left)
+        self.name = 'EnemyThree'
+        self.damage = 12
+        self.speed_mod = round(random.uniform(0.15, 0.25), 2)
+        self.health = 3000

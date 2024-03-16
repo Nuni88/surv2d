@@ -70,8 +70,21 @@ class LitShooter(Emitter):
 class IceShooter(Emitter):
     def __init__(self, pos, acc_mod):
         super().__init__(pos, acc_mod)
+        self.life_timer = 0
+        self.delay = 1500
+        self.proj_dur = 3000
 
     def shoot(self):
         bullet = Iceball(self.rect.center, self.acc_mod)
         self.bullets.append(bullet)
         print(f'Ice! Bullets iced: {len(self.bullets)}')
+
+    def update_timers(self, ms):
+        super().update_timers(ms)
+
+        # Destroy old projectiles
+        self.life_timer += ms
+        if self.life_timer >= self.proj_dur:
+            if self.bullets:
+                self.bullets = self.bullets[1::]
+            self.life_timer -= self.proj_dur

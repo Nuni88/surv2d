@@ -2,12 +2,18 @@ import sys
 import time
 import pygame
 from pygame.locals import *
-from actor import Player, Enemy
+from actor import Player, EnemyOne, EnemyTwo, EnemyThree
 from platform import Platform
-from pickup import ExpPickup
+from pickup import ExpSmall, ExpMed, ExpLarge
 from constants import WIDTH, HEIGHT, FPS, MAX_TIME
 
 vec = pygame.math.Vector2
+
+LOOT_TABLE = {
+    'EnemyOne': ExpSmall,
+    'EnemyTwo': ExpMed,
+    'EnemyThree': ExpLarge
+}
 
 
 # noinspection PyTypeChecker
@@ -19,35 +25,29 @@ class SurvGame:
         self.displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont('Arial', 24)
+        self.spawn_delay = 1500
 
         self.floor = Platform(vec(WIDTH / 2, HEIGHT))
         self.P1 = Player()
-        self.enemy1 = Enemy()
-        self.enemy2 = Enemy()
-        self.enemy3 = Enemy()
 
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites.add(self.floor)
-        self.all_sprites.add(self.enemy1)
-        self.all_sprites.add(self.enemy2)
-        self.all_sprites.add(self.enemy3)
         self.all_sprites.add(self.P1)
 
         self.actors = pygame.sprite.Group()
         self.actors.add(self.P1)
-        self.actors.add(self.enemy1)
-        self.actors.add(self.enemy2)
-        self.actors.add(self.enemy3)
-
-        self.enemies = pygame.sprite.Group()
-        self.enemies.add(self.enemy1)
-        self.enemies.add(self.enemy2)
-        self.enemies.add(self.enemy3)
 
         self.platforms = pygame.sprite.Group()
         self.platforms.add(self.floor)
 
         self.pickups = pygame.sprite.Group()
+        self.enemies = pygame.sprite.Group()
+
+    def spawn_enemy(self, enemy_type):
+        enemy = enemy_type()
+        self.all_sprites.add(enemy)
+        self.actors.add(enemy)
+        self.enemies.add(enemy)
 
     def end_game(self):
         for entity in self.all_sprites:
@@ -60,22 +60,18 @@ class SurvGame:
         sys.exit()
 
     def run(self):
+        spawn_timer = 0
+
         while True:
             if self.P1.get_health() <= 0:
                 return
-            '''
-            for enemy in self.enemies:
-                if enemy.get_health() <= 0:
-                    print('Enemy killed!')
-                    enemy.kill()
-            '''
 
             bullets = self.P1.get_bullets()
 
             self.P1.move()
             self.floor.scroll(-(self.P1.get_scroll_dist()))
             for enemy in self.enemies:
-                enemy.move()
+                enemy.move_to(self.P1)
 
             # Scroll the screen
             if self.P1.out_of_bounds():
@@ -92,7 +88,7 @@ class SurvGame:
             pickup_hits = pygame.sprite.spritecollide(self.P1, self.pickups, False)
             if pickup_hits:
                 for pickup in pickup_hits:
-                    self.P1.gain_exp(5)
+                    self.P1.gain_exp(pickup.get_value())
                     pickup.kill()
 
             # Handle player landing
@@ -111,7 +107,8 @@ class SurvGame:
                 for enemy in proj_hits:
                     if enemy.take_damage(bullet.get_damage()):
                         print('Enemy killed!')
-                        drop = ExpPickup(enemy.get_pos())
+                        loot_type = LOOT_TABLE[enemy.get_name()]
+                        drop = loot_type(enemy.get_pos())
                         self.all_sprites.add(drop)
                         self.pickups.add(drop)
                         enemy.kill()
@@ -142,10 +139,6 @@ class SurvGame:
             if game_time == 0:
                 return
 
-            # Set enemy direction
-            for enemy in self.enemies:
-                enemy.set_facing(enemy.pos_greater_x(self.P1))
-
             # Display timer as MM:SS
             minutes = int(game_time / 60)
             seconds = int(game_time - minutes * 60)
@@ -153,9 +146,10 @@ class SurvGame:
                 minutes = '0' + str(minutes)
             if seconds < 10:
                 seconds = '0' + str(seconds)
-            text_time = self.font.render(f'Time: {minutes}:{seconds}', False, (0, 0, 0))
 
+            text_time = self.font.render(f'Time: {minutes}:{seconds}', False, (0, 0, 0))
             text_health = self.font.render(f'Health: {self.P1.get_health()}', False, (0, 0, 0))
+            text_level = self.font.render(f'Level: {self.P1.get_level()} [{self.P1.get_exp()}%]', False, (0, 0, 0))
 
             for entity in self.all_sprites:
                 self.displaysurface.blit(entity.surf, entity.rect)
@@ -163,10 +157,17 @@ class SurvGame:
                 self.displaysurface.blit(bullet.surf, bullet.rect)
             self.displaysurface.blit(text_time, (0, 0))
             self.displaysurface.blit(text_health, (0, 30))
+            self.displaysurface.blit(text_level, (0, 60))
 
             pygame.display.update()
             time_update = self.clock.tick(FPS)
             self.P1.update_timers(time_update)
+            spawn_timer += time_update
+            if spawn_timer >= self.spawn_delay:
+                self.spawn_enemy(EnemyOne)
+                self.spawn_enemy(EnemyTwo)
+                self.spawn_enemy(EnemyThree)
+                spawn_timer -= self.spawn_delay
 
 
 if __name__ == '__main__':
