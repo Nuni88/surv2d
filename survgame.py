@@ -1,10 +1,11 @@
 import sys
 import time
+import random
 import pygame
 from pygame.locals import *
 from actor import Player, EnemyOne, EnemyTwo, EnemyThree
 from platform import Platform
-from pickup import ExpSmall, ExpMed, ExpLarge
+from pickup import ExpSmall, ExpMed, ExpLarge, MaxHealthPickup, HealthPickup
 from constants import WIDTH, HEIGHT, FPS, MAX_TIME
 
 vec = pygame.math.Vector2
@@ -25,23 +26,33 @@ class SurvGame:
         self.displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont('Arial', 24)
-        self.spawn_delay = 1500
+        self.spawn_delay = 2000
 
-        self.floor = Platform(vec(WIDTH / 2, HEIGHT))
         self.P1 = Player()
 
         self.all_sprites = pygame.sprite.Group()
-        self.all_sprites.add(self.floor)
-        self.all_sprites.add(self.P1)
-
         self.actors = pygame.sprite.Group()
-        self.actors.add(self.P1)
-
-        self.platforms = pygame.sprite.Group()
-        self.platforms.add(self.floor)
-
-        self.pickups = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
+        self.platforms = pygame.sprite.Group()
+        self.pickups = pygame.sprite.Group()
+
+        self.floor = Platform(vec(WIDTH / 2, HEIGHT), 'plat_floor.png')
+        self.platforms.add(self.floor)
+        self.all_sprites.add(self.floor)
+        for i in range(-20, 20):
+            plat = Platform(vec(WIDTH * i, HEIGHT * 0.70), 'plat_med.png')
+            self.all_sprites.add(plat)
+            self.platforms.add(plat)
+            plat = Platform(vec(WIDTH * i - WIDTH / 2, HEIGHT * 0.50), 'plat_med.png')
+            self.all_sprites.add(plat)
+            self.platforms.add(plat)
+
+        heart = MaxHealthPickup(vec(WIDTH / 2, HEIGHT * 0.50 - 20))
+        self.all_sprites.add(heart)
+        self.pickups.add(heart)
+
+        self.all_sprites.add(self.P1)
+        self.actors.add(self.P1)
 
     def spawn_enemy(self, enemy_type):
         enemy = enemy_type()
@@ -69,32 +80,34 @@ class SurvGame:
             bullets = self.P1.get_bullets()
 
             self.P1.move()
-            self.floor.scroll(-(self.P1.get_scroll_dist()))
+            mod = self.P1.get_scroll_dist()
+            self.floor.scroll(-mod)
             for enemy in self.enemies:
                 enemy.move_to(self.P1)
 
             # Scroll the screen
             if self.P1.out_of_bounds():
-                mod = self.P1.get_scroll_dist()
                 for enemy in self.enemies:
                     enemy.scroll(mod)
                 for bullet in bullets:
                     bullet.scroll(mod)
                 for pickup in self.pickups:
                     pickup.scroll(mod)
-                self.floor.scroll(mod)
+                for plat in self.platforms:
+                    plat.scroll(mod)
 
             # Handle player grabbing pickups
             pickup_hits = pygame.sprite.spritecollide(self.P1, self.pickups, False)
             if pickup_hits:
                 for pickup in pickup_hits:
-                    self.P1.gain_exp(pickup.get_value())
+                    pickup.collect(self.P1)
                     pickup.kill()
 
             # Handle player landing
             plat_hits = pygame.sprite.spritecollide(self.P1, self.platforms, False)
             if plat_hits:
-                self.P1.land(plat_hits[0].rect.top)
+                self.P1.land(plat_hits[0])
+                # self.P1.land(plat_hits[0].rect.top)
 
             # Handle damage from enemies
             enemy_hits = pygame.sprite.spritecollide(self.P1, self.enemies, False)
@@ -107,8 +120,13 @@ class SurvGame:
                 for enemy in proj_hits:
                     if enemy.take_damage(bullet.get_damage()):
                         print('Enemy killed!')
-                        loot_type = LOOT_TABLE[enemy.get_name()]
-                        drop = loot_type(enemy.get_pos())
+                        enemy_pos = enemy.get_pos()
+                        hp_chance = random.randint(1, 100)
+                        if hp_chance <= 10:
+                            drop = HealthPickup(enemy_pos)
+                        else:
+                            loot_type = LOOT_TABLE[enemy.get_name()]
+                            drop = loot_type(enemy_pos)
                         self.all_sprites.add(drop)
                         self.pickups.add(drop)
                         enemy.kill()
@@ -148,7 +166,7 @@ class SurvGame:
                 seconds = '0' + str(seconds)
 
             text_time = self.font.render(f'Time: {minutes}:{seconds}', False, (0, 0, 0))
-            text_health = self.font.render(f'Health: {self.P1.get_health()}', False, (0, 0, 0))
+            text_health = self.font.render(f'Health: {self.P1.get_health()}/{self.P1.get_max_health()}', False, (0, 0, 0))
             text_level = self.font.render(f'Level: {self.P1.get_level()} [{self.P1.get_exp()}%]', False, (0, 0, 0))
 
             for entity in self.all_sprites:

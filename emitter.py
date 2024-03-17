@@ -73,18 +73,23 @@ class IceShooter(Emitter):
         self.life_timer = 0
         self.delay = 1500
         self.proj_dur = 3000
+        self.max_proj = 6
 
     def shoot(self):
         bullet = Iceball(self.rect.center, self.acc_mod)
         self.bullets.append(bullet)
+        if len(self.bullets) > self.max_proj:
+            self.bullets = self.bullets[1::]
         print(f'Ice! Bullets iced: {len(self.bullets)}')
 
     def update_timers(self, ms):
         super().update_timers(ms)
 
+        '''
         # Destroy old projectiles
         self.life_timer += ms
         if self.life_timer >= self.proj_dur:
             if self.bullets:
                 self.bullets = self.bullets[1::]
             self.life_timer -= self.proj_dur
+        '''

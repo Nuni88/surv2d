@@ -49,7 +49,10 @@ class Player(Actor):
         self.invincible = False
         self.invul_dur = 400
         self.invul_timer = 0
-        self.health = 100
+        self.stats = {
+            'MaxHealth': 100
+        }
+        self.health = self.stats['MaxHealth']
         self.level = 1
         self.exp = 0
         self.shooters = []
@@ -91,9 +94,14 @@ class Player(Actor):
         for shooter in self.shooters:
             shooter.shoot()
 
-    def land(self, floor):
-        if self.vel.y > 0:
-            self.pos.y = floor
+    def land(self, plat):
+        # Player is below platform
+        if self.rect.top >= plat.rect.top:
+            self.rect.top = plat.rect.bottom + 1
+            self.vel.y = -self.vel.y
+        # Player is above platform
+        elif self.vel.y > 0:
+            self.pos.y = plat.rect.top
             self.vel.y = 0
             self.jumping = False
             self.midair_jumping = False
@@ -165,11 +173,23 @@ class Player(Actor):
             self.level += 1
             self.exp -= 100
 
+    def gain_stat_bonus(self, stat, amt):
+        self.stats[stat] += amt
+        print(f'Player {stat} went up by {amt}!')
+
+    def heal(self, mod):
+        self.health += int(self.stats['MaxHealth'] * mod)
+        if self.health > self.stats['MaxHealth']:
+            self.health = self.stats['MaxHealth']
+
     def get_level(self) -> int:
         return self.level
 
     def get_exp(self) -> int:
         return self.exp
+
+    def get_max_health(self) -> int:
+        return self.stats['MaxHealth']
 
 
 class Enemy(Actor):
