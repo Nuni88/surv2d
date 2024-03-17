@@ -176,9 +176,18 @@ class Player(Actor):
     def gain_stat_bonus(self, stat, amt):
         self.stats[stat] += amt
         print(f'Player {stat} went up by {amt}!')
+        if stat == 'MaxHealth':
+            self.heal(amt)
 
-    def heal(self, mod):
-        self.health += int(self.stats['MaxHealth'] * mod)
+    def heal(self, amt):
+        if amt > 0:
+            self.health += amt
+        if self.health > self.stats['MaxHealth']:
+            self.health = self.stats['MaxHealth']
+
+    def heal_percent(self, mod):
+        if mod > 0:
+            self.health += int(self.stats['MaxHealth'] * mod)
         if self.health > self.stats['MaxHealth']:
             self.health = self.stats['MaxHealth']
 
@@ -234,9 +243,9 @@ class EnemyOne(Enemy):
         self.spr_right = pygame.image.load(os.path.join('images\\enemy1', 'enemy_right.gif'))
         super().__init__(self.spr_left)
         self.name = 'EnemyOne'
-        self.damage = 8
+        self.damage = 5
         self.speed_mod = round(random.uniform(0.35, 0.45), 2)
-        self.health = 2000
+        self.health = 1600
 
 
 class EnemyTwo(Enemy):
@@ -245,9 +254,9 @@ class EnemyTwo(Enemy):
         self.spr_right = pygame.image.load(os.path.join('images\\enemy2', 'enemy_right.gif'))
         super().__init__(self.spr_left)
         self.name = 'EnemyTwo'
-        self.damage = 3
+        self.damage = 2
         self.speed_mod = round(random.uniform(0.5, 0.6), 2)
-        self.health = 1000
+        self.health = 800
 
 
 class EnemyThree(Enemy):
@@ -256,6 +265,6 @@ class EnemyThree(Enemy):
         self.spr_right = pygame.image.load(os.path.join('images\\enemy3', 'enemy_right.gif'))
         super().__init__(self.spr_left)
         self.name = 'EnemyThree'
-        self.damage = 12
+        self.damage = 8
         self.speed_mod = round(random.uniform(0.15, 0.25), 2)
-        self.health = 3000
+        self.health = 2400

@@ -1,6 +1,5 @@
 import os
 import pygame
-from actor import Player
 
 
 class Pickup(pygame.sprite.Sprite):
@@ -29,19 +28,19 @@ class ExpPickup(Pickup):
         player.gain_exp(self.value)
 
 
-class ExpSmall(Pickup):
+class ExpSmall(ExpPickup):
     def __init__(self, pos):
         super().__init__(pos, pygame.image.load(os.path.join('images\\pickups', 'exp_small.png')))
         self.value = 5
 
 
-class ExpMed(Pickup):
+class ExpMed(ExpPickup):
     def __init__(self, pos):
         super().__init__(pos, pygame.image.load(os.path.join('images\\pickups', 'exp_med.png')))
         self.value = 20
 
 
-class ExpLarge(Pickup):
+class ExpLarge(ExpPickup):
     def __init__(self, pos):
         super().__init__(pos, pygame.image.load(os.path.join('images\\pickups', 'exp_large.png')))
         self.value = 50
@@ -62,4 +61,4 @@ class HealthPickup(Pickup):
         self.value = 0.2
 
     def collect(self, player):
-        player.heal(self.value)
+        player.heal_percent(self.value)
