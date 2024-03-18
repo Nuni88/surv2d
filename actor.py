@@ -17,7 +17,6 @@ class Actor(pygame.sprite.Sprite):
         self.acc = vec(0, 0)
         self.pos = vec(0, 0)
         self.health = 2500
-        self.speed_mod = 1
 
     def pos_greater_x(self, other):
         return self.pos.x > other.pos.x
@@ -40,21 +39,25 @@ class Actor(pygame.sprite.Sprite):
 
 
 class Player(Actor):
-    def __init__(self):
-        super().__init__(pygame.image.load(os.path.join('images\\player', 'player_right.gif')))
+    def __init__(self, chardata):
+        super().__init__(pygame.image.load(chardata['frame_left']))
         self.pos = vec((WIDTH / 2, HEIGHT - 25))
         self.rect.midbottom = self.pos
-        self.jumping = False
-        self.midair_jumping = False
-        self.invincible = False
-        self.invul_dur = 400
-        self.invul_timer = 0
-        self.stats = {
-            'MaxHealth': 100
-        }
+
+        self.stats = chardata['stats']
+        self.mods = chardata['mods']
+        self.frame_left = chardata['frame_left']
+        self.frame_right = chardata['frame_right']
+
         self.health = self.stats['MaxHealth']
         self.level = 1
         self.exp = 0
+
+        self.jumping = False
+        self.midair_jumping = False
+        self.invincible = False
+        self.invul_timer = 0
+
         self.shooters = []
         shooter1 = FireShooter(self.rect.center, vec(1, 1))
         shooter2 = LitShooter(self.rect.topright, vec(1, 1))
@@ -70,11 +73,11 @@ class Player(Actor):
         self.acc = vec(0, GRAVITY)
         pressed_keys = pygame.key.get_pressed()
         if pressed_keys[K_LEFT]:
-            self.acc.x = -ACC * self.speed_mod
-            self.surf = pygame.image.load(os.path.join('images\\player', 'player_left.gif'))
+            self.acc.x = -ACC * self.stats['MoveSpeed']
+            self.surf = pygame.image.load(self.frame_left)
         if pressed_keys[K_RIGHT]:
-            self.acc.x = ACC * self.speed_mod
-            self.surf = pygame.image.load(os.path.join('images\\player', 'player_right.gif'))
+            self.acc.x = ACC * self.stats['MoveSpeed']
+            self.surf = pygame.image.load(self.frame_right)
         self.shooters[0].move(self.rect.center)
         self.shooters[1].move(self.rect.topright)
         self.shooters[2].move(self.rect.bottomright)
@@ -92,7 +95,7 @@ class Player(Actor):
 
     def shoot(self):
         for shooter in self.shooters:
-            shooter.shoot()
+            shooter.shoot(self.mods)
 
     def land(self, plat):
         # Player is below platform
@@ -109,13 +112,13 @@ class Player(Actor):
     def jump(self):
         if not self.jumping:
             self.jumping = True
-            self.vel.y = -15
+            self.vel.y = -self.stats['JumpHeight']
             # self.jump_sfx.play()
 
     def midair_jump(self):
         if not self.midair_jumping:
             self.midair_jumping = True
-            self.vel.y = -10
+            self.vel.y = -self.stats['JumpHeight'] / 2
             # self.jump_sfx.play()
 
     def cancel_jump(self):
@@ -137,15 +140,15 @@ class Player(Actor):
         return bullets
 
     def update_timers(self, ms):
-        # Invincibility wears off after invul_dur time
+        # Invulnerability wears off after InvulDuration seconds
         # Turn player invincibility off and reset invulnerability tracking
         if self.invincible:
             self.invul_timer += ms
-            if self.invul_timer >= self.invul_dur:
+            if self.invul_timer >= self.stats['InvulDuration'] * 1000:
                 self.invincible = False
                 self.invul_timer = 0
         for shooter in self.shooters:
-            shooter.update_timers(ms)
+            shooter.update_timers(ms, self.mods)
 
     def scroll_left(self) -> bool:
         if self.pos.x < MOVE_EDGE_LEFT:
@@ -199,6 +202,12 @@ class Player(Actor):
 
     def get_max_health(self) -> int:
         return self.stats['MaxHealth']
+
+    def get_crit_chance(self) -> int:
+        return self.stats['CritChance']
+
+    def get_crit_mod(self) -> float:
+        return self.mods['CritDamage']
 
 
 class Enemy(Actor):

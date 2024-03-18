@@ -1,6 +1,8 @@
 import sys
 import time
 import random
+import os
+import json
 import pygame
 from pygame.locals import *
 from actor import Player, EnemyOne, EnemyTwo, EnemyThree
@@ -28,7 +30,12 @@ class SurvGame:
         self.font = pygame.font.SysFont('Arial', 24)
         self.spawn_delay = 2000
 
-        self.P1 = Player()
+        # Add units from JSON file
+        unitdatafile = open(os.path.join('data', 'unitdata.json'), 'r')
+        unitdata = json.loads(str(unitdatafile.read()))
+        unitdatafile.close()
+
+        self.P1 = Player(unitdata['Char1'])
 
         self.all_sprites = pygame.sprite.Group()
         self.actors = pygame.sprite.Group()
@@ -118,7 +125,9 @@ class SurvGame:
             for bullet in bullets:
                 proj_hits = pygame.sprite.spritecollide(bullet, self.enemies, False)
                 for enemy in proj_hits:
-                    if enemy.take_damage(bullet.get_damage()):
+                    crit_chance = self.P1.get_crit_chance()
+                    crit_mod = self.P1.get_crit_mod()
+                    if enemy.take_damage(bullet.get_damage(crit_chance, crit_mod)):
                         print('Enemy killed!')
                         enemy_pos = enemy.get_pos()
                         hp_chance = random.randint(1, 100)

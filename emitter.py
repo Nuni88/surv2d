@@ -32,18 +32,18 @@ class Emitter(pygame.sprite.Sprite):
             if bullet.out_of_bounds():
                 self.bullets.remove(bullet)
 
-    def shoot(self):
+    def shoot(self, mods):
         pass
 
     def get_bullets(self) -> list:
         return self.bullets
 
-    def update_timers(self, ms):
+    def update_timers(self, ms, mods):
         for bullet in self.bullets:
             bullet.update_timers(ms)
         self.shot_timer += ms
         if self.shot_timer >= self.delay:
-            self.shoot()
+            self.shoot(mods)
             self.shot_timer -= self.delay
 
 
@@ -51,8 +51,8 @@ class FireShooter(Emitter):
     def __init__(self, pos, acc_mod):
         super().__init__(pos, acc_mod)
 
-    def shoot(self):
-        bullet = Fireball(self.rect.center + vec(-50, 0), self.acc_mod)
+    def shoot(self, mods):
+        bullet = Fireball(self.rect.center + vec(-50, 0), self.acc_mod, mods)
         self.bullets.append(bullet)
         print(f'Fire! Bullets fired: {len(self.bullets)}')
 
@@ -61,8 +61,8 @@ class LitShooter(Emitter):
     def __init__(self, pos, acc_mod):
         super().__init__(pos, acc_mod)
 
-    def shoot(self):
-        bullet = Lightning(self.rect.center, self.acc_mod)
+    def shoot(self, mods):
+        bullet = Lightning(self.rect.center, self.acc_mod, mods)
         self.bullets.append(bullet)
         print(f'Lit! Bullets lited: {len(self.bullets)}')
 
@@ -75,21 +75,9 @@ class IceShooter(Emitter):
         self.proj_dur = 3000
         self.max_proj = 6
 
-    def shoot(self):
-        bullet = Iceball(self.rect.center, self.acc_mod)
+    def shoot(self, mods):
+        bullet = Iceball(self.rect.center, self.acc_mod, mods)
         self.bullets.append(bullet)
         if len(self.bullets) > self.max_proj:
             self.bullets = self.bullets[1::]
         print(f'Ice! Bullets iced: {len(self.bullets)}')
-
-    def update_timers(self, ms):
-        super().update_timers(ms)
-
-        '''
-        # Destroy old projectiles
-        self.life_timer += ms
-        if self.life_timer >= self.proj_dur:
-            if self.bullets:
-                self.bullets = self.bullets[1::]
-            self.life_timer -= self.proj_dur
-        '''

@@ -1,0 +1,23 @@
+{
+	"Char1": {
+		"name": "Char1",
+		"desc": "First character.",
+		"stats": {
+			"MaxHealth": 100,
+			"CritChance": 10,
+			"AttackSpeed": 1.0,
+			"MoveSpeed": 1.5,
+			"JumpHeight": 15,
+			"InvulDuration": 0.4
+		},
+		"mods": {
+			"Damage": 2.0,
+			"CritDamage": 2.0,
+			"ProjSpeed": 1.0,
+			"WeaponArea": 1.0,
+			"NumProjectiles": 1.0
+		},
+		"frame_left": "images\\player\\player_left.gif",
+		"frame_right": "images\\player\\player_right.gif"
+	}
+}
