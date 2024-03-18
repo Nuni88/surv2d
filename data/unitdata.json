@@ -11,7 +11,7 @@
 			"InvulDuration": 0.4
 		},
 		"mods": {
-			"Damage": 2.0,
+			"Damage": 5.0,
 			"CritDamage": 2.0,
 			"ProjSpeed": 1.0,
 			"WeaponArea": 1.0,

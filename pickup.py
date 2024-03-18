@@ -24,8 +24,10 @@ class ExpPickup(Pickup):
         super().__init__(pos, surf)
         self.value = 0
 
+    '''
     def collect(self, player):
         player.gain_exp(self.value)
+    '''
 
 
 class ExpSmall(ExpPickup):

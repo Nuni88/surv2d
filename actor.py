@@ -48,10 +48,9 @@ class Player(Actor):
         self.mods = chardata['mods']
         self.frame_left = chardata['frame_left']
         self.frame_right = chardata['frame_right']
-
         self.health = self.stats['MaxHealth']
-        self.level = 1
-        self.exp = 0
+        # self.level = 1
+        # self.exp = 0
 
         self.jumping = False
         self.midair_jumping = False
@@ -168,16 +167,23 @@ class Player(Actor):
     def get_scroll_dist(self) -> float:
         return self.vel.x + 0.5 * self.acc.x
 
-    def gain_exp(self, amt):
+    '''
+    def gain_exp(self, amt) -> bool:
         self.exp += amt
         print(f'Player XP: {self.exp}')
         if self.exp >= 100:
             print('Level up!')
             self.level += 1
             self.exp -= 100
+            return True
+        return False
+    '''
 
     def gain_stat_bonus(self, stat, amt):
-        self.stats[stat] += amt
+        if stat in self.stats:
+            self.stats[stat] += amt
+        elif stat in self.mods:
+            self.mods[stat] += amt
         print(f'Player {stat} went up by {amt}!')
         if stat == 'MaxHealth':
             self.heal(amt)
