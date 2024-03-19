@@ -3,7 +3,8 @@ import os
 import random
 from pygame.locals import *
 from emitter import FireShooter, LitShooter, IceShooter
-from constants import ACC, FRIC, WIDTH, HEIGHT, MOVE_EDGE_LEFT, MOVE_EDGE_RIGHT, GRAVITY
+from constants import ACC, FRIC, WIDTH, HEIGHT, MOVE_EDGE_LEFT, MOVE_EDGE_RIGHT, GRAVITY,\
+                      MAXHP, CRITC, CRITD, MSPD, JUMPH, INVUL
 
 vec = pygame.math.Vector2
 
@@ -48,7 +49,7 @@ class Player(Actor):
         self.mods = chardata['mods']
         self.frame_left = chardata['frame_left']
         self.frame_right = chardata['frame_right']
-        self.health = self.stats['MaxHealth']
+        self.health = self.stats[MAXHP]
         # self.level = 1
         # self.exp = 0
 
@@ -72,10 +73,10 @@ class Player(Actor):
         self.acc = vec(0, GRAVITY)
         pressed_keys = pygame.key.get_pressed()
         if pressed_keys[K_LEFT]:
-            self.acc.x = -ACC * self.stats['MoveSpeed']
+            self.acc.x = -ACC * self.stats[MSPD]
             self.surf = pygame.image.load(self.frame_left)
         if pressed_keys[K_RIGHT]:
-            self.acc.x = ACC * self.stats['MoveSpeed']
+            self.acc.x = ACC * self.stats[MSPD]
             self.surf = pygame.image.load(self.frame_right)
         self.shooters[0].move(self.rect.center)
         self.shooters[1].move(self.rect.topright)
@@ -111,13 +112,13 @@ class Player(Actor):
     def jump(self):
         if not self.jumping:
             self.jumping = True
-            self.vel.y = -self.stats['JumpHeight']
+            self.vel.y = -self.stats[JUMPH]
             # self.jump_sfx.play()
 
     def midair_jump(self):
         if not self.midair_jumping:
             self.midair_jumping = True
-            self.vel.y = -self.stats['JumpHeight'] / 2
+            self.vel.y = -self.stats[JUMPH] / 2
             # self.jump_sfx.play()
 
     def cancel_jump(self):
@@ -143,7 +144,7 @@ class Player(Actor):
         # Turn player invincibility off and reset invulnerability tracking
         if self.invincible:
             self.invul_timer += ms
-            if self.invul_timer >= self.stats['InvulDuration'] * 1000:
+            if self.invul_timer >= self.stats[INVUL] * 1000:
                 self.invincible = False
                 self.invul_timer = 0
         for shooter in self.shooters:
@@ -185,35 +186,37 @@ class Player(Actor):
         elif stat in self.mods:
             self.mods[stat] += amt
         print(f'Player {stat} went up by {amt}!')
-        if stat == 'MaxHealth':
+        if stat == MAXHP:
             self.heal(amt)
 
     def heal(self, amt):
         if amt > 0:
             self.health += amt
-        if self.health > self.stats['MaxHealth']:
-            self.health = self.stats['MaxHealth']
+        if self.health > self.stats[MAXHP]:
+            self.health = self.stats[MAXHP]
 
     def heal_percent(self, mod):
         if mod > 0:
-            self.health += int(self.stats['MaxHealth'] * mod)
-        if self.health > self.stats['MaxHealth']:
-            self.health = self.stats['MaxHealth']
+            self.health += int(self.stats[MAXHP] * mod)
+        if self.health > self.stats[MAXHP]:
+            self.health = self.stats[MAXHP]
 
+    '''
     def get_level(self) -> int:
         return self.level
 
     def get_exp(self) -> int:
         return self.exp
+    '''
 
     def get_max_health(self) -> int:
-        return self.stats['MaxHealth']
+        return self.stats[MAXHP]
 
     def get_crit_chance(self) -> int:
-        return self.stats['CritChance']
+        return self.stats[CRITC]
 
     def get_crit_mod(self) -> float:
-        return self.mods['CritDamage']
+        return self.mods[CRITD]
 
 
 class Enemy(Actor):

@@ -1,5 +1,6 @@
 import os
 import pygame
+from constants import MAXHP
 
 
 class Pickup(pygame.sprite.Sprite):
@@ -54,7 +55,7 @@ class MaxHealthPickup(Pickup):
         self.value = 10
 
     def collect(self, player):
-        player.gain_stat_bonus('MaxHealth', self.value)
+        player.gain_stat_bonus(MAXHP, self.value)
 
 
 class HealthPickup(Pickup):

@@ -10,7 +10,7 @@ from platform import Platform
 from pickup import ExpPickup, ExpSmall, ExpMed, ExpLarge, MaxHealthPickup, HealthPickup
 from menu import Menu
 from cursor import Cursor
-from constants import WIDTH, HEIGHT, FPS, MAX_TIME, LEVEL_UP_OPTIONS, LEVEL_UP_BONUSES
+from constants import WIDTH, HEIGHT, FPS, MAX_TIME, LEVEL_OPTIONS, LEVEL_BONUSES
 
 vec = pygame.math.Vector2
 
@@ -42,6 +42,7 @@ class SurvGame:
         self.P1 = Player(unitdata['Char1'])
         self.p_exp = 0
         self.p_level = 1
+        self.to_next_level = 100
 
         self.all_sprites = pygame.sprite.Group()
         self.actors = pygame.sprite.Group()
@@ -67,6 +68,8 @@ class SurvGame:
         self.all_sprites.add(self.P1)
         self.actors.add(self.P1)
 
+        pygame.mouse.set_visible(False)
+
     def spawn_enemy(self, enemy_type):
         enemy = enemy_type()
         self.all_sprites.add(enemy)
@@ -75,14 +78,15 @@ class SurvGame:
 
     def show_level_up_menu(self):
         self.p_level += 1
-        self.p_exp -= 100
+        self.p_exp -= self.to_next_level
+        self.to_next_level += 50
         options = []
-        opts_len = len(LEVEL_UP_OPTIONS)
+        opts_len = len(LEVEL_OPTIONS)
         while len(options) < 4:
             roll = random.randint(0, opts_len - 1)
-            if LEVEL_UP_OPTIONS[roll] not in options:
-                options.append(LEVEL_UP_OPTIONS[roll])
-                print(f'{LEVEL_UP_OPTIONS[roll]}')
+            if LEVEL_OPTIONS[roll] not in options:
+                options.append(LEVEL_OPTIONS[roll])
+                print(f'{LEVEL_OPTIONS[roll]}')
         self.menu = Menu(options, vec(WIDTH / 2, HEIGHT / 2))
         self.all_sprites.add(self.menu)
         self.all_sprites.add(self.cursor)
@@ -117,13 +121,11 @@ class SurvGame:
                             menu_hit = pygame.sprite.collide_rect(self.cursor, self.menu)
                             if menu_hit:
                                 option = self.menu.get_option(self.cursor)
-                                print(f'{option}')
-                                if option != '':
-                                    print(option)
-                                    self.P1.gain_stat_bonus(option, LEVEL_UP_BONUSES[option])
-                                    self.menu.kill()
-                                    self.menu = None
-                                    self.cursor.kill()
+                                print(option)
+                                self.P1.gain_stat_bonus(option, LEVEL_BONUSES[option])
+                                self.menu.kill()
+                                self.menu = None
+                                self.cursor.kill()
                 self.cursor.move()
             else:
                 self.P1.move()
@@ -147,10 +149,9 @@ class SurvGame:
                 pickup_hits = pygame.sprite.spritecollide(self.P1, self.pickups, False)
                 if pickup_hits:
                     for pickup in pickup_hits:
-                        # if type(pickup) == ExpPickup:
                         if isinstance(pickup, ExpPickup):
                             self.p_exp += pickup.get_value()
-                            if self.p_exp >= 100:
+                            if self.p_exp >= self.to_next_level:
                                 self.show_level_up_menu()
                         else:
                             pickup.collect(self.P1)
@@ -230,8 +231,11 @@ class SurvGame:
                 seconds = '0' + str(seconds)
 
             text_time = self.font.render(f'Time: {minutes}:{seconds}', False, (0, 0, 0))
-            text_health = self.font.render(f'Health: {self.P1.get_health()}/{self.P1.get_max_health()}', False, (0, 0, 0))
-            text_level = self.font.render(f'Level: {self.p_level} [{self.p_exp}%]', False, (0, 0, 0))
+            hp = self.P1.get_health()
+            mhp = self.P1.get_max_health()
+            text_health = self.font.render(f'Health: {hp}/{mhp}', False, (0, 0, 0))
+            level_pct = round(100 * self.p_exp / self.to_next_level, 2)
+            text_level = self.font.render(f'Level: {self.p_level} [{level_pct}%]', False, (0, 0, 0))
 
             for entity in self.all_sprites:
                 self.displaysurface.blit(entity.surf, entity.rect)
