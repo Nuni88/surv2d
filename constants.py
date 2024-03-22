@@ -1,5 +1,4 @@
 import math
-import enum
 
 HEIGHT = 500
 WIDTH = 500
@@ -19,7 +18,7 @@ MENU_BUTTON_HEIGHT = 23
 MENU_BUTTON_WIDTH = 135
 
 # Stats
-MAXHP = 'MaxHP'
+MAXHP = 'Max HP'
 CRITC = 'Crit Chance'
 ASPD = 'Attack Speed'
 MSPD = 'Move Speed'

@@ -3,19 +3,52 @@
 		"name": "Char1",
 		"desc": "First character.",
 		"stats": {
-			"MaxHP": 100,
-			"Crit Chance": 10,
-			"Attack Speed": 1.0,
-			"Move Speed": 1.5,
-			"Jump Height": 15,
-			"Invulnerability": 0.4
+			"Max HP": {
+				"value": 100,
+				"level": 1
+			},
+			"Crit Chance": {
+				"value": 10,
+				"level": 1
+			},
+			"Attack Speed": {
+				"value": 1.0,
+				"level": 1
+			},
+			"Move Speed": {
+				"value": 1.5,
+				"level": 1
+			},
+			"Jump Height": {
+				"value": 15,
+				"level": 1
+			},
+			"Invulnerability": {
+				"value": 0.4,
+				"level": 1
+			}
 		},
 		"mods": {
-			"Damage": 5.0,
-			"Crit Damage": 2.0,
-			"Projectile Speed": 1.0,
-			"Weapon Size": 1.0,
-			"Projectile Count": 1.0
+			"Damage": {
+				"value": 5.0,
+				"level": 1
+			},
+			"Crit Damage": {
+				"value": 2.0,
+				"level": 1
+			},
+			"Projectile Speed": {
+				"value": 1.0,
+				"level": 1
+			},
+			"Weapon Size": {
+				"value": 1.0,
+				"level": 1
+			},
+			"Projectile Count": {
+				"value": 1.0,
+				"level": 1
+			}
 		},
 		"frame_left": "images\\player\\player_left.gif",
 		"frame_right": "images\\player\\player_right.gif"

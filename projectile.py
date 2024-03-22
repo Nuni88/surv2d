@@ -47,11 +47,12 @@ class Projectile(pygame.sprite.Sprite):
 
 class Fireball(Projectile):
     def __init__(self, pos, acc_mod, mods):
-        super().__init__(pos, acc_mod, pygame.image.load(os.path.join('images\\projectiles', 'fire.png')), mods[PROJSZ])
+        surf = pygame.image.load(os.path.join('images\\projectiles', 'fire.png'))
+        super().__init__(pos, acc_mod, surf, mods[PROJSZ]['value'])
         self.acc_angle = ACC_ANGLE
         self.acc = vec(0, -0.1)
         self.vel = vec(0, -0.1)
-        self.damage = int(1 * mods[DMG])
+        self.damage = int(1 * mods[DMG]['value'])
         self.crit = 20
         self.speed_mod = 0.001
         self.rot_delay = 20
@@ -82,20 +83,22 @@ class Fireball(Projectile):
 
 class Iceball(Projectile):
     def __init__(self, pos, acc_mod, mods):
-        super().__init__(pos, acc_mod, pygame.image.load(os.path.join('images\\projectiles', 'ice.png')), mods[PROJSZ])
+        surf = pygame.image.load(os.path.join('images\\projectiles', 'ice.png'))
+        super().__init__(pos, acc_mod, surf, mods[PROJSZ]['value'])
         self.acc = vec(0, 0)
-        self.damage = int(5 * mods[DMG])
+        self.damage = int(5 * mods[DMG]['value'])
         self.crit = 0
 
 
 class Lightning(Projectile):
     def __init__(self, pos, acc_mod, mods):
-        super().__init__(pos, acc_mod, pygame.image.load(os.path.join('images\\projectiles', 'lit.png')), mods[PROJSZ])
+        surf = pygame.image.load(os.path.join('images\\projectiles', 'lit.png'))
+        super().__init__(pos, acc_mod, surf, mods[PROJSZ]['value'])
         self.acc = vec(0.1, 0.1)
         self.acc.x *= acc_mod.x
         self.acc.y *= acc_mod.y
-        self.acc *= mods[PROJSPD]
-        self.damage = int(2 * mods[DMG])
+        self.acc *= mods[PROJSPD]['value']
+        self.damage = int(2 * mods[DMG]['value'])
         self.crit = 10
 
     def update_timers(self, ms):

@@ -49,9 +49,7 @@ class Player(Actor):
         self.mods = chardata['mods']
         self.frame_left = chardata['frame_left']
         self.frame_right = chardata['frame_right']
-        self.health = self.stats[MAXHP]
-        # self.level = 1
-        # self.exp = 0
+        self.health = self.stats[MAXHP]['value']
 
         self.jumping = False
         self.midair_jumping = False
@@ -73,10 +71,10 @@ class Player(Actor):
         self.acc = vec(0, GRAVITY)
         pressed_keys = pygame.key.get_pressed()
         if pressed_keys[K_LEFT]:
-            self.acc.x = -ACC * self.stats[MSPD]
+            self.acc.x = -ACC * self.stats[MSPD]['value']
             self.surf = pygame.image.load(self.frame_left)
         if pressed_keys[K_RIGHT]:
-            self.acc.x = ACC * self.stats[MSPD]
+            self.acc.x = ACC * self.stats[MSPD]['value']
             self.surf = pygame.image.load(self.frame_right)
         self.shooters[0].move(self.rect.center)
         self.shooters[1].move(self.rect.topright)
@@ -112,13 +110,13 @@ class Player(Actor):
     def jump(self):
         if not self.jumping:
             self.jumping = True
-            self.vel.y = -self.stats[JUMPH]
+            self.vel.y = -self.stats[JUMPH]['value']
             # self.jump_sfx.play()
 
     def midair_jump(self):
         if not self.midair_jumping:
             self.midair_jumping = True
-            self.vel.y = -self.stats[JUMPH] / 2
+            self.vel.y = -self.stats[JUMPH]['value'] / 2
             # self.jump_sfx.play()
 
     def cancel_jump(self):
@@ -144,7 +142,7 @@ class Player(Actor):
         # Turn player invincibility off and reset invulnerability tracking
         if self.invincible:
             self.invul_timer += ms
-            if self.invul_timer >= self.stats[INVUL] * 1000:
+            if self.invul_timer >= self.stats[INVUL]['value'] * 1000:
                 self.invincible = False
                 self.invul_timer = 0
         for shooter in self.shooters:
@@ -168,38 +166,31 @@ class Player(Actor):
     def get_scroll_dist(self) -> float:
         return self.vel.x + 0.5 * self.acc.x
 
-    '''
-    def gain_exp(self, amt) -> bool:
-        self.exp += amt
-        print(f'Player XP: {self.exp}')
-        if self.exp >= 100:
-            print('Level up!')
-            self.level += 1
-            self.exp -= 100
-            return True
-        return False
-    '''
-
     def gain_stat_bonus(self, stat, amt):
         if stat in self.stats:
-            self.stats[stat] += amt
+            self.stats[stat]['value'] += amt
+            self.stats[stat]['level'] += 1
+            print(f'Player {stat} went up by {amt}!')
+            print(f'{stat} is now level {self.stats[stat]["level"]}!')
         elif stat in self.mods:
-            self.mods[stat] += amt
-        print(f'Player {stat} went up by {amt}!')
+            self.mods[stat]['value'] += amt
+            self.mods[stat]['level'] += 1
+            print(f'Player {stat} went up by {amt}!')
+            print(f'{stat} is now level {self.mods[stat]["level"]}!')
         if stat == MAXHP:
             self.heal(amt)
 
     def heal(self, amt):
         if amt > 0:
             self.health += amt
-        if self.health > self.stats[MAXHP]:
-            self.health = self.stats[MAXHP]
+        if self.health > self.stats[MAXHP]['value']:
+            self.health = self.stats[MAXHP]['value']
 
     def heal_percent(self, mod):
         if mod > 0:
-            self.health += int(self.stats[MAXHP] * mod)
-        if self.health > self.stats[MAXHP]:
-            self.health = self.stats[MAXHP]
+            self.health += int(self.stats[MAXHP]['value'] * mod)
+        if self.health > self.stats[MAXHP]['value']:
+            self.health = self.stats[MAXHP]['value']
 
     '''
     def get_level(self) -> int:
@@ -210,13 +201,13 @@ class Player(Actor):
     '''
 
     def get_max_health(self) -> int:
-        return self.stats[MAXHP]
+        return self.stats[MAXHP]['value']
 
     def get_crit_chance(self) -> int:
-        return self.stats[CRITC]
+        return self.stats[CRITC]['value']
 
     def get_crit_mod(self) -> float:
-        return self.mods[CRITD]
+        return self.mods[CRITD]['value']
 
 
 class Enemy(Actor):
