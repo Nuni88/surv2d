@@ -23,6 +23,7 @@ CRITC = 'Crit Chance'
 ASPD = 'Attack Speed'
 MSPD = 'Move Speed'
 JUMPH = 'Jump Height'
+DODGE = 'Dodge Cooldown'
 INVUL = 'Invulnerability'
 DMG = 'Damage'
 CRITD = 'Crit Damage'
@@ -36,6 +37,7 @@ LEVEL_OPTIONS = [
     ASPD,
     MSPD,
     JUMPH,
+    DODGE,
     INVUL,
     DMG,
     CRITD,
@@ -50,6 +52,7 @@ LEVEL_BONUSES = {
     ASPD: 0.05,
     MSPD: 0.05,
     JUMPH: 1,
+    DODGE: -0.05,
     INVUL: 0.01,
     DMG: 0.05,
     CRITD: 0.1,

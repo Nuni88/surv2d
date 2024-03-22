@@ -23,8 +23,12 @@
 				"value": 15,
 				"level": 1
 			},
+			"Dodge Cooldown": {
+				"value": 3.0,
+				"level": 1
+			},
 			"Invulnerability": {
-				"value": 0.4,
+				"value": 0.5,
 				"level": 1
 			}
 		},
@@ -51,6 +55,7 @@
 			}
 		},
 		"frame_left": "images\\player\\player_left.gif",
-		"frame_right": "images\\player\\player_right.gif"
+		"frame_right": "images\\player\\player_right.gif",
+		"frame_dodge": "images\\player\\player_dodge.gif"
 	}
 }

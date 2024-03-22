@@ -48,6 +48,7 @@ class SurvGame:
         self.actors = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
         self.platforms = pygame.sprite.Group()
+        self.walls = pygame.sprite.Group()
         self.pickups = pygame.sprite.Group()
 
         self.floor = Platform(vec(WIDTH / 2, HEIGHT), 'plat_floor.png')
@@ -60,6 +61,17 @@ class SurvGame:
             plat = Platform(vec(WIDTH * i - WIDTH / 2, HEIGHT * 0.50), 'plat_med.png')
             self.all_sprites.add(plat)
             self.platforms.add(plat)
+            plat = Platform(vec(WIDTH * i - WIDTH / 2, HEIGHT * 0.26), 'plat_med.png')
+            self.all_sprites.add(plat)
+            self.platforms.add(plat)
+
+        for i in range(-20, 20):
+            plat = Platform(vec(WIDTH * i - WIDTH * 0.32, HEIGHT * 0.38), 'wall_med.png')
+            self.all_sprites.add(plat)
+            self.walls.add(plat)
+            plat = Platform(vec(WIDTH * i - WIDTH * 0.68, HEIGHT * 0.38), 'wall_med.png')
+            self.all_sprites.add(plat)
+            self.walls.add(plat)
 
         heart = MaxHealthPickup(vec(WIDTH / 2, HEIGHT * 0.50 - 20))
         self.all_sprites.add(heart)
@@ -144,6 +156,8 @@ class SurvGame:
                         pickup.scroll(mod)
                     for plat in self.platforms:
                         plat.scroll(mod)
+                    for wall in self.walls:
+                        wall.scroll(mod)
 
                 # Handle player grabbing pickups
                 pickup_hits = pygame.sprite.spritecollide(self.P1, self.pickups, False)
@@ -197,6 +211,9 @@ class SurvGame:
                                 self.P1.jump()
                             else:
                                 self.P1.midair_jump()
+                        if event.key == pygame.K_r:
+                            if plat_hits:
+                                self.P1.dodge()
                     '''
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_f:

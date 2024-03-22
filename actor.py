@@ -4,7 +4,7 @@ import random
 from pygame.locals import *
 from emitter import FireShooter, LitShooter, IceShooter
 from constants import ACC, FRIC, WIDTH, HEIGHT, MOVE_EDGE_LEFT, MOVE_EDGE_RIGHT, GRAVITY,\
-                      MAXHP, CRITC, CRITD, MSPD, JUMPH, INVUL
+                      MAXHP, CRITC, CRITD, MSPD, JUMPH, DODGE, INVUL
 
 vec = pygame.math.Vector2
 
@@ -49,10 +49,13 @@ class Player(Actor):
         self.mods = chardata['mods']
         self.frame_left = chardata['frame_left']
         self.frame_right = chardata['frame_right']
+        self.frame_dodge = chardata['frame_dodge']
         self.health = self.stats[MAXHP]['value']
 
         self.jumping = False
         self.midair_jumping = False
+        self.dodging = False
+        self.dodge_timer = 0
         self.invincible = False
         self.invul_timer = 0
 
@@ -76,6 +79,8 @@ class Player(Actor):
         if pressed_keys[K_RIGHT]:
             self.acc.x = ACC * self.stats[MSPD]['value']
             self.surf = pygame.image.load(self.frame_right)
+        if self.dodging and self.invincible:
+            self.surf = pygame.image.load(self.frame_dodge)
         self.shooters[0].move(self.rect.center)
         self.shooters[1].move(self.rect.topright)
         self.shooters[2].move(self.rect.bottomright)
@@ -123,6 +128,13 @@ class Player(Actor):
         if self.jumping and self.vel.y < -3:
             self.vel.y = -3
 
+    def dodge(self):
+        if not self.dodging:
+            print('Dodged!')
+            self.dodging = True
+            self.invincible = True
+            self.move()
+
     def take_hit(self, enemy):
         if enemy.damage > 0:
             if not self.invincible:
@@ -138,13 +150,23 @@ class Player(Actor):
         return bullets
 
     def update_timers(self, ms):
-        # Invulnerability wears off after InvulDuration seconds
+        # Time between dodges determined by dodge stat
+        # Turn dodge cooldown off and reset tracking
+        if self.dodging:
+            self.dodge_timer += ms
+            if self.dodge_timer >= self.stats[DODGE]['value'] * 1000:
+                self.dodging = False
+                self.dodge_timer = 0
+
+        # Invulnerability wears off after seconds determined by invulnerability stat
         # Turn player invincibility off and reset invulnerability tracking
         if self.invincible:
             self.invul_timer += ms
             if self.invul_timer >= self.stats[INVUL]['value'] * 1000:
                 self.invincible = False
                 self.invul_timer = 0
+                if self.dodging:
+                    self.surf = pygame.image.load(self.frame_left)
         for shooter in self.shooters:
             shooter.update_timers(ms, self.mods)
 
@@ -236,7 +258,7 @@ class Enemy(Actor):
 
     def take_damage(self, amt) -> bool:
         if amt > 0:
-            print(f'Enemy took {amt} damage.')
+            # print(f'Enemy took {amt} damage.')
             self.health -= amt
             if self.health <= 0:
                 return True
