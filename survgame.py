@@ -30,7 +30,7 @@ class SurvGame:
         self.displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont('Arial', 24)
-        self.spawn_delay = 2000
+        self.spawn_delay = 200000
         self.menu = None
         self.cursor = Cursor()
 
@@ -48,7 +48,6 @@ class SurvGame:
         self.actors = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
         self.platforms = pygame.sprite.Group()
-        self.walls = pygame.sprite.Group()
         self.pickups = pygame.sprite.Group()
 
         self.floor = Platform(vec(WIDTH / 2, HEIGHT), 'plat_floor.png')
@@ -68,10 +67,10 @@ class SurvGame:
         for i in range(-20, 20):
             plat = Platform(vec(WIDTH * i - WIDTH * 0.32, HEIGHT * 0.38), 'wall_med.png')
             self.all_sprites.add(plat)
-            self.walls.add(plat)
+            self.platforms.add(plat)
             plat = Platform(vec(WIDTH * i - WIDTH * 0.68, HEIGHT * 0.38), 'wall_med.png')
             self.all_sprites.add(plat)
-            self.walls.add(plat)
+            self.platforms.add(plat)
 
         heart = MaxHealthPickup(vec(WIDTH / 2, HEIGHT * 0.50 - 20))
         self.all_sprites.add(heart)
@@ -141,13 +140,12 @@ class SurvGame:
                 self.cursor.move()
             else:
                 self.P1.move()
-                mod = self.P1.get_scroll_dist()
-                self.floor.scroll(-mod)
                 for enemy in self.enemies:
                     enemy.move_to(self.P1)
 
                 # Scroll the screen
                 if self.P1.out_of_bounds():
+                    mod = self.P1.get_scroll_dist()
                     for enemy in self.enemies:
                         enemy.scroll(mod)
                     for bullet in bullets:
@@ -156,8 +154,6 @@ class SurvGame:
                         pickup.scroll(mod)
                     for plat in self.platforms:
                         plat.scroll(mod)
-                    for wall in self.walls:
-                        wall.scroll(mod)
 
                 # Handle player grabbing pickups
                 pickup_hits = pygame.sprite.spritecollide(self.P1, self.pickups, False)
@@ -174,8 +170,9 @@ class SurvGame:
                 # Handle player landing
                 plat_hits = pygame.sprite.spritecollide(self.P1, self.platforms, False)
                 if plat_hits:
-                    self.P1.land(plat_hits[0])
-                    # self.P1.land(plat_hits[0].rect.top)
+                    # self.P1.handle_platform_collision(plat_hits[0])
+                    for plat in plat_hits:
+                        self.P1.handle_platform_collision(plat)
 
                 # Handle damage from enemies
                 enemy_hits = pygame.sprite.spritecollide(self.P1, self.enemies, False)
@@ -223,10 +220,7 @@ class SurvGame:
                         if event.key == pygame.K_SPACE:
                             self.P1.cancel_jump()
 
-                # Check if time is over
-                game_time = MAX_TIME - int(pygame.time.get_ticks() / 1000)
-                if game_time == 0:
-                    return
+                self.floor.recenter(self.P1)
 
                 # Update timers
                 self.P1.update_timers(time_update)
@@ -238,6 +232,11 @@ class SurvGame:
                     spawn_timer -= self.spawn_delay
 
             self.displaysurface.fill((200, 200, 200))
+
+            # Check if time is over
+            game_time = MAX_TIME - int(pygame.time.get_ticks() / 1000)
+            if game_time == 0:
+                return
 
             # Display timer as MM:SS
             minutes = int(game_time / 60)

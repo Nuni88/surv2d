@@ -37,7 +37,7 @@ class Projectile(pygame.sprite.Sprite):
     def get_damage(self, crit_chance, crit_mod) -> int:
         roll = random.randint(0, 99)
         if roll < crit_chance + self.crit:
-            print('Critical hit!')
+            # print('Critical hit!')
             return int(self.damage * crit_mod)
         return self.damage
 

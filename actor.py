@@ -89,9 +89,9 @@ class Player(Actor):
         self.vel += self.acc
         self.pos += self.vel + 0.5 * self.acc
 
-        if self.scroll_left():
+        if self.pos.x < MOVE_EDGE_LEFT:
             self.pos.x = MOVE_EDGE_LEFT
-        elif self.scroll_right():
+        elif self.pos.x > MOVE_EDGE_RIGHT:
             self.pos.x = MOVE_EDGE_RIGHT
 
         self.rect.midbottom = self.pos
@@ -100,17 +100,30 @@ class Player(Actor):
         for shooter in self.shooters:
             shooter.shoot(self.mods)
 
-    def land(self, plat):
-        # Player is below platform
-        if self.rect.top >= plat.rect.top:
-            self.rect.top = plat.rect.bottom + 1
-            self.vel.y = -self.vel.y
-        # Player is above platform
-        elif self.vel.y > 0:
-            self.pos.y = plat.rect.top
-            self.vel.y = 0
-            self.jumping = False
-            self.midair_jumping = False
+    def handle_platform_collision(self, plat):
+        if plat.rect.top <= self.rect.top and self.rect.bottom <= plat.rect.bottom:
+            # Moving left
+            if self.vel.x < 0:
+                self.rect.left = plat.rect.right
+                self.vel.x = 0
+            # Moving right
+            elif self.vel.x > 0:
+                self.rect.right = plat.rect.left
+                self.vel.x = 0
+
+        if plat.rect.left <= self.rect.left and self.rect.right <= plat.rect.right:
+            # Moving up
+            if self.vel.y < 0:
+                self.rect.top = plat.rect.bottom
+                self.vel.y = 0
+            # Moving down
+            elif self.vel.y > 0:
+                self.rect.bottom = plat.rect.top
+                self.jumping = False
+                self.midair_jumping = False
+                self.vel.y = 0
+
+        self.pos = self.rect.midbottom
 
     def jump(self):
         if not self.jumping:
@@ -170,20 +183,8 @@ class Player(Actor):
         for shooter in self.shooters:
             shooter.update_timers(ms, self.mods)
 
-    def scroll_left(self) -> bool:
-        if self.pos.x < MOVE_EDGE_LEFT:
-            return True
-        return False
-
-    def scroll_right(self) -> bool:
-        if self.pos.x > MOVE_EDGE_RIGHT:
-            return True
-        return False
-
     def out_of_bounds(self) -> bool:
-        if MOVE_EDGE_LEFT < self.pos.x < MOVE_EDGE_RIGHT:
-            return False
-        return True
+        return not (MOVE_EDGE_LEFT < self.pos.x < MOVE_EDGE_RIGHT)
 
     def get_scroll_dist(self) -> float:
         return self.vel.x + 0.5 * self.acc.x
@@ -213,14 +214,6 @@ class Player(Actor):
             self.health += int(self.stats[MAXHP]['value'] * mod)
         if self.health > self.stats[MAXHP]['value']:
             self.health = self.stats[MAXHP]['value']
-
-    '''
-    def get_level(self) -> int:
-        return self.level
-
-    def get_exp(self) -> int:
-        return self.exp
-    '''
 
     def get_max_health(self) -> int:
         return self.stats[MAXHP]['value']

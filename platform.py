@@ -14,3 +14,7 @@ class Platform(pygame.sprite.Sprite):
     def scroll(self, offset):
         self.pos.x -= offset
         self.rect.midbottom = self.pos
+
+    def recenter(self, player):
+        self.pos.x = player.rect.centerx
+        self.rect.midbottom = self.pos
