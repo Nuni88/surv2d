@@ -6,7 +6,7 @@ import json
 import pygame
 from pygame.locals import *
 from actor import Player, EnemyOne, EnemyTwo, EnemyThree
-from platform import Platform
+from platform import Platform, WeapDoor
 from pickup import ExpPickup, ExpSmall, ExpMed, ExpLarge, MaxHealthPickup, HealthPickup
 from menu import Menu
 from cursor import Cursor
@@ -48,6 +48,7 @@ class SurvGame:
         self.actors = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
         self.platforms = pygame.sprite.Group()
+        self.doors = pygame.sprite.Group()
         self.pickups = pygame.sprite.Group()
 
         self.floor = Platform(vec(WIDTH / 2, HEIGHT), 'plat_floor.png')
@@ -68,9 +69,10 @@ class SurvGame:
             plat = Platform(vec(WIDTH * i - WIDTH * 0.32, HEIGHT * 0.38), 'wall_med.png')
             self.all_sprites.add(plat)
             self.platforms.add(plat)
-            plat = Platform(vec(WIDTH * i - WIDTH * 0.68, HEIGHT * 0.38), 'wall_med.png')
-            self.all_sprites.add(plat)
-            self.platforms.add(plat)
+            door = WeapDoor(vec(WIDTH * i - WIDTH * 0.68, HEIGHT * 0.38), 'wall_med.png', 'FireShooter', 0)
+            self.all_sprites.add(door)
+            self.doors.add(door)
+            self.platforms.add(door)
 
         heart = MaxHealthPickup(vec(WIDTH / 2, HEIGHT * 0.50 - 20))
         self.all_sprites.add(heart)
@@ -167,6 +169,13 @@ class SurvGame:
                             pickup.collect(self.P1)
                         pickup.kill()
 
+                # Handle opening locked doors
+                door_hits = pygame.sprite.spritecollide(self.P1, self.doors, False)
+                if door_hits:
+                    for door in door_hits:
+                        if door.unlockable(self.P1):
+                            door.kill()
+
                 # Handle player landing
                 plat_hits = pygame.sprite.spritecollide(self.P1, self.platforms, False)
                 if plat_hits:
@@ -257,6 +266,8 @@ class SurvGame:
                 self.displaysurface.blit(entity.surf, entity.rect)
             for bullet in bullets:
                 self.displaysurface.blit(bullet.surf, bullet.rect)
+            for door in self.doors:
+                door.display_lock()
             self.displaysurface.blit(text_time, (0, 0))
             self.displaysurface.blit(text_health, (0, 30))
             self.displaysurface.blit(text_level, (0, 60))

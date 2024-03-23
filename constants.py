@@ -1,4 +1,5 @@
 import math
+import os
 
 HEIGHT = 500
 WIDTH = 500
@@ -45,7 +46,6 @@ LEVEL_OPTIONS = [
     PROJSZ,
     PROJNUM
 ]
-
 LEVEL_BONUSES = {
     MAXHP: 10,
     CRITC: 0.05,
@@ -60,3 +60,26 @@ LEVEL_BONUSES = {
     PROJSZ: 0.05,
     PROJNUM: 0.1
 }
+
+LOCK_PATH = 'images\\environment\\locks'
+LOCK_IMG_PATHS = {
+    'FireShooter': os.path.join(LOCK_PATH, 'fire.png'),
+    'LitShooter': os.path.join(LOCK_PATH, 'lit.png'),
+    'IceShooter': os.path.join(LOCK_PATH, 'ice.png')
+}
+LOCK_NUM_PATHS = {
+    0: os.path.join(LOCK_PATH, 'lock_0.png'),
+    1: os.path.join(LOCK_PATH, 'lock_1.png'),
+    2: os.path.join(LOCK_PATH, 'lock_2.png')
+}
+
+
+'''
+    3: os.path.join(LOCK_PATH, 'lock_3.png'),
+    4: os.path.join(LOCK_PATH, 'lock_4.png'),
+    5: os.path.join(LOCK_PATH, 'lock_5.png'),
+    6: os.path.join(LOCK_PATH, 'lock_6.png'),
+    7: os.path.join(LOCK_PATH, 'lock_7.png'),
+    8: os.path.join(LOCK_PATH, 'lock_8.png'),
+    9: os.path.join(LOCK_PATH, 'lock_9.png')
+'''

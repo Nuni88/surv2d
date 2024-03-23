@@ -1,5 +1,6 @@
 import os
 import pygame
+from constants import LOCK_IMG_PATHS, LOCK_NUM_PATHS
 
 vec = pygame.math.Vector2
 
@@ -25,14 +26,28 @@ class Door(Platform):
         super().__init__(c, surf)
         self.lock_surf = None
         self.lock_lvl_surf = None
-        self.lock = {
-            'typ': 'Weapon',
-            'req': 'FireShooter',
-            'req_lvl': 5
-        }
+        self.lock = None
 
     def display_lock(self):
         pass
 
-    def can_unlock(self, player) -> bool:
+    def unlockable(self, player) -> bool:
         return False
+
+
+class WeapDoor(Door):
+    def __init__(self, c, surf, req, lvl):
+        super().__init__(c, surf)
+        self.lock_surf = pygame.image.load(LOCK_IMG_PATHS[req])
+        self.lock_lvl_surf = pygame.image.load(LOCK_NUM_PATHS[lvl])
+        self.lock = {
+            'req': req,
+            'req_lvl': lvl
+        }
+
+    def display_lock(self):
+        self.surf.blit(self.lock_surf, (self.rect.width * 0.25, self.rect.height * 0.4))
+        self.surf.blit(self.lock_lvl_surf, (self.rect.width * 0.3, self.rect.height * 0.6))
+
+    def unlockable(self, player) -> bool:
+        return True
