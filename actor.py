@@ -220,6 +220,15 @@ class Player(Actor):
                 return True
         return False
 
+    def has_req_stat(self, req, lvl) -> bool:
+        if req in self.stats:
+            if self.stats[req]['level'] >= lvl:
+                return True
+        elif req in self.mods:
+            if self.mods[req]['level'] >= lvl:
+                return True
+        return False
+
     def get_max_health(self) -> int:
         return self.stats[MAXHP]['value']
 

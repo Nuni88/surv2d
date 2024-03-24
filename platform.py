@@ -22,20 +22,6 @@ class Platform(pygame.sprite.Sprite):
 
 
 class Door(Platform):
-    def __init__(self, c, surf):
-        super().__init__(c, surf)
-        self.lock_surf = None
-        self.lock_lvl_surf = None
-        self.lock = None
-
-    def display_lock(self):
-        pass
-
-    def unlockable(self, player) -> bool:
-        return False
-
-
-class WeapDoor(Door):
     def __init__(self, c, surf, req, lvl):
         super().__init__(c, surf)
         self.lock_base_surf = pygame.image.load(LOCK_IMG_PATHS['Base'])
@@ -53,4 +39,20 @@ class WeapDoor(Door):
         self.surf.blit(self.lock_lvl_surf, (self.rect.width * 0.28, self.rect.height * 0.61))
 
     def unlockable(self, player) -> bool:
+        return False
+
+
+class WeapDoor(Door):
+    def __init__(self, c, surf, req, lvl):
+        super().__init__(c, surf, req, lvl)
+
+    def unlockable(self, player) -> bool:
         return player.has_req_weapon(self.lock['req'], self.lock['lvl'])
+
+
+class StatDoor(Door):
+    def __init__(self, c, surf, req, lvl):
+        super().__init__(c, surf, req, lvl)
+
+    def unlockable(self, player) -> bool:
+        return player.has_req_stat(self.lock['req'], self.lock['lvl'])

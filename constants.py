@@ -32,7 +32,7 @@ PROJSPD = 'Projectile Speed'
 PROJSZ = 'Weapon Size'
 PROJNUM = 'Projectile Count'
 
-LEVEL_OPTIONS = [
+STATS = [
     MAXHP,
     CRITC,
     ASPD,
@@ -66,8 +66,22 @@ LOCK_IMG_PATHS = {
     'Base': os.path.join(LOCK_PATH, 'lock_base.png'),
     'FireShooter': os.path.join(LOCK_PATH, 'fire.png'),
     'LitShooter': os.path.join(LOCK_PATH, 'lit.png'),
-    'IceShooter': os.path.join(LOCK_PATH, 'ice.png')
+    'IceShooter': os.path.join(LOCK_PATH, 'ice.png'),
+    MAXHP: os.path.join(LOCK_PATH, 'maxhp.png'),
+    CRITC: os.path.join(LOCK_PATH, 'critc.png'),
+    ASPD: os.path.join(LOCK_PATH, 'aspd.png'),
+    MSPD: os.path.join(LOCK_PATH, 'mspd.png'),
+    JUMPH: os.path.join(LOCK_PATH, 'jumph.png'),
+    DODGE: os.path.join(LOCK_PATH, 'dodge.png'),
+    INVUL: os.path.join(LOCK_PATH, 'invul.png'),
+    DMG: os.path.join(LOCK_PATH, 'dmg.png'),
+    CRITD: os.path.join(LOCK_PATH, 'critd.png'),
+    PROJSPD: os.path.join(LOCK_PATH, 'projspd.png'),
+    PROJSZ: os.path.join(LOCK_PATH, 'projsz.png'),
+    PROJNUM: os.path.join(LOCK_PATH, 'projnum.png')
 }
+# for stat in STATS:
+#     LOCK_IMG_PATHS[stat] = os.path.join(LOCK_PATH, 'maxhp.png')
 LOCK_NUM_PATHS = {
     0: os.path.join(LOCK_PATH, 'lock_0.png'),
     1: os.path.join(LOCK_PATH, 'lock_1.png'),

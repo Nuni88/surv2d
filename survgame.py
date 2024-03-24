@@ -6,11 +6,11 @@ import json
 import pygame
 from pygame.locals import *
 from actor import Player, EnemyOne, EnemyTwo, EnemyThree
-from platform import Platform, WeapDoor
+from platform import Platform, WeapDoor, StatDoor
 from pickup import ExpPickup, ExpSmall, ExpMed, ExpLarge, MaxHealthPickup, HealthPickup
 from menu import Menu
 from cursor import Cursor
-from constants import WIDTH, HEIGHT, FPS, MAX_TIME, LEVEL_OPTIONS, LEVEL_BONUSES
+from constants import WIDTH, HEIGHT, FPS, MAX_TIME, STATS, LEVEL_BONUSES
 
 vec = pygame.math.Vector2
 
@@ -69,12 +69,13 @@ class SurvGame:
             plat = Platform(vec(WIDTH * i - WIDTH * 0.32, HEIGHT * 0.38), 'wall_med.png')
             self.all_sprites.add(plat)
             self.platforms.add(plat)
-            door = WeapDoor(vec(WIDTH * i - WIDTH * 0.68, HEIGHT * 0.38), 'wall_med.png', 'LitShooter', 2)
+            roll = random.randint(0, len(STATS) - 1)
+            door = StatDoor(vec(WIDTH * i - WIDTH * 0.68, HEIGHT * 0.38), 'wall_med.png', STATS[roll], 1)
             self.all_sprites.add(door)
             self.doors.add(door)
             self.platforms.add(door)
 
-        heart = MaxHealthPickup(vec(WIDTH / 2, HEIGHT * 0.50 - 20))
+        heart = MaxHealthPickup(vec(WIDTH * 0.2, HEIGHT - 30))
         self.all_sprites.add(heart)
         self.pickups.add(heart)
 
@@ -94,12 +95,12 @@ class SurvGame:
         self.p_exp -= self.to_next_level
         self.to_next_level += 50
         options = []
-        opts_len = len(LEVEL_OPTIONS)
+        opts_len = len(STATS)
         while len(options) < 4:
             roll = random.randint(0, opts_len - 1)
-            if LEVEL_OPTIONS[roll] not in options:
-                options.append(LEVEL_OPTIONS[roll])
-                print(f'{LEVEL_OPTIONS[roll]}')
+            if STATS[roll] not in options:
+                options.append(STATS[roll])
+                print(f'{STATS[roll]}')
         self.menu = Menu(options, vec(WIDTH / 2, HEIGHT / 2))
         self.all_sprites.add(self.menu)
         self.all_sprites.add(self.cursor)
