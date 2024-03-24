@@ -24,6 +24,7 @@ class Emitter(pygame.sprite.Sprite):
         self.shot_timer = 0
         self.delay = SHOOTING_DELAY
         self.acc_mod = acc_mod
+        self.level = 1
 
     def move(self, loc):
         self.rect.center = loc
@@ -45,6 +46,12 @@ class Emitter(pygame.sprite.Sprite):
         if self.shot_timer >= self.delay:
             self.shoot(mods)
             self.shot_timer -= self.delay
+
+    def level_up(self):
+        self.level += 1
+
+    def get_level(self) -> int:
+        return self.level
 
 
 class FireShooter(Emitter):

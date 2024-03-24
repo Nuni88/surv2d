@@ -69,7 +69,7 @@ class SurvGame:
             plat = Platform(vec(WIDTH * i - WIDTH * 0.32, HEIGHT * 0.38), 'wall_med.png')
             self.all_sprites.add(plat)
             self.platforms.add(plat)
-            door = WeapDoor(vec(WIDTH * i - WIDTH * 0.68, HEIGHT * 0.38), 'wall_med.png', 'FireShooter', 0)
+            door = WeapDoor(vec(WIDTH * i - WIDTH * 0.68, HEIGHT * 0.38), 'wall_med.png', 'LitShooter', 2)
             self.all_sprites.add(door)
             self.doors.add(door)
             self.platforms.add(door)

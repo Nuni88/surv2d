@@ -63,6 +63,7 @@ LEVEL_BONUSES = {
 
 LOCK_PATH = 'images\\environment\\locks'
 LOCK_IMG_PATHS = {
+    'Base': os.path.join(LOCK_PATH, 'lock_base.png'),
     'FireShooter': os.path.join(LOCK_PATH, 'fire.png'),
     'LitShooter': os.path.join(LOCK_PATH, 'lit.png'),
     'IceShooter': os.path.join(LOCK_PATH, 'ice.png')

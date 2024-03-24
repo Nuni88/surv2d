@@ -38,16 +38,19 @@ class Door(Platform):
 class WeapDoor(Door):
     def __init__(self, c, surf, req, lvl):
         super().__init__(c, surf)
-        self.lock_surf = pygame.image.load(LOCK_IMG_PATHS[req])
+        self.lock_base_surf = pygame.image.load(LOCK_IMG_PATHS['Base'])
+        self.lock_req_surf = pygame.image.load(LOCK_IMG_PATHS[req])
         self.lock_lvl_surf = pygame.image.load(LOCK_NUM_PATHS[lvl])
         self.lock = {
             'req': req,
-            'req_lvl': lvl
+            'lvl': lvl
         }
 
     def display_lock(self):
-        self.surf.blit(self.lock_surf, (self.rect.width * 0.25, self.rect.height * 0.4))
-        self.surf.blit(self.lock_lvl_surf, (self.rect.width * 0.3, self.rect.height * 0.6))
+        self.surf.blit(self.lock_base_surf, (0, self.rect.height * 0.3))
+        self.surf.blit(self.lock_req_surf, (self.rect.width * 0.18, self.rect.height * 0.31))
+        self.surf.blit(self.lock_base_surf, (0, self.rect.height * 0.6))
+        self.surf.blit(self.lock_lvl_surf, (self.rect.width * 0.28, self.rect.height * 0.61))
 
     def unlockable(self, player) -> bool:
-        return True
+        return player.has_req_weapon(self.lock['req'], self.lock['lvl'])

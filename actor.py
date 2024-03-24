@@ -61,8 +61,8 @@ class Player(Actor):
 
         self.shooters = []
         shooter1 = FireShooter(self.rect.center, vec(1, 1))
-        shooter2 = LitShooter(self.rect.topright, vec(1, 1))
-        shooter3 = IceShooter(self.rect.bottomright, vec(1, 1))
+        shooter2 = LitShooter(self.rect.center, vec(1, 1))
+        shooter3 = IceShooter(self.rect.center, vec(1, 1))
         self.shooters.append(shooter1)
         self.shooters.append(shooter2)
         self.shooters.append(shooter3)
@@ -81,9 +81,8 @@ class Player(Actor):
             self.surf = pygame.image.load(self.frame_right)
         if self.dodging and self.invincible:
             self.surf = pygame.image.load(self.frame_dodge)
-        self.shooters[0].move(self.rect.center)
-        self.shooters[1].move(self.rect.topright)
-        self.shooters[2].move(self.rect.bottomright)
+        for shooter in self.shooters:
+            shooter.move(self.rect.center)
 
         self.acc.x += self.vel.x * FRIC
         self.vel += self.acc
@@ -214,6 +213,12 @@ class Player(Actor):
             self.health += int(self.stats[MAXHP]['value'] * mod)
         if self.health > self.stats[MAXHP]['value']:
             self.health = self.stats[MAXHP]['value']
+
+    def has_req_weapon(self, req, lvl) -> bool:
+        for shooter in self.shooters:
+            if shooter.__class__.__name__ == req and shooter.get_level() >= lvl:
+                return True
+        return False
 
     def get_max_health(self) -> int:
         return self.stats[MAXHP]['value']
