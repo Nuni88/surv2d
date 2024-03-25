@@ -30,7 +30,7 @@ class SurvGame:
         self.displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont('Arial', 24)
-        self.spawn_delay = 200000
+        self.spawn_delay = 2000
         self.menu = None
         self.cursor = Cursor()
 
@@ -70,7 +70,10 @@ class SurvGame:
             self.all_sprites.add(plat)
             self.platforms.add(plat)
             roll = random.randint(0, len(STATS) - 1)
-            door = StatDoor(vec(WIDTH * i - WIDTH * 0.68, HEIGHT * 0.38), 'wall_med.png', STATS[roll], 1)
+            if i == 1:
+                door = WeapDoor(vec(WIDTH * i - WIDTH * 0.68, HEIGHT * 0.38), 'door.png', 'FireShooter', 2)
+            else:
+                door = StatDoor(vec(WIDTH * i - WIDTH * 0.68, HEIGHT * 0.38), 'door.png', STATS[roll], 2)
             self.all_sprites.add(door)
             self.doors.add(door)
             self.platforms.add(door)

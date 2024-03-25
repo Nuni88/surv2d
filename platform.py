@@ -33,10 +33,10 @@ class Door(Platform):
         }
 
     def display_lock(self):
-        self.surf.blit(self.lock_base_surf, (0, self.rect.height * 0.3))
-        self.surf.blit(self.lock_req_surf, (self.rect.width * 0.18, self.rect.height * 0.31))
-        self.surf.blit(self.lock_base_surf, (0, self.rect.height * 0.6))
-        self.surf.blit(self.lock_lvl_surf, (self.rect.width * 0.28, self.rect.height * 0.61))
+        self.surf.blit(self.lock_base_surf, (1, self.rect.height * 0.3))
+        self.surf.blit(self.lock_req_surf, (2, self.rect.height * 0.3 + 1))
+        self.surf.blit(self.lock_base_surf, (1, self.rect.height * 0.6))
+        self.surf.blit(self.lock_lvl_surf, (5, self.rect.height * 0.6 + 1))
 
     def unlockable(self, player) -> bool:
         return False
