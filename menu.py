@@ -1,8 +1,12 @@
 import pygame
 from button import Button
-from constants import HEIGHT, WIDTH, MENU_TRANSPARENCY, MENU_BUTTON_HEIGHT, MENU_BUTTON_WIDTH, DISP_SCALE
+from constants import HEIGHT, WIDTH
 
 vec = pygame.math.Vector2
+
+MENU_TRANSPARENCY = 255
+MENU_BUTTON_HEIGHT = HEIGHT // 21
+MENU_BUTTON_WIDTH = WIDTH // 6
 
 
 class Menu(pygame.sprite.Sprite):

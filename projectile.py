@@ -2,9 +2,12 @@ import os
 import math
 import random
 import pygame
-from constants import WIDTH, HEIGHT, ACC_ANGLE, DMG, PROJSZ, PROJSPD, DISP_SCALE
+from constants import WIDTH, HEIGHT, STAT_STRS, DISP_SCALE
 
 vec = pygame.math.Vector2
+
+# TODO: Read projectile attributes from file
+ACC_ANGLE = math.pi
 
 
 class Projectile(pygame.sprite.Sprite):
@@ -51,11 +54,11 @@ class Projectile(pygame.sprite.Sprite):
 class Fireball(Projectile):
     def __init__(self, pos, acc_mod, mods):
         surf = pygame.image.load(os.path.join('images\\projectiles', 'fire.png'))
-        super().__init__(pos, acc_mod, surf, mods[PROJSZ]['value'])
+        super().__init__(pos, acc_mod, surf, mods[STAT_STRS['PROJSZ']]['value'])
         self.acc_angle = ACC_ANGLE
         self.acc = vec(0, -0.1)
         self.vel = vec(0, -0.1)
-        self.damage = int(1 * mods[DMG]['value'])
+        self.damage = int(1 * mods[STAT_STRS['DMG']]['value'])
         self.crit = 20
         self.speed_mod = 0.001
         self.rot_delay = 20
@@ -84,21 +87,21 @@ class Fireball(Projectile):
 class Iceball(Projectile):
     def __init__(self, pos, acc_mod, mods):
         surf = pygame.image.load(os.path.join('images\\projectiles', 'ice.png'))
-        super().__init__(pos, acc_mod, surf, mods[PROJSZ]['value'])
+        super().__init__(pos, acc_mod, surf, mods[STAT_STRS['PROJSZ']]['value'])
         self.acc = vec(0, 0)
-        self.damage = int(5 * mods[DMG]['value'])
+        self.damage = int(5 * mods[STAT_STRS['DMG']]['value'])
         self.crit = 0
 
 
 class Lightning(Projectile):
     def __init__(self, pos, acc_mod, mods):
         surf = pygame.image.load(os.path.join('images\\projectiles', 'lit.png'))
-        super().__init__(pos, acc_mod, surf, mods[PROJSZ]['value'])
+        super().__init__(pos, acc_mod, surf, mods[STAT_STRS['PROJSZ']]['value'])
         self.acc = vec(0.1, 0.1)
         self.acc.x *= acc_mod.x
         self.acc.y *= acc_mod.y
-        self.acc *= mods[PROJSPD]['value']
-        self.damage = int(2 * mods[DMG]['value'])
+        self.acc *= mods[STAT_STRS['PROJSPD']]['value']
+        self.damage = int(2 * mods[STAT_STRS['DMG']]['value'])
         self.crit = 10
 
     def update_timers(self, ms):

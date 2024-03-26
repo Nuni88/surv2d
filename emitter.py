@@ -1,7 +1,6 @@
-from enum import Enum
 import pygame
 from projectile import Fireball, Iceball, Lightning
-from constants import SHOOTING_DELAY, DISP_SCALE
+from constants import DISP_SCALE
 
 vec = pygame.math.Vector2
 '''
@@ -11,18 +10,23 @@ WEAPONTYPES = {
     'Lightning': Lightning
 }
 '''
+BASE_SHOT_DELAY = 1000
+BASE_DIMS = (100, 100)  # (W, H)
+BGCOLOR = (0, 0, 0)     # (R, G, B)
+
+# TODO: Read weapon attributes from file
 
 
 class Emitter(pygame.sprite.Sprite):
     def __init__(self, pos, acc_mod):
         super().__init__()
-        self.surf = pygame.transform.scale_by(pygame.Surface((100, 100)), DISP_SCALE)
-        self.surf.fill((0, 0, 0))
+        self.surf = pygame.transform.scale_by(pygame.Surface(BASE_DIMS), DISP_SCALE)
+        self.surf.fill(BGCOLOR)
         self.surf.set_alpha(0)
         self.rect = self.surf.get_rect(center=pos)
         self.bullets = []
         self.shot_timer = 0
-        self.delay = SHOOTING_DELAY
+        self.delay = BASE_SHOT_DELAY
         self.acc_mod = acc_mod
         self.level = 1
 

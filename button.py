@@ -1,8 +1,9 @@
 import pygame
 import os
-from constants import BUTTON_FONT_SIZE, DISP_SCALE
+from constants import HEIGHT, FONT, DISP_SCALE
 
-button_font = 'Arial'
+TEXTCOLOR = (0, 0, 0)   # (R, G, B)
+BUTTON_FONT_SIZE = HEIGHT // 40
 
 
 class Button(pygame.sprite.Sprite):
@@ -15,10 +16,10 @@ class Button(pygame.sprite.Sprite):
         
     def show_text(self):
         pygame.font.init()
-        game_font = pygame.font.SysFont(button_font, BUTTON_FONT_SIZE)
+        game_font = pygame.font.SysFont(FONT, BUTTON_FONT_SIZE)
         
-        text_render = game_font.render(self.text, False, (0, 0, 0))
-        self.surf.blit(text_render, (self.surf.get_width() / 8, self.surf.get_height() / 4))
+        text_render = game_font.render(self.text, False, TEXTCOLOR)
+        self.surf.blit(text_render, (self.rect.width / 5, self.rect.height / 4))
 
     def scale_to_screen(self, scale):
         self.surf = pygame.transform.scale_by(self.surf, scale)

@@ -3,10 +3,16 @@ import os
 import random
 from pygame.locals import *
 from emitter import FireShooter, LitShooter, IceShooter
-from constants import ACC, FRIC, WIDTH, HEIGHT, MOVE_EDGE_LEFT, MOVE_EDGE_RIGHT, GRAVITY,\
-                      MAXHP, CRITC, CRITD, MSPD, JUMPH, DODGE, INVUL, DISP_SCALE
+from constants import WIDTH, HEIGHT, STAT_STRS, DISP_SCALE
 
 vec = pygame.math.Vector2
+
+MOVE_EDGE_LEFT = WIDTH * 0.1
+MOVE_EDGE_RIGHT = WIDTH * 0.9
+GRAVITY = 0.9 * DISP_SCALE
+ACC = 0.5 * DISP_SCALE
+FRIC = -0.12 * DISP_SCALE
+# TODO: Read enemy attributes from file
 
 
 class Actor(pygame.sprite.Sprite):
@@ -53,8 +59,8 @@ class Player(Actor):
         self.frame_left = pygame.transform.scale_by(pygame.image.load(chardata['frame_left']), DISP_SCALE)
         self.frame_right = pygame.transform.scale_by(pygame.image.load(chardata['frame_right']), DISP_SCALE)
         self.frame_dodge = pygame.transform.scale_by(pygame.image.load(chardata['frame_dodge']), DISP_SCALE)
-        self.health = self.stats[MAXHP]['value']
-        self.stats[JUMPH]['value'] *= DISP_SCALE
+        self.health = self.stats[STAT_STRS['MAXHP']]['value']
+        self.stats[STAT_STRS['JUMPH']]['value'] *= DISP_SCALE
 
         self.jumping = False
         self.midair_jumping = False
@@ -78,10 +84,10 @@ class Player(Actor):
         self.acc = vec(0, GRAVITY)
         pressed_keys = pygame.key.get_pressed()
         if pressed_keys[K_LEFT]:
-            self.acc.x = -ACC * self.stats[MSPD]['value']
+            self.acc.x = -ACC * self.stats[STAT_STRS['MSPD']]['value']
             self.surf = self.frame_left
         if pressed_keys[K_RIGHT]:
-            self.acc.x = ACC * self.stats[MSPD]['value']
+            self.acc.x = ACC * self.stats[STAT_STRS['MSPD']]['value']
             self.surf = self.frame_right
         if self.dodging and self.invincible:
             self.surf = self.frame_dodge
@@ -131,13 +137,13 @@ class Player(Actor):
     def jump(self):
         if not self.jumping:
             self.jumping = True
-            self.vel.y = -self.stats[JUMPH]['value']
+            self.vel.y = -self.stats[STAT_STRS['JUMPH']]['value']
             # self.jump_sfx.play()
 
     def midair_jump(self):
         if not self.midair_jumping:
             self.midair_jumping = True
-            self.vel.y = -self.stats[JUMPH]['value'] / 2
+            self.vel.y = -self.stats[STAT_STRS['JUMPH']]['value'] / 2
             # self.jump_sfx.play()
 
     def cancel_jump(self):
@@ -170,7 +176,7 @@ class Player(Actor):
         # Turn dodge cooldown off and reset tracking
         if self.dodging:
             self.dodge_timer += ms
-            if self.dodge_timer >= self.stats[DODGE]['value'] * 1000:
+            if self.dodge_timer >= self.stats[STAT_STRS['DODGE']]['value'] * 1000:
                 self.dodging = False
                 self.dodge_timer = 0
 
@@ -178,7 +184,7 @@ class Player(Actor):
         # Turn player invincibility off and reset invulnerability tracking
         if self.invincible:
             self.invul_timer += ms
-            if self.invul_timer >= self.stats[INVUL]['value'] * 1000:
+            if self.invul_timer >= self.stats[STAT_STRS['INVUL']]['value'] * 1000:
                 self.invincible = False
                 self.invul_timer = 0
                 if self.dodging:
@@ -204,20 +210,20 @@ class Player(Actor):
             self.mods[stat]['level'] += 1
             print(f'Player {stat} went up by {amt}!')
             print(f'{stat} is now level {self.mods[stat]["level"]}!')
-        if stat == MAXHP:
+        if stat == STAT_STRS['MAXHP']:
             self.heal(amt)
 
     def heal(self, amt):
         if amt > 0:
             self.health += amt
-        if self.health > self.stats[MAXHP]['value']:
-            self.health = self.stats[MAXHP]['value']
+        if self.health > self.stats[STAT_STRS['MAXHP']]['value']:
+            self.health = self.stats[STAT_STRS['MAXHP']]['value']
 
     def heal_percent(self, mod):
         if mod > 0:
-            self.health += int(self.stats[MAXHP]['value'] * mod)
-        if self.health > self.stats[MAXHP]['value']:
-            self.health = self.stats[MAXHP]['value']
+            self.health += int(self.stats[STAT_STRS['MAXHP']]['value'] * mod)
+        if self.health > self.stats[STAT_STRS['MAXHP']]['value']:
+            self.health = self.stats[STAT_STRS['MAXHP']]['value']
 
     def has_req_weapon(self, req, lvl) -> bool:
         for shooter in self.shooters:
@@ -235,13 +241,13 @@ class Player(Actor):
         return False
 
     def get_max_health(self) -> int:
-        return self.stats[MAXHP]['value']
+        return self.stats[STAT_STRS['MAXHP']]['value']
 
     def get_crit_chance(self) -> int:
-        return self.stats[CRITC]['value']
+        return self.stats[STAT_STRS['CRITC']]['value']
 
     def get_crit_mod(self) -> float:
-        return self.mods[CRITD]['value']
+        return self.mods[STAT_STRS['CRITD']]['value']
 
 
 class Enemy(Actor):

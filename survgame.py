@@ -10,7 +10,7 @@ from platform import Platform, WeapDoor, StatDoor
 from pickup import ExpPickup, ExpSmall, ExpMed, ExpLarge, MaxHealthPickup, HealthPickup
 from menu import Menu
 from cursor import Cursor
-from constants import WIDTH, HEIGHT, FPS, MAX_TIME, STATS, LEVEL_BONUSES, DISP_SCALE
+from constants import WIDTH, HEIGHT, FONT, STAT_STRS, DISP_SCALE
 
 vec = pygame.math.Vector2
 
@@ -18,6 +18,37 @@ LOOT_TABLE = {
     'EnemyOne': ExpSmall,
     'EnemyTwo': ExpMed,
     'EnemyThree': ExpLarge
+}
+
+# Modifiable values
+FPS = 60
+MAX_TIME = 300
+SPAWN_DELAY = 2000
+FONT_SZ = 24
+PLAT_RANGE = 20
+EXP_REQ_SCALE = 50
+NUM_LVL_OPTIONS = 4
+POT_DROP_RT = 10
+TEXTBOXHT = 30
+END_SCRN_COLOR = (255, 0, 0)   # (R, G, B)
+BGCOLOR = (200, 200, 200)
+TEXTCOLOR = (0, 0, 0)
+STATS = []
+for stat in STAT_STRS:
+    STATS.append(STAT_STRS[stat])
+LEVEL_BONUSES = {
+    STAT_STRS['MAXHP']: 10,
+    STAT_STRS['CRITC']: 0.05,
+    STAT_STRS['ASPD']: 0.05,
+    STAT_STRS['MSPD']: 0.05,
+    STAT_STRS['JUMPH']: 1,
+    STAT_STRS['DODGE']: -0.05,
+    STAT_STRS['INVUL']: 0.01,
+    STAT_STRS['DMG']: 0.05,
+    STAT_STRS['CRITD']: 0.1,
+    STAT_STRS['PROJSPD']: 0.05,
+    STAT_STRS['PROJSZ']: 2.0,
+    STAT_STRS['PROJNUM']: 0.1
 }
 
 
@@ -29,8 +60,8 @@ class SurvGame:
         pygame.display.set_caption("2D Survivors")
         self.displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
-        self.font = pygame.font.SysFont('Arial', 24)
-        self.spawn_delay = 2000
+        self.font = pygame.font.SysFont(FONT, FONT_SZ)
+        self.spawn_delay = SPAWN_DELAY
         self.menu = None
         self.cursor = Cursor()
 
@@ -54,7 +85,7 @@ class SurvGame:
         self.floor = Platform(vec(WIDTH / 2, HEIGHT), 'plat_floor.png')
         self.platforms.add(self.floor)
         self.all_sprites.add(self.floor)
-        for i in range(-20, 20):
+        for i in range(-PLAT_RANGE, PLAT_RANGE):
             plat = Platform(vec(WIDTH * i, HEIGHT * 0.70), 'plat_med.png')
             self.all_sprites.add(plat)
             self.platforms.add(plat)
@@ -65,7 +96,7 @@ class SurvGame:
             self.all_sprites.add(plat)
             self.platforms.add(plat)
 
-        for i in range(-20, 20):
+        for i in range(-PLAT_RANGE, PLAT_RANGE):
             plat = Platform(vec(WIDTH * i - WIDTH * 0.32, HEIGHT * 0.38), 'wall_med.png')
             self.all_sprites.add(plat)
             self.platforms.add(plat)
@@ -96,15 +127,15 @@ class SurvGame:
     def show_level_up_menu(self):
         self.p_level += 1
         self.p_exp -= self.to_next_level
-        self.to_next_level += 50
+        self.to_next_level += EXP_REQ_SCALE
         options = []
         opts_len = len(STATS)
-        while len(options) < 4:
+        while len(options) < NUM_LVL_OPTIONS:
             roll = random.randint(0, opts_len - 1)
             if STATS[roll] not in options:
                 options.append(STATS[roll])
                 print(f'{STATS[roll]}')
-        self.menu = Menu(options, vec(WIDTH / 2, HEIGHT / 2))
+        self.menu = Menu(options, vec(self.displaysurface.get_rect().center))
         self.all_sprites.add(self.menu)
         self.all_sprites.add(self.cursor)
 
@@ -112,7 +143,7 @@ class SurvGame:
         for entity in self.all_sprites:
             entity.kill()
         time.sleep(1)
-        self.displaysurface.fill((255, 0, 0))
+        self.displaysurface.fill(END_SCRN_COLOR)
         pygame.display.update()
         time.sleep(1)
         pygame.quit()
@@ -204,7 +235,7 @@ class SurvGame:
                             print('Enemy killed!')
                             enemy_pos = enemy.get_pos()
                             hp_chance = random.randint(1, 100)
-                            if hp_chance <= 10:
+                            if hp_chance <= POT_DROP_RT:
                                 drop = HealthPickup(enemy_pos)
                             else:
                                 loot_type = LOOT_TABLE[enemy.get_name()]
@@ -248,7 +279,7 @@ class SurvGame:
                     self.spawn_enemy(EnemyThree)
                     spawn_timer -= self.spawn_delay
 
-            self.displaysurface.fill((200, 200, 200))
+            self.displaysurface.fill(BGCOLOR)
 
             # Check if time is over
             game_time = MAX_TIME - int(pygame.time.get_ticks() / 1000)
@@ -263,14 +294,14 @@ class SurvGame:
             if seconds < 10:
                 seconds = '0' + str(seconds)
 
-            text_time = self.font.render(f'Time: {minutes}:{seconds}', False, (0, 0, 0))
+            text_time = self.font.render(f'Time: {minutes}:{seconds}', False, TEXTCOLOR)
             text_time = pygame.transform.scale_by(text_time, DISP_SCALE)
             hp = self.P1.get_health()
             mhp = self.P1.get_max_health()
-            text_health = self.font.render(f'Health: {hp}/{mhp}', False, (0, 0, 0))
+            text_health = self.font.render(f'Health: {hp}/{mhp}', False, TEXTCOLOR)
             text_health = pygame.transform.scale_by(text_health, DISP_SCALE)
             level_pct = round(100 * self.p_exp / self.to_next_level, 2)
-            text_level = self.font.render(f'Level: {self.p_level} [{level_pct}%]', False, (0, 0, 0))
+            text_level = self.font.render(f'Level: {self.p_level} [{level_pct}%]', False, TEXTCOLOR)
             text_level = pygame.transform.scale_by(text_level, DISP_SCALE)
 
             for entity in self.all_sprites:
@@ -280,8 +311,8 @@ class SurvGame:
             for door in self.doors:
                 door.display_lock()
             self.displaysurface.blit(text_time, (0, 0))
-            self.displaysurface.blit(text_health, (0, 30 * DISP_SCALE))
-            self.displaysurface.blit(text_level, (0, 60 * DISP_SCALE))
+            self.displaysurface.blit(text_health, (0, TEXTBOXHT * DISP_SCALE))
+            self.displaysurface.blit(text_level, (0, 2 * TEXTBOXHT * DISP_SCALE))
             if self.menu:
                 self.menu.display()
 
