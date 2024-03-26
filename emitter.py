@@ -1,7 +1,7 @@
 from enum import Enum
 import pygame
 from projectile import Fireball, Iceball, Lightning
-from constants import SHOOTING_DELAY
+from constants import SHOOTING_DELAY, DISP_SCALE
 
 vec = pygame.math.Vector2
 '''
@@ -16,7 +16,7 @@ WEAPONTYPES = {
 class Emitter(pygame.sprite.Sprite):
     def __init__(self, pos, acc_mod):
         super().__init__()
-        self.surf = pygame.Surface((100, 100))
+        self.surf = pygame.transform.scale_by(pygame.Surface((100, 100)), DISP_SCALE)
         self.surf.fill((0, 0, 0))
         self.surf.set_alpha(0)
         self.rect = self.surf.get_rect(center=pos)
@@ -52,6 +52,9 @@ class Emitter(pygame.sprite.Sprite):
 
     def get_level(self) -> int:
         return self.level
+
+    def scale_to_screen(self, scale):
+        self.surf = pygame.transform.scale_by(self.surf, scale)
 
 
 class FireShooter(Emitter):

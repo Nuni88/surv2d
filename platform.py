@@ -1,6 +1,6 @@
 import os
 import pygame
-from constants import LOCK_IMG_PATHS, LOCK_NUM_PATHS
+from constants import LOCK_IMG_PATHS, LOCK_NUM_PATHS, DISP_SCALE
 
 vec = pygame.math.Vector2
 
@@ -8,7 +8,7 @@ vec = pygame.math.Vector2
 class Platform(pygame.sprite.Sprite):
     def __init__(self, c, surf):
         super().__init__()
-        self.surf = pygame.image.load(os.path.join('images\\environment', surf))
+        self.surf = pygame.transform.scale_by(pygame.image.load(os.path.join('images\\environment', surf)), DISP_SCALE)
         self.rect = self.surf.get_rect(center=c)
         self.pos = vec(self.rect.midbottom)
 
@@ -20,13 +20,16 @@ class Platform(pygame.sprite.Sprite):
         self.pos.x = player.rect.centerx
         self.rect.midbottom = self.pos
 
+    def scale_to_screen(self, scale):
+        self.surf = pygame.transform.scale_by(self.surf, scale)
+
 
 class Door(Platform):
     def __init__(self, c, surf, req, lvl):
         super().__init__(c, surf)
-        self.lock_base_surf = pygame.image.load(LOCK_IMG_PATHS['Base'])
-        self.lock_req_surf = pygame.image.load(LOCK_IMG_PATHS[req])
-        self.lock_lvl_surf = pygame.image.load(LOCK_NUM_PATHS[lvl])
+        self.lock_base_surf = pygame.transform.scale_by(pygame.image.load(LOCK_IMG_PATHS['Base']), DISP_SCALE)
+        self.lock_req_surf = pygame.transform.scale_by(pygame.image.load(LOCK_IMG_PATHS[req]), DISP_SCALE)
+        self.lock_lvl_surf = pygame.transform.scale_by(pygame.image.load(LOCK_NUM_PATHS[lvl]), DISP_SCALE)
         self.lock = {
             'req': req,
             'lvl': lvl

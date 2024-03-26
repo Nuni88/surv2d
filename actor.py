@@ -4,7 +4,7 @@ import random
 from pygame.locals import *
 from emitter import FireShooter, LitShooter, IceShooter
 from constants import ACC, FRIC, WIDTH, HEIGHT, MOVE_EDGE_LEFT, MOVE_EDGE_RIGHT, GRAVITY,\
-                      MAXHP, CRITC, CRITD, MSPD, JUMPH, DODGE, INVUL
+                      MAXHP, CRITC, CRITD, MSPD, JUMPH, DODGE, INVUL, DISP_SCALE
 
 vec = pygame.math.Vector2
 
@@ -12,7 +12,7 @@ vec = pygame.math.Vector2
 class Actor(pygame.sprite.Sprite):
     def __init__(self, surf):
         super().__init__()
-        self.surf = surf
+        self.surf = pygame.transform.scale_by(surf, DISP_SCALE)
         self.rect = self.surf.get_rect()
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
@@ -38,19 +38,23 @@ class Actor(pygame.sprite.Sprite):
     def get_pos(self) -> (float, float):
         return self.rect.midbottom
 
+    def scale_to_screen(self, scale):
+        self.surf = pygame.transform.scale_by(self.surf, scale)
+
 
 class Player(Actor):
     def __init__(self, chardata):
         super().__init__(pygame.image.load(chardata['frame_left']))
-        self.pos = vec((WIDTH / 2, HEIGHT - 25))
+        self.pos = vec((WIDTH / 2, HEIGHT * 0.94))
         self.rect.midbottom = self.pos
 
         self.stats = chardata['stats']
         self.mods = chardata['mods']
-        self.frame_left = chardata['frame_left']
-        self.frame_right = chardata['frame_right']
-        self.frame_dodge = chardata['frame_dodge']
+        self.frame_left = pygame.transform.scale_by(pygame.image.load(chardata['frame_left']), DISP_SCALE)
+        self.frame_right = pygame.transform.scale_by(pygame.image.load(chardata['frame_right']), DISP_SCALE)
+        self.frame_dodge = pygame.transform.scale_by(pygame.image.load(chardata['frame_dodge']), DISP_SCALE)
         self.health = self.stats[MAXHP]['value']
+        self.stats[JUMPH]['value'] *= DISP_SCALE
 
         self.jumping = False
         self.midair_jumping = False
@@ -75,12 +79,12 @@ class Player(Actor):
         pressed_keys = pygame.key.get_pressed()
         if pressed_keys[K_LEFT]:
             self.acc.x = -ACC * self.stats[MSPD]['value']
-            self.surf = pygame.image.load(self.frame_left)
+            self.surf = self.frame_left
         if pressed_keys[K_RIGHT]:
             self.acc.x = ACC * self.stats[MSPD]['value']
-            self.surf = pygame.image.load(self.frame_right)
+            self.surf = self.frame_right
         if self.dodging and self.invincible:
-            self.surf = pygame.image.load(self.frame_dodge)
+            self.surf = self.frame_dodge
         for shooter in self.shooters:
             shooter.move(self.rect.center)
 
@@ -178,7 +182,8 @@ class Player(Actor):
                 self.invincible = False
                 self.invul_timer = 0
                 if self.dodging:
-                    self.surf = pygame.image.load(self.frame_left)
+                    self.surf = self.frame_left
+
         for shooter in self.shooters:
             shooter.update_timers(ms, self.mods)
 
@@ -249,7 +254,7 @@ class Enemy(Actor):
             x = random.randint(int(WIDTH * 1.5), int(WIDTH * 2))
         else:
             x = random.randint(int(WIDTH * -1), int(WIDTH * -0.5))
-        self.pos = vec(x, HEIGHT - 25)
+        self.pos = vec(x, HEIGHT * 0.95)
         self.rect.midbottom = self.pos
         self.name = ''
 
@@ -277,8 +282,10 @@ class Enemy(Actor):
 
 class EnemyOne(Enemy):
     def __init__(self):
-        self.spr_left = pygame.image.load(os.path.join('images\\enemy1', 'enemy_left.gif'))
-        self.spr_right = pygame.image.load(os.path.join('images\\enemy1', 'enemy_right.gif'))
+        path_left = os.path.join('images\\enemy1', 'enemy_left.gif')
+        path_right = os.path.join('images\\enemy1', 'enemy_right.gif')
+        self.spr_left = pygame.transform.scale_by(pygame.image.load(path_left), DISP_SCALE)
+        self.spr_right = pygame.transform.scale_by(pygame.image.load(path_right), DISP_SCALE)
         super().__init__(self.spr_left)
         self.name = 'EnemyOne'
         self.damage = 5
@@ -288,8 +295,10 @@ class EnemyOne(Enemy):
 
 class EnemyTwo(Enemy):
     def __init__(self):
-        self.spr_left = pygame.image.load(os.path.join('images\\enemy2', 'enemy_left.gif'))
-        self.spr_right = pygame.image.load(os.path.join('images\\enemy2', 'enemy_right.gif'))
+        path_left = os.path.join('images\\enemy2', 'enemy_left.gif')
+        path_right = os.path.join('images\\enemy2', 'enemy_right.gif')
+        self.spr_left = pygame.transform.scale_by(pygame.image.load(path_left), DISP_SCALE)
+        self.spr_right = pygame.transform.scale_by(pygame.image.load(path_right), DISP_SCALE)
         super().__init__(self.spr_left)
         self.name = 'EnemyTwo'
         self.damage = 2
@@ -299,8 +308,10 @@ class EnemyTwo(Enemy):
 
 class EnemyThree(Enemy):
     def __init__(self):
-        self.spr_left = pygame.image.load(os.path.join('images\\enemy3', 'enemy_left.gif'))
-        self.spr_right = pygame.image.load(os.path.join('images\\enemy3', 'enemy_right.gif'))
+        path_left = os.path.join('images\\enemy3', 'enemy_left.gif')
+        path_right = os.path.join('images\\enemy3', 'enemy_right.gif')
+        self.spr_left = pygame.transform.scale_by(pygame.image.load(path_left), DISP_SCALE)
+        self.spr_right = pygame.transform.scale_by(pygame.image.load(path_right), DISP_SCALE)
         super().__init__(self.spr_left)
         self.name = 'EnemyThree'
         self.damage = 8

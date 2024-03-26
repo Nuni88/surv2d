@@ -1,12 +1,12 @@
 import os
 import pygame
-from constants import MAXHP
+from constants import MAXHP, DISP_SCALE
 
 
 class Pickup(pygame.sprite.Sprite):
     def __init__(self, pos, surf):
         super().__init__()
-        self.surf = surf
+        self.surf = pygame.transform.scale_by(surf, DISP_SCALE)
         self.rect = self.surf.get_rect(center=pos)
         self.value = 0
 
@@ -18,6 +18,9 @@ class Pickup(pygame.sprite.Sprite):
 
     def collect(self, player):
         pass
+
+    def scale_to_screen(self, scale):
+        self.surf = pygame.transform.scale_by(self.surf, scale)
 
 
 class ExpPickup(Pickup):

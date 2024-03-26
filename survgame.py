@@ -10,7 +10,7 @@ from platform import Platform, WeapDoor, StatDoor
 from pickup import ExpPickup, ExpSmall, ExpMed, ExpLarge, MaxHealthPickup, HealthPickup
 from menu import Menu
 from cursor import Cursor
-from constants import WIDTH, HEIGHT, FPS, MAX_TIME, STATS, LEVEL_BONUSES
+from constants import WIDTH, HEIGHT, FPS, MAX_TIME, STATS, LEVEL_BONUSES, DISP_SCALE
 
 vec = pygame.math.Vector2
 
@@ -78,7 +78,7 @@ class SurvGame:
             self.doors.add(door)
             self.platforms.add(door)
 
-        heart = MaxHealthPickup(vec(WIDTH * 0.2, HEIGHT - 30))
+        heart = MaxHealthPickup(vec(WIDTH * 0.2, HEIGHT * 0.93))
         self.all_sprites.add(heart)
         self.pickups.add(heart)
 
@@ -134,15 +134,17 @@ class SurvGame:
                         pygame.quit()
                         sys.exit()
                     if event.type == MOUSEBUTTONDOWN:
+                        # Left click
                         if event.button == 1:
                             menu_hit = pygame.sprite.collide_rect(self.cursor, self.menu)
                             if menu_hit:
                                 option = self.menu.get_option(self.cursor)
                                 print(option)
-                                self.P1.gain_stat_bonus(option, LEVEL_BONUSES[option])
-                                self.menu.kill()
-                                self.menu = None
-                                self.cursor.kill()
+                                if option != '':
+                                    self.P1.gain_stat_bonus(option, LEVEL_BONUSES[option])
+                                    self.menu.kill()
+                                    self.menu = None
+                                    self.cursor.kill()
                 self.cursor.move()
             else:
                 self.P1.move()
@@ -224,6 +226,8 @@ class SurvGame:
                         if event.key == pygame.K_r:
                             if plat_hits:
                                 self.P1.dodge()
+                        if event.key == pygame.K_ESCAPE:
+                            return
                     '''
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_f:
@@ -260,11 +264,14 @@ class SurvGame:
                 seconds = '0' + str(seconds)
 
             text_time = self.font.render(f'Time: {minutes}:{seconds}', False, (0, 0, 0))
+            text_time = pygame.transform.scale_by(text_time, DISP_SCALE)
             hp = self.P1.get_health()
             mhp = self.P1.get_max_health()
             text_health = self.font.render(f'Health: {hp}/{mhp}', False, (0, 0, 0))
+            text_health = pygame.transform.scale_by(text_health, DISP_SCALE)
             level_pct = round(100 * self.p_exp / self.to_next_level, 2)
             text_level = self.font.render(f'Level: {self.p_level} [{level_pct}%]', False, (0, 0, 0))
+            text_level = pygame.transform.scale_by(text_level, DISP_SCALE)
 
             for entity in self.all_sprites:
                 self.displaysurface.blit(entity.surf, entity.rect)
@@ -273,8 +280,8 @@ class SurvGame:
             for door in self.doors:
                 door.display_lock()
             self.displaysurface.blit(text_time, (0, 0))
-            self.displaysurface.blit(text_health, (0, 30))
-            self.displaysurface.blit(text_level, (0, 60))
+            self.displaysurface.blit(text_health, (0, 30 * DISP_SCALE))
+            self.displaysurface.blit(text_level, (0, 60 * DISP_SCALE))
             if self.menu:
                 self.menu.display()
 

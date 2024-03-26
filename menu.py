@@ -1,6 +1,6 @@
 import pygame
 from button import Button
-from constants import HEIGHT, WIDTH, MENU_TRANSPARENCY, MENU_BUTTON_HEIGHT, MENU_BUTTON_WIDTH
+from constants import HEIGHT, WIDTH, MENU_TRANSPARENCY, MENU_BUTTON_HEIGHT, MENU_BUTTON_WIDTH, DISP_SCALE
 
 vec = pygame.math.Vector2
 
@@ -30,13 +30,17 @@ class Menu(pygame.sprite.Sprite):
             self.surf.blit(option.surf, (0, height))
             option.show_text()
             height += MENU_BUTTON_HEIGHT + 1
-            
+
+    # TODO: Modify loop
     def get_option(self, cursor) -> str:
         for option in self.options:
             hit = pygame.sprite.collide_rect(cursor, option)
             if hit:
                 return option.text
         return ''
+
+    def scale_to_screen(self, scale):
+        self.surf = pygame.transform.scale_by(self.surf, scale)
 
     @staticmethod
     def adjust_pos(x, y, width, height) -> (int, int):

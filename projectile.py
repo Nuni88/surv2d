@@ -2,7 +2,7 @@ import os
 import math
 import random
 import pygame
-from constants import WIDTH, HEIGHT, ACC_ANGLE, DMG, PROJSZ, PROJSPD
+from constants import WIDTH, HEIGHT, ACC_ANGLE, DMG, PROJSZ, PROJSPD, DISP_SCALE
 
 vec = pygame.math.Vector2
 
@@ -10,7 +10,7 @@ vec = pygame.math.Vector2
 class Projectile(pygame.sprite.Sprite):
     def __init__(self, pos, acc_mod, surf, scale):
         super().__init__()
-        self.surf = pygame.transform.scale_by(surf, scale)
+        self.surf = pygame.transform.scale_by(surf, scale * DISP_SCALE)
         self.rect = self.surf.get_rect(center=pos)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
@@ -44,6 +44,9 @@ class Projectile(pygame.sprite.Sprite):
     def scroll(self, offset):
         self.rect.centerx -= offset
 
+    def scale_to_screen(self, scale):
+        self.surf = pygame.transform.scale_by(self.surf, scale)
+
 
 class Fireball(Projectile):
     def __init__(self, pos, acc_mod, mods):
@@ -72,9 +75,6 @@ class Fireball(Projectile):
         self.acc.x += self.speed_mod * math.cos(self.acc_angle)
         self.acc.y += -self.speed_mod * math.sin(self.acc_angle)
         '''
-
-    def move(self):
-        self.rect.center += self.vel
 
     def move(self):
         self.vel += self.acc
