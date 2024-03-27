@@ -3,6 +3,9 @@ import pygame
 from constants import STAT_STRS, DISP_SCALE
 
 
+# TODO: Read pickup attributes from file
+
+
 class Pickup(pygame.sprite.Sprite):
     def __init__(self, pos, surf):
         super().__init__()
@@ -27,11 +30,6 @@ class ExpPickup(Pickup):
     def __init__(self, pos, surf):
         super().__init__(pos, surf)
         self.value = 0
-
-    '''
-    def collect(self, player):
-        player.gain_exp(self.value)
-    '''
 
 
 class ExpSmall(ExpPickup):

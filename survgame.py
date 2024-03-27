@@ -5,8 +5,10 @@ import os
 import json
 import pygame
 from pygame.locals import *
-from actor import Player, EnemyOne, EnemyTwo, EnemyThree
-from platform import Platform, WeapDoor, StatDoor
+from enemy import Enemy
+from player import Player
+from platform import Platform
+from door import WeapDoor, StatDoor
 from pickup import ExpPickup, ExpSmall, ExpMed, ExpLarge, MaxHealthPickup, HealthPickup
 from menu import Menu
 from cursor import Cursor
@@ -26,8 +28,9 @@ MAX_TIME = 300
 SPAWN_DELAY = 2000
 FONT_SZ = 24
 PLAT_RANGE = 20
-EXP_REQ_SCALE = 50
-NUM_LVL_OPTIONS = 4
+BASE_EXP_REQ = 100
+EXP_REQ_SCALE = 20
+NUM_LVL_OPTIONS = 6
 POT_DROP_RT = 10
 TEXTBOXHT = 30
 END_SCRN_COLOR = (255, 0, 0)   # (R, G, B)
@@ -65,22 +68,28 @@ class SurvGame:
         self.menu = None
         self.cursor = Cursor()
 
-        # Add units from JSON file
-        unitdatafile = open(os.path.join('data', 'unitdata.json'), 'r')
-        unitdata = json.loads(str(unitdatafile.read()))
-        unitdatafile.close()
-
-        self.P1 = Player(unitdata['Char1'])
-        self.p_exp = 0
-        self.p_level = 1
-        self.to_next_level = 100
-
+        # Create sprite groups
         self.all_sprites = pygame.sprite.Group()
         self.actors = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
         self.platforms = pygame.sprite.Group()
         self.doors = pygame.sprite.Group()
         self.pickups = pygame.sprite.Group()
+        self.menu_sprites = pygame.sprite.Group()
+
+        # Add player data from JSON file and create player object
+        unitdatafile = open(os.path.join('data', 'unitdata.json'), 'r')
+        unitdata = json.loads(str(unitdatafile.read()))
+        unitdatafile.close()
+        self.P1 = Player(unitdata['Char1'])
+        self.p_exp = 0
+        self.p_level = 1
+        self.to_next_level = BASE_EXP_REQ
+
+        # Add enemy data from JSON file for spawning enemies
+        enemydatafile = open(os.path.join('data', 'enemydata.json'), 'r')
+        self.enemydata = json.loads(str(enemydatafile.read()))
+        enemydatafile.close()
 
         self.floor = Platform(vec(WIDTH / 2, HEIGHT), 'plat_floor.png')
         self.platforms.add(self.floor)
@@ -124,6 +133,13 @@ class SurvGame:
         self.actors.add(enemy)
         self.enemies.add(enemy)
 
+    def spawn_enemies(self):
+        for enemy in self.enemydata:
+            e = Enemy(self.enemydata[enemy])
+            self.all_sprites.add(e)
+            self.actors.add(e)
+            self.enemies.add(e)
+
     def show_level_up_menu(self):
         self.p_level += 1
         self.p_exp -= self.to_next_level
@@ -136,8 +152,8 @@ class SurvGame:
                 options.append(STATS[roll])
                 print(f'{STATS[roll]}')
         self.menu = Menu(options, vec(self.displaysurface.get_rect().center))
-        self.all_sprites.add(self.menu)
-        self.all_sprites.add(self.cursor)
+        self.menu_sprites.add(self.menu)
+        self.menu_sprites.add(self.cursor)
 
     def end_game(self):
         for entity in self.all_sprites:
@@ -274,9 +290,7 @@ class SurvGame:
                 self.P1.update_timers(time_update)
                 spawn_timer += time_update
                 if spawn_timer >= self.spawn_delay:
-                    self.spawn_enemy(EnemyOne)
-                    self.spawn_enemy(EnemyTwo)
-                    self.spawn_enemy(EnemyThree)
+                    self.spawn_enemies()
                     spawn_timer -= self.spawn_delay
 
             self.displaysurface.fill(BGCOLOR)
@@ -314,6 +328,8 @@ class SurvGame:
             self.displaysurface.blit(text_health, (0, TEXTBOXHT * DISP_SCALE))
             self.displaysurface.blit(text_level, (0, 2 * TEXTBOXHT * DISP_SCALE))
             if self.menu:
+                for entity in self.menu_sprites:
+                    self.displaysurface.blit(entity.surf, entity.rect)
                 self.menu.display()
 
             pygame.display.update()

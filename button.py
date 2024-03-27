@@ -2,8 +2,11 @@ import pygame
 import os
 from constants import HEIGHT, FONT, DISP_SCALE
 
+# Modifiable values
 TEXTCOLOR = (0, 0, 0)   # (R, G, B)
 BUTTON_FONT_SIZE = HEIGHT // 40
+TEXT_OFFSET_X = 0.22
+TEXT_OFFSET_Y = 0.24
 
 
 class Button(pygame.sprite.Sprite):
@@ -19,7 +22,7 @@ class Button(pygame.sprite.Sprite):
         game_font = pygame.font.SysFont(FONT, BUTTON_FONT_SIZE)
         
         text_render = game_font.render(self.text, False, TEXTCOLOR)
-        self.surf.blit(text_render, (self.rect.width / 5, self.rect.height / 4))
+        self.surf.blit(text_render, (self.rect.width * TEXT_OFFSET_X, self.rect.height * TEXT_OFFSET_Y))
 
     def scale_to_screen(self, scale):
         self.surf = pygame.transform.scale_by(self.surf, scale)

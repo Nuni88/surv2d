@@ -7,6 +7,7 @@ from constants import WIDTH, HEIGHT, STAT_STRS, DISP_SCALE
 vec = pygame.math.Vector2
 
 # TODO: Read projectile attributes from file
+# Modifiable values
 ACC_ANGLE = math.pi
 
 
