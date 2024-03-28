@@ -71,7 +71,6 @@ class SurvGame:
         self.displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont(FONT, FONT_SZ)
-        self.spawn_delay = SPAWN_DELAY
         self.level_up_menu = None
         self.pause_menu = None
         self.cursor = Cursor()
@@ -198,7 +197,8 @@ class SurvGame:
         sys.exit()
 
     def run(self):
-        spawn_timer = 0
+        SPAWNENEMIES = pygame.USEREVENT
+        pygame.time.set_timer(SPAWNENEMIES, SPAWN_DELAY)
 
         while True:
             time_update = self.clock.tick(FPS)
@@ -313,6 +313,8 @@ class SurvGame:
                         if event.type == QUIT:
                             pygame.quit()
                             sys.exit()
+                        if event.type == SPAWNENEMIES:
+                            self.spawn_enemies()
                         if event.type == pygame.KEYDOWN:
                             if event.key == pygame.K_SPACE:
                                 if plat_hits:
@@ -322,10 +324,8 @@ class SurvGame:
                             if event.key == pygame.K_r:
                                 if plat_hits:
                                     self.P1.dodge()
-                            if event.key == pygame.K_p:
-                                self.add_pause_menu()
                             if event.key == pygame.K_ESCAPE:
-                                return
+                                self.add_pause_menu()
                         '''
                         if event.type == pygame.KEYDOWN:
                             if event.key == pygame.K_f:
@@ -339,14 +339,9 @@ class SurvGame:
 
                     # Update timers
                     self.P1.update_timers(time_update)
-                    spawn_timer += time_update
-                    if spawn_timer >= self.spawn_delay:
-                        self.spawn_enemies()
-                        spawn_timer -= self.spawn_delay
 
                     # Check if time is over
                     game_time = MAX_TIME - int((pygame.time.get_ticks() - self.time_delay) / 1000)
-                    print(f'Delay: {self.time_delay}')
                     if game_time == 0:
                         return
 
