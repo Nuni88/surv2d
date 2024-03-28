@@ -65,20 +65,26 @@ class Emitter(pygame.sprite.Sprite):
 class FireShooter(Emitter):
     def __init__(self, pos, acc_mod):
         super().__init__(pos, acc_mod)
+        self.max_proj = 6
 
     def shoot(self, mods):
         bullet = Fireball(self.rect.center + vec(-50, 0), self.acc_mod, mods)
         self.bullets.append(bullet)
+        if len(self.bullets) > self.max_proj:
+            self.bullets = self.bullets[1::]
         print(f'Fire! Bullets fired: {len(self.bullets)}')
 
 
 class LitShooter(Emitter):
     def __init__(self, pos, acc_mod):
         super().__init__(pos, acc_mod)
+        self.max_proj = 6
 
     def shoot(self, mods):
         bullet = Lightning(self.rect.center, self.acc_mod, mods)
         self.bullets.append(bullet)
+        if len(self.bullets) > self.max_proj:
+            self.bullets = self.bullets[1::]
         print(f'Lit! Bullets lited: {len(self.bullets)}')
 
 

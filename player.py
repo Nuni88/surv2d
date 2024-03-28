@@ -10,6 +10,7 @@ vec = pygame.math.Vector2
 MOVE_EDGE_LEFT = WIDTH * 0.1
 MOVE_EDGE_RIGHT = WIDTH * 0.9
 GRAVITY = 0.9 * DISP_SCALE
+JUMP_CANCEL_HT = -3 * DISP_SCALE
 
 
 class Player(Actor):
@@ -60,7 +61,7 @@ class Player(Actor):
 
         self.acc.x += self.vel.x * FRIC
         self.vel += self.acc
-        self.pos += self.vel + 0.5 * self.acc
+        self.pos += self.vel + self.acc * 0.5
 
         if self.pos.x < MOVE_EDGE_LEFT:
             self.pos.x = MOVE_EDGE_LEFT
@@ -73,6 +74,7 @@ class Player(Actor):
         for shooter in self.shooters:
             shooter.shoot(self.mods)
 
+    # TODO: Fix platform collision
     def handle_platform_collision(self, plat):
         if plat.rect.top <= self.rect.top and self.rect.bottom <= plat.rect.bottom:
             # Moving left
@@ -111,8 +113,8 @@ class Player(Actor):
             # self.jump_sfx.play()
 
     def cancel_jump(self):
-        if self.jumping and self.vel.y < -3:
-            self.vel.y = -3
+        if self.jumping and self.vel.y < JUMP_CANCEL_HT:
+            self.vel.y = JUMP_CANCEL_HT
 
     def dodge(self):
         if not self.dodging:
@@ -161,7 +163,7 @@ class Player(Actor):
         return not (MOVE_EDGE_LEFT < self.pos.x < MOVE_EDGE_RIGHT)
 
     def get_scroll_dist(self) -> float:
-        return self.vel.x + 0.5 * self.acc.x
+        return self.vel.x + self.acc.x * 0.5
 
     def gain_stat_bonus(self, stat, amt):
         if stat in self.stats:
