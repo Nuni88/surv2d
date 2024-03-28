@@ -214,3 +214,9 @@ class Player(Actor):
 
     def get_crit_mod(self) -> float:
         return self.mods[STAT_STRS['CRITD']]['value']
+
+    def get_stats(self) -> dict:
+        stats = self.stats
+        for mod in self.mods:
+            stats[mod] = self.mods[mod]
+        return stats

@@ -33,6 +33,7 @@ EXP_REQ_SCALE = 20
 NUM_LVL_OPTIONS = 6
 POT_DROP_RT = 10
 TEXTBOXHT = 30
+TEXTSTATHT = 20
 END_SCRN_COLOR = (255, 0, 0)   # (R, G, B)
 BGCOLOR = (200, 200, 200)
 TEXTCOLOR = (0, 0, 0)
@@ -50,7 +51,7 @@ LEVEL_BONUSES = {
     STAT_STRS['DMG']: 0.05,
     STAT_STRS['CRITD']: 0.1,
     STAT_STRS['PROJSPD']: 0.05,
-    STAT_STRS['PROJSZ']: 2.0,
+    STAT_STRS['PROJSZ']: 0.1,
     STAT_STRS['PROJNUM']: 0.1
 }
 PAUSE_MENU_OPTIONS = [
@@ -62,7 +63,7 @@ PAUSE_MENU_OPTIONS = [
 ]
 
 
-# noinspection PyTypeChecker
+# noinspection PyTypeChecker,PyPep8Naming
 class SurvGame:
     def __init__(self):
         pygame.init()
@@ -77,13 +78,12 @@ class SurvGame:
         self.time_delay = 0
 
         # Create sprite groups
-        self.all_sprites = pygame.sprite.Group()
-        self.actors = pygame.sprite.Group()
+        self.environment = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
         self.platforms = pygame.sprite.Group()
         self.doors = pygame.sprite.Group()
         self.pickups = pygame.sprite.Group()
-        self.menu_sprites = pygame.sprite.Group()
+        self.pause_text_sprites = []
 
         # Add player data from JSON file and create player object
         unitdatafile = open(os.path.join('data', 'unitdata.json'), 'r')
@@ -102,48 +102,41 @@ class SurvGame:
         # Generate platforms, walls, and doors
         self.floor = Platform(vec(WIDTH * 0.5, HEIGHT), 'plat_floor.png')
         self.platforms.add(self.floor)
-        self.all_sprites.add(self.floor)
+        self.environment.add(self.floor)
         for i in range(-PLAT_RANGE, PLAT_RANGE):
             plat = Platform(vec(WIDTH * (i - 0.5), HEIGHT * 0.65), 'plat_med.png')
-            self.all_sprites.add(plat)
+            self.environment.add(plat)
             self.platforms.add(plat)
             plat = Platform(vec(WIDTH * i, HEIGHT * 0.77), 'plat_med.png')
-            self.all_sprites.add(plat)
+            self.environment.add(plat)
             self.platforms.add(plat)
 
         for i in range(-PLAT_RANGE, PLAT_RANGE):
             plat = Platform(vec(WIDTH * (i - 0.13), HEIGHT * 0.85), 'wall_med.png')
-            self.all_sprites.add(plat)
+            self.environment.add(plat)
             self.platforms.add(plat)
             roll = random.randint(0, len(STATS) - 1)
             if i == 1:
                 door = WeapDoor(vec(WIDTH * (i + 0.13), HEIGHT * 0.85), 'door.png', 'FireShooter', 2)
             else:
                 door = StatDoor(vec(WIDTH * (i + 0.13), HEIGHT * 0.85), 'door.png', STATS[roll], 2)
-            self.all_sprites.add(door)
+            self.environment.add(door)
             self.doors.add(door)
             self.platforms.add(door)
 
         heart = MaxHealthPickup(vec(WIDTH * 0.2, HEIGHT * 0.93))
-        self.all_sprites.add(heart)
+        self.environment.add(heart)
         self.pickups.add(heart)
-
-        self.all_sprites.add(self.P1)
-        self.actors.add(self.P1)
 
         pygame.mouse.set_visible(False)
 
     def spawn_enemy(self, enemy_type):
         enemy = enemy_type()
-        self.all_sprites.add(enemy)
-        self.actors.add(enemy)
         self.enemies.add(enemy)
 
     def spawn_enemies(self):
         for enemy in self.enemydata:
             e = Enemy(self.enemydata[enemy])
-            self.all_sprites.add(e)
-            self.actors.add(e)
             self.enemies.add(e)
 
     def add_level_up_menu(self):
@@ -158,13 +151,17 @@ class SurvGame:
                 options.append(STATS[roll])
                 print(f'{STATS[roll]}')
         self.level_up_menu = Menu(options, vec(self.displaysurface.get_rect().center))
-        self.menu_sprites.add(self.level_up_menu)
-        self.menu_sprites.add(self.cursor)
 
     def add_pause_menu(self):
         self.pause_menu = Menu(PAUSE_MENU_OPTIONS, vec(self.displaysurface.get_rect().center))
-        self.menu_sprites.add(self.pause_menu)
-        self.menu_sprites.add(self.cursor)
+
+        # Add player stats for display
+        font = pygame.font.SysFont(FONT, FONT_SZ - 6)
+        stats = self.P1.get_stats()
+        for s in stats:
+            text = font.render(f'{s}: {stats[s]["value"]},     Level: {stats[s]["level"]}', True, TEXTCOLOR)
+            text = pygame.transform.scale_by(text, DISP_SCALE)
+            self.pause_text_sprites.append(text)
 
     def handle_pause_option(self, option):
         if option == '':
@@ -173,6 +170,7 @@ class SurvGame:
             self.pause_menu.kill()
             self.pause_menu = None
             self.cursor.kill()
+            self.pause_text_sprites = []
             return
         if option == 'Display Settings':
             self.show_display_settings()
@@ -187,8 +185,6 @@ class SurvGame:
         pass
 
     def end_game(self):
-        for entity in self.all_sprites:
-            entity.kill()
         time.sleep(1)
         self.displaysurface.fill(END_SCRN_COLOR)
         pygame.display.update()
@@ -202,6 +198,9 @@ class SurvGame:
 
         while True:
             time_update = self.clock.tick(FPS)
+            game_time = MAX_TIME - int((pygame.time.get_ticks() - self.time_delay) / 1000)
+            self.displaysurface.fill(BGCOLOR)
+            bullets = None
 
             # Pause menu open
             if self.pause_menu:
@@ -218,9 +217,18 @@ class SurvGame:
                             if menu_hit:
                                 option = self.pause_menu.get_option(self.cursor)
                                 self.handle_pause_option(option)
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            self.handle_pause_option('Resume')
             else:
+                # Check if player has died
                 if self.P1.get_health() <= 0:
                     return
+
+                # Check if time is over
+                if game_time == 0:
+                    return
+
                 bullets = self.P1.get_bullets()
 
                 if self.level_up_menu:
@@ -305,7 +313,7 @@ class SurvGame:
                                 else:
                                     loot_type = LOOT_TABLE[enemy.get_name()]
                                     drop = loot_type(enemy_pos)
-                                self.all_sprites.add(drop)
+                                self.environment.add(drop)
                                 self.pickups.add(drop)
                                 enemy.kill()
 
@@ -335,17 +343,10 @@ class SurvGame:
                             if event.key == pygame.K_SPACE:
                                 self.P1.cancel_jump()
 
-                    self.floor.recenter(self.P1)
-
                     # Update timers
                     self.P1.update_timers(time_update)
 
-                    # Check if time is over
-                    game_time = MAX_TIME - int((pygame.time.get_ticks() - self.time_delay) / 1000)
-                    if game_time == 0:
-                        return
-
-            self.displaysurface.fill(BGCOLOR)
+                    self.floor.recenter(self.P1)
 
             # Display timer as MM:SS
             minutes = int(game_time / 60)
@@ -355,33 +356,42 @@ class SurvGame:
             if seconds < 10:
                 seconds = '0' + str(seconds)
 
-            text_time = self.font.render(f'Time: {minutes}:{seconds}', False, TEXTCOLOR)
+            text_time = self.font.render(f'Time: {minutes}:{seconds}', True, TEXTCOLOR)
             text_time = pygame.transform.scale_by(text_time, DISP_SCALE)
             hp = self.P1.get_health()
             mhp = self.P1.get_max_health()
-            text_health = self.font.render(f'Health: {hp}/{mhp}', False, TEXTCOLOR)
+            text_health = self.font.render(f'Health: {hp}/{mhp}', True, TEXTCOLOR)
             text_health = pygame.transform.scale_by(text_health, DISP_SCALE)
             level_pct = round(100 * self.p_exp / self.to_next_level, 2)
-            text_level = self.font.render(f'Level: {self.p_level} [{level_pct}%]', False, TEXTCOLOR)
+            text_level = self.font.render(f'Level: {self.p_level} [{level_pct}%]', True, TEXTCOLOR)
             text_level = pygame.transform.scale_by(text_level, DISP_SCALE)
 
-            for entity in self.all_sprites:
-                self.displaysurface.blit(entity.surf, entity.rect)
-            for bullet in bullets:
-                self.displaysurface.blit(bullet.surf, bullet.rect)
+            # Display sprites
+            for obj in self.environment:
+                self.displaysurface.blit(obj.surf, obj.rect)
             for door in self.doors:
                 door.display_lock()
+            for enemy in self.enemies:
+                self.displaysurface.blit(enemy.surf, enemy.rect)
+            self.displaysurface.blit(self.P1.surf, self.P1.rect)
+            if bullets:
+                for bullet in bullets:
+                    self.displaysurface.blit(bullet.surf, bullet.rect)
             self.displaysurface.blit(text_time, (0, 0))
             self.displaysurface.blit(text_health, (0, TEXTBOXHT * DISP_SCALE))
             self.displaysurface.blit(text_level, (0, 2 * TEXTBOXHT * DISP_SCALE))
             if self.level_up_menu:
-                for entity in self.menu_sprites:
-                    self.displaysurface.blit(entity.surf, entity.rect)
+                self.displaysurface.blit(self.level_up_menu.surf, self.level_up_menu.rect)
                 self.level_up_menu.display()
+                self.displaysurface.blit(self.cursor.surf, self.cursor.rect)
             elif self.pause_menu:
-                for entity in self.menu_sprites:
-                    self.displaysurface.blit(entity.surf, entity.rect)
+                self.displaysurface.blit(self.pause_menu.surf, self.pause_menu.rect)
                 self.pause_menu.display()
+                height = 2 * TEXTBOXHT * DISP_SCALE
+                for entity in self.pause_text_sprites:
+                    self.displaysurface.blit(entity, (0, height * DISP_SCALE))
+                    height += TEXTSTATHT
+                self.displaysurface.blit(self.cursor.surf, self.cursor.rect)
 
             pygame.display.update()
 
