@@ -5,25 +5,25 @@ import os
 import json
 import pygame
 from pygame.locals import *
-from enemy import Enemy
+from enemy import Enemy, FlyingEnemy
 from player import Player
 from platform import Platform
 from door import WeapDoor, StatDoor
 from pickup import ExpPickup, ExpSmall, ExpMed, ExpLarge, MaxHealthPickup, HealthPickup
 from menu import Menu
 from cursor import Cursor
-from constants import WIDTH, HEIGHT, FONT, STAT_STRS, DISP_SCALE
+from constants import WIDTH, HEIGHT, FONT, STAT_STRS, FPS, DISP_SCALE
 
 vec = pygame.math.Vector2
 
 LOOT_TABLE = {
     'EnemyOne': ExpSmall,
     'EnemyTwo': ExpMed,
-    'EnemyThree': ExpLarge
+    'EnemyThree': ExpLarge,
+    'FlyingEnemyOne': ExpSmall
 }
 
 # Modifiable values
-FPS = 60
 MAX_TIME = 300
 SPAWN_DELAY = 2000
 FONT_SZ = 24
@@ -32,8 +32,8 @@ BASE_EXP_REQ = 100
 EXP_REQ_SCALE = 20
 NUM_LVL_OPTIONS = 6
 POT_DROP_RT = 10
-TEXTBOXHT = 30
-TEXTSTATHT = 20
+TEXTBOXHT = 30 * DISP_SCALE
+TEXTSTATHT = 20 * DISP_SCALE
 END_SCRN_COLOR = (255, 0, 0)   # (R, G, B)
 BGCOLOR = (200, 200, 200)
 TEXTCOLOR = (0, 0, 0)
@@ -130,13 +130,12 @@ class SurvGame:
 
         pygame.mouse.set_visible(False)
 
-    def spawn_enemy(self, enemy_type):
-        enemy = enemy_type()
-        self.enemies.add(enemy)
-
     def spawn_enemies(self):
-        for enemy in self.enemydata:
-            e = Enemy(self.enemydata[enemy])
+        for enemy in self.enemydata['Ground']:
+            e = Enemy(self.enemydata['Ground'][enemy])
+            self.enemies.add(e)
+        for enemy in self.enemydata['Flying']:
+            e = FlyingEnemy(self.enemydata['Flying'][enemy])
             self.enemies.add(e)
 
     def add_level_up_menu(self):
@@ -252,8 +251,9 @@ class SurvGame:
                                         self.cursor.kill()
                 else:
                     self.P1.move()
-                    for enemy in self.enemies:
-                        enemy.move_to(self.P1)
+                    self.enemies.update(vec(self.P1.get_pos()))
+                    # for enemy in self.enemies:
+                    #     enemy.update(vec(self.P1.get_pos()))
 
                     # Scroll the screen
                     if self.P1.out_of_bounds():
@@ -378,8 +378,8 @@ class SurvGame:
                 for bullet in bullets:
                     self.displaysurface.blit(bullet.surf, bullet.rect)
             self.displaysurface.blit(text_time, (0, 0))
-            self.displaysurface.blit(text_health, (0, TEXTBOXHT * DISP_SCALE))
-            self.displaysurface.blit(text_level, (0, 2 * TEXTBOXHT * DISP_SCALE))
+            self.displaysurface.blit(text_health, (0, TEXTBOXHT))
+            self.displaysurface.blit(text_level, (0, 2 * TEXTBOXHT))
             if self.level_up_menu:
                 self.displaysurface.blit(self.level_up_menu.surf, self.level_up_menu.rect)
                 self.level_up_menu.display()
@@ -387,9 +387,9 @@ class SurvGame:
             elif self.pause_menu:
                 self.displaysurface.blit(self.pause_menu.surf, self.pause_menu.rect)
                 self.pause_menu.display()
-                height = 2 * TEXTBOXHT * DISP_SCALE
+                height = 3 * TEXTBOXHT
                 for entity in self.pause_text_sprites:
-                    self.displaysurface.blit(entity, (0, height * DISP_SCALE))
+                    self.displaysurface.blit(entity, (0, height))
                     height += TEXTSTATHT
                 self.displaysurface.blit(self.cursor.surf, self.cursor.rect)
 

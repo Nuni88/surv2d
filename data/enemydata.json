@@ -1,26 +1,38 @@
 {
-	"Enemy1": {
-		"name": "EnemyOne",
-		"damage": 5,
-		"speed_mod": 0.40,
-		"health": 1600,
-		"frame_left": "images\\enemy1\\enemy_left.gif",
-		"frame_right": "images\\enemy1\\enemy_right.gif"
+	"Ground": {
+		"Enemy1": {
+			"name": "EnemyOne",
+			"damage": 5,
+			"speed_mod": 0.40,
+			"health": 1600,
+			"frame_left": "images\\enemy1\\enemy_left.gif",
+			"frame_right": "images\\enemy1\\enemy_right.gif"
+		},
+		"Enemy2": {
+			"name": "EnemyTwo",
+			"damage": 2,
+			"speed_mod": 0.55,
+			"health": 800,
+			"frame_left": "images\\enemy2\\enemy_left.gif",
+			"frame_right": "images\\enemy2\\enemy_right.gif"
+		},
+		"Enemy3": {
+			"name": "EnemyThree",
+			"damage": 8,
+			"speed_mod": 0.20,
+			"health": 2400,
+			"frame_left": "images\\enemy3\\enemy_left.gif",
+			"frame_right": "images\\enemy3\\enemy_right.gif"
+		}
 	},
-	"Enemy2": {
-		"name": "EnemyTwo",
-		"damage": 2,
-		"speed_mod": 0.55,
-		"health": 800,
-		"frame_left": "images\\enemy2\\enemy_left.gif",
-		"frame_right": "images\\enemy2\\enemy_right.gif"
-	},
-	"Enemy3": {
-		"name": "EnemyThree",
-		"damage": 8,
-		"speed_mod": 0.20,
-		"health": 2400,
-		"frame_left": "images\\enemy3\\enemy_left.gif",
-		"frame_right": "images\\enemy3\\enemy_right.gif"
+	"Flying": {
+		"Enemy4": {
+			"name": "FlyingEnemyOne",
+			"damage": 1,
+			"speed_mod": 0.25,
+			"health": 1000,
+			"frame_left": "images\\enemy4\\enemy_left.png",
+			"frame_right": "images\\enemy4\\enemy_right.png"
+		}
 	}
 }

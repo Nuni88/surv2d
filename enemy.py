@@ -2,7 +2,7 @@ import os
 import random
 import pygame
 from actor import Actor
-from constants import WIDTH, HEIGHT, ACC, DISP_SCALE
+from constants import WIDTH, HEIGHT, ACC, FPS, DISP_SCALE
 
 vec = pygame.math.Vector2
 
@@ -26,10 +26,10 @@ class Enemy(Actor):
         self.pos = vec(x, HEIGHT * 0.95)
         self.rect.midbottom = self.pos
 
-    def move_to(self, player):
+    def update(self, ppos):
         super().move()
         # Sets enemy movement and sprite relative to player position
-        if self.pos.x > player.pos.x:
+        if self.pos.x > ppos.x:
             self.acc.x = -ACC * self.speed_mod
             self.surf = self.frame_left
         else:
@@ -47,6 +47,19 @@ class Enemy(Actor):
     def get_name(self) -> str:
         return self.name
 
+
+class FlyingEnemy(Enemy):
+    def __init__(self, enemydata):
+        super().__init__(enemydata)
+        self.pos.y = HEIGHT * round(random.uniform(0.1, 0.7), 2)
+        self.rect.center = self.pos
+
+    def update(self, ppos):
+        # Move toward player directly
+        dx, dy = (ppos.x - self.pos.x, ppos.y - self.pos.y)
+        stepx, stepy = (self.speed_mod * dx // FPS, self.speed_mod * dy // FPS)
+        self.pos = vec(self.pos.x + stepx, self.pos.y + stepy)
+        self.rect.center = self.pos
 
 '''
 class EnemyOne(Enemy):
