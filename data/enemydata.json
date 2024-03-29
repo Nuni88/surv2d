@@ -29,7 +29,7 @@
 		"Enemy4": {
 			"name": "FlyingEnemyOne",
 			"damage": 1,
-			"speed_mod": 0.25,
+			"speed_mod": 1.0,
 			"health": 1000,
 			"frame_left": "images\\enemy4\\enemy_left.png",
 			"frame_right": "images\\enemy4\\enemy_right.png"

@@ -72,7 +72,7 @@ class FireShooter(Emitter):
         self.bullets.append(bullet)
         if len(self.bullets) > self.max_proj:
             self.bullets = self.bullets[1::]
-        print(f'Fire! Bullets fired: {len(self.bullets)}')
+        # print(f'Fire! Bullets fired: {len(self.bullets)}')
 
 
 class LitShooter(Emitter):
@@ -85,7 +85,7 @@ class LitShooter(Emitter):
         self.bullets.append(bullet)
         if len(self.bullets) > self.max_proj:
             self.bullets = self.bullets[1::]
-        print(f'Lit! Bullets lited: {len(self.bullets)}')
+        # print(f'Lit! Bullets lited: {len(self.bullets)}')
 
 
 class IceShooter(Emitter):
@@ -101,4 +101,4 @@ class IceShooter(Emitter):
         self.bullets.append(bullet)
         if len(self.bullets) > self.max_proj:
             self.bullets = self.bullets[1::]
-        print(f'Ice! Bullets iced: {len(self.bullets)}')
+        # print(f'Ice! Bullets iced: {len(self.bullets)}')

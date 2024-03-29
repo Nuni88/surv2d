@@ -31,7 +31,7 @@ class Actor(pygame.sprite.Sprite):
         self.rect.midbottom = self.pos
 
     def get_pos(self) -> (float, float):
-        return self.rect.midbottom
+        return self.rect.center
 
     def scale_to_screen(self, scale):
         self.surf = pygame.transform.scale_by(self.surf, scale)

@@ -57,8 +57,8 @@ class FlyingEnemy(Enemy):
     def update(self, ppos):
         # Move toward player directly
         dx, dy = (ppos.x - self.pos.x, ppos.y - self.pos.y)
-        stepx, stepy = (self.speed_mod * dx // FPS, self.speed_mod * dy // FPS)
-        self.pos = vec(self.pos.x + stepx, self.pos.y + stepy)
+        self.vel = vec(self.speed_mod * dx / FPS, self.speed_mod * dy / FPS)
+        self.pos += self.vel
         self.rect.center = self.pos
 
 '''
