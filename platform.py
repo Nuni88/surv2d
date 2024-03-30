@@ -16,8 +16,8 @@ class Platform(pygame.sprite.Sprite):
         self.pos.x -= offset
         self.rect.midbottom = self.pos
 
-    def recenter(self, player):
-        self.pos.x = player.rect.centerx
+    def update(self, pos):
+        self.pos.x = pos.x
         self.rect.midbottom = self.pos
 
     def scale_to_screen(self, scale):

@@ -36,13 +36,13 @@ class Enemy(Actor):
             self.acc.x = ACC * self.speed_mod
             self.surf = self.frame_right
 
-    def take_damage(self, amt) -> bool:
+    def take_damage(self, amt):
         if amt > 0:
             # print(f'Enemy took {amt} damage.')
             self.health -= amt
             if self.health <= 0:
-                return True
-        return False
+                print('Enemy killed!')
+                self.kill()
 
     def get_name(self) -> str:
         return self.name

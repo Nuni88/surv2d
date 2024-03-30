@@ -55,36 +55,35 @@ class Door(Platform):
         base_width = self.lock_base_surf.get_width()
         base_height = self.lock_base_surf.get_height()
         req_width = self.lock_req_surf.get_width()
-        req_height = self.lock_req_surf.get_height()
         lvl_width = self.lock_lvl_surf.get_width()
         lvl_height = self.lock_lvl_surf.get_height()
 
         # Display locks centered on door with equal space above top lock and below bottom lock
         # Space above and below is LOCK_DIST * door height
         h = self.rect.height * LOCK_DIST
-        # self.surf.blit(self.lock_base_surf, (self.rect.width * 0.5 - base_width * 0.5, h))
-        # h = h + base_height * 0.5 - req_height * 0.5
         self.surf.blit(self.lock_req_surf, (self.rect.width * 0.5 - req_width * 0.5, h))
         h = self.rect.height - self.rect.height * LOCK_DIST - base_height
         self.surf.blit(self.lock_base_surf, (self.rect.width * 0.5 - base_width * 0.5, h))
         h = h + base_height * 0.5 - lvl_height * 0.5
         self.surf.blit(self.lock_lvl_surf, (self.rect.width * 0.5 - lvl_width * 0.5, h))
 
-    def unlockable(self, player) -> bool:
-        return False
+    def handle_lock_check(self, player):
+        pass
 
 
 class WeapDoor(Door):
     def __init__(self, c, surf, req, lvl):
         super().__init__(c, surf, req, lvl)
 
-    def unlockable(self, player) -> bool:
-        return player.has_req_weapon(self.lock['req'], self.lock['lvl'])
+    def handle_lock_check(self, player):
+        if player.has_req_weapon(self.lock['req'], self.lock['lvl']):
+            self.kill()
 
 
 class StatDoor(Door):
     def __init__(self, c, surf, req, lvl):
         super().__init__(c, surf, req, lvl)
 
-    def unlockable(self, player) -> bool:
-        return player.has_req_stat(self.lock['req'], self.lock['lvl'])
+    def handle_lock_check(self, player):
+        if player.has_req_stat(self.lock['req'], self.lock['lvl']):
+            self.kill()
