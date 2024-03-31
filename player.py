@@ -25,7 +25,6 @@ class Player(Actor):
         self.frame_right = pygame.transform.scale_by(pygame.image.load(chardata['frame_right']), DISP_SCALE)
         self.frame_dodge = pygame.transform.scale_by(pygame.image.load(chardata['frame_dodge']), DISP_SCALE)
         self.health = self.stats[STAT_STRS['MAXHP']]['value']
-        self.stats[STAT_STRS['JUMPH']]['value'] *= DISP_SCALE
 
         self.jumping = False
         self.midair_jumping = False
@@ -45,99 +44,15 @@ class Player(Actor):
         # self.jump_sfx = pygame.mixer.Sound(os.path.join('sound', 'jump.wav'))
         # self.jump_sfx.set_volume(0.1)
 
-    def move(self):
-        self.acc = vec(0, GRAVITY)
-        pressed_keys = pygame.key.get_pressed()
-        if pressed_keys[K_LEFT]:
-            self.acc.x = -ACC * self.stats[STAT_STRS['MSPD']]['value']
-            self.surf = self.frame_left
-        if pressed_keys[K_RIGHT]:
-            self.acc.x = ACC * self.stats[STAT_STRS['MSPD']]['value']
-            self.surf = self.frame_right
+    def update(self, ms):
+        if self.health <= 0:
+            self.kill()
+            return
+
         if self.dodging and self.invincible:
             self.surf = self.frame_dodge
-        for shooter in self.shooters:
-            shooter.move(self.rect.center)
+        # print(f'Player pos: {self.pos}')
 
-        self.acc.x += self.vel.x * FRIC
-        self.vel += self.acc
-        self.pos += self.vel + self.acc * 0.5
-
-        if self.pos.x < MOVE_EDGE_LEFT:
-            self.pos.x = MOVE_EDGE_LEFT
-        elif self.pos.x > MOVE_EDGE_RIGHT:
-            self.pos.x = MOVE_EDGE_RIGHT
-
-        self.rect.midbottom = self.pos
-
-    def shoot(self):
-        for shooter in self.shooters:
-            shooter.shoot(self.mods)
-
-    # TODO: Fix platform collision
-    def handle_platform_collision(self, plat):
-        if plat.rect.top <= self.rect.top and self.rect.bottom <= plat.rect.bottom:
-            # Moving left
-            if self.vel.x < 0:
-                self.rect.left = plat.rect.right
-                self.vel.x = 0
-            # Moving right
-            elif self.vel.x > 0:
-                self.rect.right = plat.rect.left
-                self.vel.x = 0
-
-        if plat.rect.left <= self.rect.left and self.rect.right <= plat.rect.right:
-            # Moving up
-            if self.vel.y < 0:
-                self.rect.top = plat.rect.bottom
-                self.vel.y = 0
-            # Moving down
-            elif self.vel.y > 0:
-                self.rect.bottom = plat.rect.top
-                self.jumping = False
-                self.midair_jumping = False
-                self.vel.y = 0
-
-        self.pos = self.rect.midbottom
-
-    def jump(self):
-        if not self.jumping:
-            self.jumping = True
-            self.vel.y = -self.stats[STAT_STRS['JUMPH']]['value']
-            # self.jump_sfx.play()
-
-    def midair_jump(self):
-        if not self.midair_jumping:
-            self.midair_jumping = True
-            self.vel.y = -self.stats[STAT_STRS['JUMPH']]['value'] / 2
-            # self.jump_sfx.play()
-
-    def cancel_jump(self):
-        if self.jumping and self.vel.y < JUMP_CANCEL_HT:
-            self.vel.y = JUMP_CANCEL_HT
-
-    def dodge(self):
-        if not self.dodging:
-            print('Dodged!')
-            self.dodging = True
-            self.invincible = True
-            self.move()
-
-    def take_hit(self, enemy):
-        if enemy.damage > 0:
-            if not self.invincible:
-                print(f'Took {enemy.damage} damage.')
-                self.health -= enemy.damage
-                self.invincible = True
-
-    def get_bullets(self) -> list:
-        bullets = []
-        for shooter in self.shooters:
-            for bullet in shooter.get_bullets():
-                bullets.append(bullet)
-        return bullets
-
-    def update_timers(self, ms):
         # Time between dodges determined by dodge stat
         # Turn dodge cooldown off and reset tracking
         if self.dodging:
@@ -157,7 +72,96 @@ class Player(Actor):
                     self.surf = self.frame_left
 
         for shooter in self.shooters:
+            shooter.move(self.rect.center)
             shooter.update_timers(ms, self.mods)
+
+    def move_x(self):
+        self.acc.x = 0
+        pressed_keys = pygame.key.get_pressed()
+        if pressed_keys[K_LEFT]:
+            self.acc.x = -ACC * self.stats[STAT_STRS['MSPD']]['value']
+            self.surf = self.frame_left
+        if pressed_keys[K_RIGHT]:
+            self.acc.x = ACC * self.stats[STAT_STRS['MSPD']]['value']
+            self.surf = self.frame_right
+
+        self.acc.x += self.vel.x * FRIC
+        self.vel.x += self.acc.x
+        self.pos.x += self.vel.x + self.acc.x * 0.5
+
+        if self.pos.x < MOVE_EDGE_LEFT:
+            self.pos.x = MOVE_EDGE_LEFT
+        elif self.pos.x > MOVE_EDGE_RIGHT:
+            self.pos.x = MOVE_EDGE_RIGHT
+
+        self.rect.midbottom = self.pos
+
+    def move_y(self):
+        self.acc.y = GRAVITY
+        self.vel.y += self.acc.y
+        self.pos.y += self.vel.y + self.acc.y * 0.5
+
+        self.rect.midbottom = self.pos
+
+    def handle_collision_x(self, plat):
+        # Moving left
+        if self.vel.x < 0:
+            self.rect.left = plat.rect.right
+        # Moving right
+        elif self.vel.x > 0:
+            self.rect.right = plat.rect.left
+        self.vel.x = 0
+        self.pos = vec(self.rect.midbottom)
+
+    def handle_collision_y(self, plat):
+        # Moving up
+        if self.vel.y < 0:
+            self.rect.top = plat.rect.bottom
+        # Moving down
+        elif self.vel.y > 0:
+            self.rect.bottom = plat.rect.top
+            self.jumping = False
+            self.midair_jumping = False
+        self.vel.y = 0
+        self.pos = vec(self.rect.midbottom)
+
+    def jump(self):
+        if not self.jumping:
+            if self.vel.y == 0:
+                self.jumping = True
+                self.vel.y = -self.stats[STAT_STRS['JUMPH']]['value'] * DISP_SCALE
+                # self.jump_sfx.play()
+        elif not self.midair_jumping:
+            print('In double jump section')
+            self.midair_jumping = True
+            self.vel.y = -self.stats[STAT_STRS['JUMPH']]['value'] * 0.5 * DISP_SCALE
+            # self.jump_sfx.play()
+
+    def cancel_jump(self):
+        if self.jumping and self.vel.y < JUMP_CANCEL_HT:
+            self.vel.y = JUMP_CANCEL_HT
+
+    def dodge(self):
+        if not self.dodging and not self.jumping:
+            print('Dodged!')
+            self.dodging = True
+            self.invincible = True
+
+    def take_hit(self, enemy):
+        if enemy.damage > 0:
+            if not self.invincible:
+                print(f'Took {enemy.damage} damage.')
+                self.health -= enemy.damage
+                if self.health <= 0:
+                    self.kill()
+                self.invincible = True
+
+    def get_bullets(self) -> list:
+        bullets = []
+        for shooter in self.shooters:
+            for bullet in shooter.get_bullets():
+                bullets.append(bullet)
+        return bullets
 
     def out_of_bounds(self) -> bool:
         return not (MOVE_EDGE_LEFT < self.pos.x < MOVE_EDGE_RIGHT)

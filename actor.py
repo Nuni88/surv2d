@@ -35,3 +35,15 @@ class Actor(pygame.sprite.Sprite):
 
     def scale_to_screen(self, scale):
         self.surf = pygame.transform.scale_by(self.surf, scale)
+
+    '''
+    def handle_collision_x(self, plat):
+        # Moving left
+        if self.vel.x < 0:
+            self.rect.left = plat.rect.right
+        # Moving right
+        elif self.vel.x > 0:
+            self.rect.right = plat.rect.left
+        self.vel.x = 0
+        self.pos = vec(self.rect.midbottom)
+    '''

@@ -46,6 +46,9 @@ class Menu(pygame.sprite.Sprite):
                 return option.text
         return ''
 
+    def get_button_text(self, button_num) -> str:
+        return self.options[button_num].text
+
     def scale_to_screen(self, scale):
         self.surf = pygame.transform.scale_by(self.surf, scale)
 

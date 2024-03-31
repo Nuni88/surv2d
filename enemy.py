@@ -47,6 +47,18 @@ class Enemy(Actor):
     def get_name(self) -> str:
         return self.name
 
+    '''
+    def handle_collision_y(self, plat):
+        # Moving up
+        if self.vel.y < 0:
+            self.rect.top = plat.rect.bottom
+        # Moving down
+        elif self.vel.y > 0:
+            self.rect.bottom = plat.rect.top
+        self.vel.y = 0
+        self.pos = vec(self.rect.midbottom)
+    '''
+
 
 class FlyingEnemy(Enemy):
     def __init__(self, enemydata):
@@ -60,43 +72,3 @@ class FlyingEnemy(Enemy):
         self.vel = vec(self.speed_mod * dx / FPS, self.speed_mod * dy / FPS)
         self.pos += self.vel
         self.rect.center = self.pos
-
-'''
-class EnemyOne(Enemy):
-    def __init__(self):
-        path_left = os.path.join('images\\enemy1', 'enemy_left.gif')
-        path_right = os.path.join('images\\enemy1', 'enemy_right.gif')
-        super().__init__(pygame.image.load(path_left))
-        self.frame_left = pygame.transform.scale_by(pygame.image.load(path_left), DISP_SCALE)
-        self.frame_right = pygame.transform.scale_by(pygame.image.load(path_right), DISP_SCALE)
-        self.name = 'EnemyOne'
-        self.damage = 5
-        self.speed_mod = round(random.uniform(0.35, 0.45), 2)
-        self.health = 1600
-
-
-class EnemyTwo(Enemy):
-    def __init__(self):
-        path_left = os.path.join('images\\enemy2', 'enemy_left.gif')
-        path_right = os.path.join('images\\enemy2', 'enemy_right.gif')
-        super().__init__(pygame.image.load(path_left))
-        self.frame_left = pygame.transform.scale_by(pygame.image.load(path_left), DISP_SCALE)
-        self.frame_right = pygame.transform.scale_by(pygame.image.load(path_right), DISP_SCALE)
-        self.name = 'EnemyTwo'
-        self.damage = 2
-        self.speed_mod = round(random.uniform(0.5, 0.6), 2)
-        self.health = 800
-
-
-class EnemyThree(Enemy):
-    def __init__(self):
-        path_left = os.path.join('images\\enemy3', 'enemy_left.gif')
-        path_right = os.path.join('images\\enemy3', 'enemy_right.gif')
-        super().__init__(pygame.image.load(path_left))
-        self.frame_left = pygame.transform.scale_by(pygame.image.load(path_left), DISP_SCALE)
-        self.frame_right = pygame.transform.scale_by(pygame.image.load(path_right), DISP_SCALE)
-        self.name = 'EnemyThree'
-        self.damage = 8
-        self.speed_mod = round(random.uniform(0.15, 0.25), 2)
-        self.health = 2400
-'''
