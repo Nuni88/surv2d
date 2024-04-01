@@ -61,6 +61,7 @@ PAUSE_MENU_OPTIONS = [
     'Return to Title',
     'Quit'
 ]
+SPAWNENEMIES = pygame.USEREVENT
 
 
 # noinspection PyTypeChecker,PyPep8Naming
@@ -155,6 +156,42 @@ class SurvGame:
                 print(f'{STATS[roll]}')
         self.level_up_menu = Menu(options, vec(self.displaysurface.get_rect().center))
 
+    def handle_level_up_screen(self, time_update):
+        self.time_delay += time_update
+        self.cursor.move()
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == MOUSEBUTTONDOWN:
+                # Left click
+                if event.button == 1:
+                    menu_hit = pygame.sprite.collide_rect(self.cursor, self.level_up_menu)
+                    if menu_hit:
+                        option = self.level_up_menu.get_option(self.cursor)
+                        # print(option)
+                        self.handle_level_option(option)
+            if event.type == KEYDOWN:
+                # Choose bonus options using keys 1-6
+                if event.key == pygame.K_1:
+                    option = self.level_up_menu.get_button_text(0)
+                    self.handle_level_option(option)
+                elif event.key == pygame.K_2:
+                    option = self.level_up_menu.get_button_text(1)
+                    self.handle_level_option(option)
+                elif event.key == pygame.K_3:
+                    option = self.level_up_menu.get_button_text(2)
+                    self.handle_level_option(option)
+                elif event.key == pygame.K_4:
+                    option = self.level_up_menu.get_button_text(3)
+                    self.handle_level_option(option)
+                elif event.key == pygame.K_5:
+                    option = self.level_up_menu.get_button_text(4)
+                    self.handle_level_option(option)
+                elif event.key == pygame.K_6:
+                    option = self.level_up_menu.get_button_text(5)
+                    self.handle_level_option(option)
+
     def handle_level_option(self, option):
         if option == '':
             return
@@ -173,6 +210,24 @@ class SurvGame:
             text = font.render(f'{s}: {stats[s]["value"]},     Level: {stats[s]["level"]}', True, TEXTCOLOR)
             text = pygame.transform.scale_by(text, DISP_SCALE)
             self.pause_text_sprites.append(text)
+
+    def handle_pause_screen(self, time_update):
+        self.time_delay += time_update
+        self.cursor.move()
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == MOUSEBUTTONDOWN:
+                # Left click
+                if event.button == 1:
+                    menu_hit = pygame.sprite.collide_rect(self.cursor, self.pause_menu)
+                    if menu_hit:
+                        option = self.pause_menu.get_option(self.cursor)
+                        self.handle_pause_option(option)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.handle_pause_option('Resume')
 
     def handle_pause_option(self, option):
         if option == '':
@@ -226,17 +281,7 @@ class SurvGame:
         self.displaysurface.blit(text_health, (0, TEXTBOXHT))
         self.displaysurface.blit(text_level, (0, 2 * TEXTBOXHT))
 
-    def display(self):
-        self.displaysurface.fill(BGCOLOR)
-        for obj in self.environment:
-            self.displaysurface.blit(obj.surf, obj.rect)
-        for door in self.doors:
-            door.display_lock()
-        for enemy in self.enemies:
-            self.displaysurface.blit(enemy.surf, enemy.rect)
-        self.displaysurface.blit(self.P1.surf, self.P1.rect)
-        for bullet in self.bullets:
-            self.displaysurface.blit(bullet.surf, bullet.rect)
+    def display_menus(self):
         if self.level_up_menu:
             self.displaysurface.blit(self.level_up_menu.surf, self.level_up_menu.rect)
             self.level_up_menu.display()
@@ -250,12 +295,117 @@ class SurvGame:
                 height += TEXTSTATHT
             self.displaysurface.blit(self.cursor.surf, self.cursor.rect)
 
+    def display(self):
+        # Display objects
+        self.displaysurface.fill(BGCOLOR)
+        for obj in self.environment:
+            self.displaysurface.blit(obj.surf, obj.rect)
+        for door in self.doors:
+            door.display_lock()
+        for enemy in self.enemies:
+            self.displaysurface.blit(enemy.surf, enemy.rect)
+        self.displaysurface.blit(self.P1.surf, self.P1.rect)
+        for bullet in self.bullets:
+            self.displaysurface.blit(bullet.surf, bullet.rect)
+
+        self.display_menus()
         self.display_text()
 
         pygame.display.update()
 
+    def handle_player_movement(self):
+        # Handle horizontal movement and collisions and door lock checks
+        self.P1.move_x()
+        door_hits = pygame.sprite.spritecollide(self.P1, self.doors, False)
+        if door_hits:
+            for door in door_hits:
+                door.handle_lock_check(self.P1)
+        plat_hits = pygame.sprite.spritecollide(self.P1, self.platforms, False)
+        if plat_hits:
+            for plat in plat_hits:
+                self.P1.handle_collision_x(plat)
+
+        # Handle vertical movement and collisions and door lock checks
+        self.P1.move_y()
+        door_hits = pygame.sprite.spritecollide(self.P1, self.doors, False)
+        if door_hits:
+            for door in door_hits:
+                door.handle_lock_check(self.P1)
+        plat_hits = pygame.sprite.spritecollide(self.P1, self.platforms, False)
+        if plat_hits:
+            for plat in plat_hits:
+                self.P1.handle_collision_y(plat)
+
+    def handle_game_events(self):
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == SPAWNENEMIES:
+                self.spawn_enemies()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    self.P1.jump()
+                if event.key == pygame.K_r:
+                    self.P1.dodge()
+                if event.key == pygame.K_ESCAPE:
+                    self.add_pause_menu()
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_SPACE:
+                    self.P1.cancel_jump()
+
+    def handle_enemy_collisions(self):
+        pass
+
+        '''
+        enemy_plat_hits = pygame.sprite.groupcollide(self.enemies, self.platforms, False, False)
+        for enemy in enemy_plat_hits:
+            for plat in enemy_plat_hits[enemy]:
+                enemy.handle_collision_x(plat)
+
+        enemy_plat_hits = pygame.sprite.groupcollide(self.enemies, self.platforms, False, False)
+        for enemy in enemy_plat_hits:
+            for plat in enemy_plat_hits[enemy]:
+                enemy.handle_collision_y(plat)
+        '''
+
+    def handle_item_pickups(self):
+        hits = pygame.sprite.spritecollide(self.P1, self.pickups, False)
+        if hits:
+            for pickup in hits:
+                # TODO: Rewrite cleaner
+                if isinstance(pickup, ExpPickup):
+                    self.p_exp += pickup.get_value()
+                    if self.p_exp >= self.to_next_level:
+                        self.add_level_up_menu()
+                else:
+                    pickup.collect(self.P1)
+                pickup.kill()
+
+    def handle_player_hits(self):
+        hits = pygame.sprite.spritecollide(self.P1, self.enemies, False)
+        if hits:
+            self.P1.take_hit(hits[0])
+
+    def handle_enemy_hits(self):
+        hits = pygame.sprite.groupcollide(self.enemies, self.bullets, False, False)
+        for enemy in hits:
+            for bullet in hits[enemy]:
+                crit_chance = self.P1.get_crit_chance()
+                crit_mod = self.P1.get_crit_mod()
+                enemy.take_damage(bullet.get_damage(crit_chance, crit_mod))
+                if not enemy.alive():
+                    enemy_pos = enemy.get_pos()
+                    hp_chance = random.randint(1, 100)
+                    if hp_chance <= POT_DROP_RT:
+                        drop = HealthPickup(enemy_pos)
+                    else:
+                        loot_type = LOOT_TABLE[enemy.get_name()]
+                        drop = loot_type(enemy_pos)
+                    self.environment.add(drop)
+                    self.pickups.add(drop)
+
     def run(self):
-        SPAWNENEMIES = pygame.USEREVENT
         pygame.time.set_timer(SPAWNENEMIES, SPAWN_DELAY)
 
         while True:
@@ -269,165 +419,30 @@ class SurvGame:
             if self.game_time == 0:
                 return
 
-            # Pause menu open
-            if self.pause_menu:
-                self.time_delay += time_update
-                self.cursor.move()
-                for event in pygame.event.get():
-                    if event.type == QUIT:
-                        pygame.quit()
-                        sys.exit()
-                    if event.type == MOUSEBUTTONDOWN:
-                        # Left click
-                        if event.button == 1:
-                            menu_hit = pygame.sprite.collide_rect(self.cursor, self.pause_menu)
-                            if menu_hit:
-                                option = self.pause_menu.get_option(self.cursor)
-                                self.handle_pause_option(option)
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_ESCAPE:
-                            self.handle_pause_option('Resume')
+            if self.pause_menu:                                 # Pause menu open
+                self.handle_pause_screen(time_update)
             else:
-                if self.level_up_menu:
-                    self.time_delay += time_update
-                    self.cursor.move()
-                    for event in pygame.event.get():
-                        if event.type == QUIT:
-                            pygame.quit()
-                            sys.exit()
-                        if event.type == MOUSEBUTTONDOWN:
-                            # Left click
-                            if event.button == 1:
-                                menu_hit = pygame.sprite.collide_rect(self.cursor, self.level_up_menu)
-                                if menu_hit:
-                                    option = self.level_up_menu.get_option(self.cursor)
-                                    print(option)
-                                    self.handle_level_option(option)
-                        if event.type == KEYDOWN:
-                            # Choose bonus options using keys 1-6
-                            if event.key == pygame.K_1:
-                                option = self.level_up_menu.get_button_text(0)
-                                self.handle_level_option(option)
-                            elif event.key == pygame.K_2:
-                                option = self.level_up_menu.get_button_text(1)
-                                self.handle_level_option(option)
-                            elif event.key == pygame.K_3:
-                                option = self.level_up_menu.get_button_text(2)
-                                self.handle_level_option(option)
-                            elif event.key == pygame.K_4:
-                                option = self.level_up_menu.get_button_text(3)
-                                self.handle_level_option(option)
-                            elif event.key == pygame.K_5:
-                                option = self.level_up_menu.get_button_text(4)
-                                self.handle_level_option(option)
-                            elif event.key == pygame.K_6:
-                                option = self.level_up_menu.get_button_text(5)
-                                self.handle_level_option(option)
-                else:
-                    # Handle horizontal movement and collisions and door lock checks
-                    self.P1.move_x()
-                    door_hits = pygame.sprite.spritecollide(self.P1, self.doors, False)
-                    if door_hits:
-                        for door in door_hits:
-                            door.handle_lock_check(self.P1)
-                    plat_hits = pygame.sprite.spritecollide(self.P1, self.platforms, False)
-                    if plat_hits:
-                        for plat in plat_hits:
-                            self.P1.handle_collision_x(plat)
+                if self.level_up_menu:                          # Level up menu open
+                    self.handle_level_up_screen(time_update)
+                else:                                           # Game is active
+                    self.handle_player_movement()
 
-                    # Handle vertical movement and collisions and door lock checks
-                    self.P1.move_y()
-                    door_hits = pygame.sprite.spritecollide(self.P1, self.doors, False)
-                    if door_hits:
-                        for door in door_hits:
-                            door.handle_lock_check(self.P1)
-                    plat_hits = pygame.sprite.spritecollide(self.P1, self.platforms, False)
-                    if plat_hits:
-                        for plat in plat_hits:
-                            self.P1.handle_collision_y(plat)
-
-                    # Scroll the screen
-                    if self.P1.out_of_bounds():
-                        mod = self.P1.get_scroll_dist()
-                        for enemy in self.enemies:
-                            enemy.scroll(mod)
-                        for bullet in self.bullets:
-                            bullet.scroll(mod)
-                        for pickup in self.pickups:
-                            pickup.scroll(mod)
-                        for plat in self.platforms:
-                            plat.scroll(mod)
-
+                    # Update objects, scroll screen
                     self.P1.update(time_update)
                     ppos = vec(self.P1.get_pos())
-                    self.enemies.update(ppos)
-                    self.floor.update(ppos)
+                    offset = self.P1.get_scroll_dist()
+                    self.enemies.update(ppos, offset)
+                    for bullet in self.bullets:         # TODO: Refactor bullets to sprite group
+                        bullet.update(offset)
+                    self.pickups.update(offset)
+                    self.platforms.update(offset)
+                    self.floor.recenter(ppos)
 
-                    '''
-                    enemy_plat_hits = pygame.sprite.groupcollide(self.enemies, self.platforms, False, False)
-                    for enemy in enemy_plat_hits:
-                        for plat in enemy_plat_hits[enemy]:
-                            enemy.handle_collision_x(plat)
-
-                    enemy_plat_hits = pygame.sprite.groupcollide(self.enemies, self.platforms, False, False)
-                    for enemy in enemy_plat_hits:
-                        for plat in enemy_plat_hits[enemy]:
-                            enemy.handle_collision_y(plat)
-                    '''
-
-                    # Handle player grabbing pickups
-                    pickup_hits = pygame.sprite.spritecollide(self.P1, self.pickups, False)
-                    if pickup_hits:
-                        for pickup in pickup_hits:
-                            # TODO: Rewrite cleaner
-                            if isinstance(pickup, ExpPickup):
-                                self.p_exp += pickup.get_value()
-                                if self.p_exp >= self.to_next_level:
-                                    self.add_level_up_menu()
-                            else:
-                                pickup.collect(self.P1)
-                            pickup.kill()
-
-                    # Handle damage from enemies
-                    enemy_hits = pygame.sprite.spritecollide(self.P1, self.enemies, False)
-                    if enemy_hits:
-                        self.P1.take_hit(enemy_hits[0])
-
-                    # Handle player shooting enemies
-                    for bullet in self.bullets:
-                        proj_hits = pygame.sprite.spritecollide(bullet, self.enemies, False)
-                        for enemy in proj_hits:
-                            crit_chance = self.P1.get_crit_chance()
-                            crit_mod = self.P1.get_crit_mod()
-                            enemy.take_damage(bullet.get_damage(crit_chance, crit_mod))
-                            if not enemy.alive():
-                                enemy_pos = enemy.get_pos()
-                                hp_chance = random.randint(1, 100)
-                                if hp_chance <= POT_DROP_RT:
-                                    drop = HealthPickup(enemy_pos)
-                                else:
-                                    loot_type = LOOT_TABLE[enemy.get_name()]
-                                    drop = loot_type(enemy_pos)
-                                self.environment.add(drop)
-                                self.pickups.add(drop)
-
-                    # Handle events
-                    for event in pygame.event.get():
-                        if event.type == QUIT:
-                            pygame.quit()
-                            sys.exit()
-                        if event.type == SPAWNENEMIES:
-                            self.spawn_enemies()
-                        if event.type == pygame.KEYDOWN:
-                            if event.key == pygame.K_SPACE:
-                                self.P1.jump()
-                            if event.key == pygame.K_r:
-                                self.P1.dodge()
-                            if event.key == pygame.K_ESCAPE:
-                                self.add_pause_menu()
-                        if event.type == pygame.KEYUP:
-                            if event.key == pygame.K_SPACE:
-                                self.P1.cancel_jump()
+                    self.handle_enemy_collisions()  # Handle enemies colliding with walls and platforms
+                    self.handle_item_pickups()      # Handle player grabbing pickups
+                    self.handle_player_hits()       # Handle player taking hits
+                    self.handle_enemy_hits()        # Handle player shooting enemies
+                    self.handle_game_events()
 
             self.display()
 

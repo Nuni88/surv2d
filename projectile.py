@@ -45,7 +45,7 @@ class Projectile(pygame.sprite.Sprite):
             return int(self.damage * crit_mod)
         return self.damage
 
-    def scroll(self, offset):
+    def update(self, offset):
         self.rect.centerx -= offset
 
     def scale_to_screen(self, scale):

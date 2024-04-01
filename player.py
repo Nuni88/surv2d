@@ -132,7 +132,6 @@ class Player(Actor):
                 self.vel.y = -self.stats[STAT_STRS['JUMPH']]['value'] * DISP_SCALE
                 # self.jump_sfx.play()
         elif not self.midair_jumping:
-            print('In double jump section')
             self.midair_jumping = True
             self.vel.y = -self.stats[STAT_STRS['JUMPH']]['value'] * 0.5 * DISP_SCALE
             # self.jump_sfx.play()
@@ -163,11 +162,11 @@ class Player(Actor):
                 bullets.append(bullet)
         return bullets
 
-    def out_of_bounds(self) -> bool:
-        return not (MOVE_EDGE_LEFT < self.pos.x < MOVE_EDGE_RIGHT)
-
     def get_scroll_dist(self) -> float:
-        return self.vel.x + self.acc.x * 0.5
+        if not (MOVE_EDGE_LEFT < self.pos.x < MOVE_EDGE_RIGHT):
+            return self.vel.x + self.acc.x * 0.5
+        else:
+            return 0
 
     def gain_stat_bonus(self, stat, amt):
         if stat in self.stats:

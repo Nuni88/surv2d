@@ -26,9 +26,11 @@ class Actor(pygame.sprite.Sprite):
     def get_health(self) -> int:
         return self.health
 
+    '''
     def scroll(self, offset):
         self.pos.x -= offset
         self.rect.midbottom = self.pos
+    '''
 
     def get_pos(self) -> (float, float):
         return self.rect.center

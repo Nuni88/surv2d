@@ -26,7 +26,8 @@ class Enemy(Actor):
         self.pos = vec(x, HEIGHT * 0.95)
         self.rect.midbottom = self.pos
 
-    def update(self, ppos):
+    def update(self, ppos, offset):
+        self.pos.x -= offset
         super().move()
         # Sets enemy movement and sprite relative to player position
         if self.pos.x > ppos.x:
@@ -64,8 +65,8 @@ class GroundEnemy(Enemy):
     def __init__(self, enemydata):
         super().__init__(enemydata)
 
-    def update(self, ppos):
-        super().update(ppos)
+    def update(self, ppos, offset):
+        super().update(ppos, offset)
 
 
 class FlyingEnemy(Enemy):
@@ -74,7 +75,8 @@ class FlyingEnemy(Enemy):
         self.pos.y = HEIGHT * round(random.uniform(0.1, 0.7), 2)
         self.rect.center = self.pos
 
-    def update(self, ppos):
+    def update(self, ppos, offset):
+        self.pos.x -= offset
         # Move toward player directly
         dx, dy = (ppos.x - self.pos.x, ppos.y - self.pos.y)
         self.vel = vec(self.speed_mod * dx / FPS, self.speed_mod * dy / FPS)

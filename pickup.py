@@ -13,7 +13,7 @@ class Pickup(pygame.sprite.Sprite):
         self.rect = self.surf.get_rect(center=pos)
         self.value = 0
 
-    def scroll(self, offset):
+    def update(self, offset):
         self.rect.centerx -= offset
 
     def get_value(self) -> int:
