@@ -5,7 +5,7 @@ import os
 import json
 import pygame
 from pygame.locals import *
-from enemy import Enemy, FlyingEnemy
+from enemy import GroundEnemy, FlyingEnemy
 from player import Player
 from platform import Platform
 from door import WeapDoor, StatDoor
@@ -34,9 +34,9 @@ NUM_LVL_OPTIONS = 6
 POT_DROP_RT = 10
 TEXTBOXHT = 30 * DISP_SCALE
 TEXTSTATHT = 20 * DISP_SCALE
-END_SCRN_COLOR = (255, 0, 0)   # (R, G, B)
-BGCOLOR = (200, 200, 200)
-TEXTCOLOR = (0, 0, 0)
+END_SCRN_COLOR = pygame.Color('red3')
+BGCOLOR = pygame.Color('darkseagreen3')
+TEXTCOLOR = pygame.Color('black')
 STATS = []
 for stat in STAT_STRS:
     STATS.append(STAT_STRS[stat])
@@ -75,7 +75,9 @@ class SurvGame:
         self.level_up_menu = None
         self.pause_menu = None
         self.cursor = Cursor()
+        self.game_time = MAX_TIME
         self.time_delay = 0
+        self.bullets = None
 
         # Create sprite groups
         self.environment = pygame.sprite.Group()
@@ -134,7 +136,7 @@ class SurvGame:
 
     def spawn_enemies(self):
         for enemy in self.enemydata['Ground']:
-            e = Enemy(self.enemydata['Ground'][enemy])
+            e = GroundEnemy(self.enemydata['Ground'][enemy])
             self.enemies.add(e)
         for enemy in self.enemydata['Flying']:
             e = FlyingEnemy(self.enemydata['Flying'][enemy])
@@ -201,19 +203,70 @@ class SurvGame:
         pygame.quit()
         sys.exit()
 
+    def display_text(self):
+        # Display timer as MM:SS
+        minutes = int(self.game_time / 60)
+        seconds = int(self.game_time - minutes * 60)
+        if minutes < 10:
+            minutes = '0' + str(minutes)
+        if seconds < 10:
+            seconds = '0' + str(seconds)
+
+        text_time = self.font.render(f'Time: {minutes}:{seconds}', True, TEXTCOLOR)
+        text_time = pygame.transform.scale_by(text_time, DISP_SCALE)
+        hp = self.P1.get_health()
+        mhp = self.P1.get_max_health()
+        text_health = self.font.render(f'Health: {hp}/{mhp}', True, TEXTCOLOR)
+        text_health = pygame.transform.scale_by(text_health, DISP_SCALE)
+        level_pct = round(100 * self.p_exp / self.to_next_level, 2)
+        text_level = self.font.render(f'Level: {self.p_level} [{level_pct}%]', True, TEXTCOLOR)
+        text_level = pygame.transform.scale_by(text_level, DISP_SCALE)
+
+        self.displaysurface.blit(text_time, (0, 0))
+        self.displaysurface.blit(text_health, (0, TEXTBOXHT))
+        self.displaysurface.blit(text_level, (0, 2 * TEXTBOXHT))
+
+    def display(self):
+        self.displaysurface.fill(BGCOLOR)
+        for obj in self.environment:
+            self.displaysurface.blit(obj.surf, obj.rect)
+        for door in self.doors:
+            door.display_lock()
+        for enemy in self.enemies:
+            self.displaysurface.blit(enemy.surf, enemy.rect)
+        self.displaysurface.blit(self.P1.surf, self.P1.rect)
+        for bullet in self.bullets:
+            self.displaysurface.blit(bullet.surf, bullet.rect)
+        if self.level_up_menu:
+            self.displaysurface.blit(self.level_up_menu.surf, self.level_up_menu.rect)
+            self.level_up_menu.display()
+            self.displaysurface.blit(self.cursor.surf, self.cursor.rect)
+        elif self.pause_menu:
+            self.displaysurface.blit(self.pause_menu.surf, self.pause_menu.rect)
+            self.pause_menu.display()
+            height = 3 * TEXTBOXHT
+            for entity in self.pause_text_sprites:
+                self.displaysurface.blit(entity, (0, height))
+                height += TEXTSTATHT
+            self.displaysurface.blit(self.cursor.surf, self.cursor.rect)
+
+        self.display_text()
+
+        pygame.display.update()
+
     def run(self):
         SPAWNENEMIES = pygame.USEREVENT
         pygame.time.set_timer(SPAWNENEMIES, SPAWN_DELAY)
 
         while True:
             time_update = self.clock.tick(FPS)
-            game_time = MAX_TIME - int((pygame.time.get_ticks() - self.time_delay) / 1000)
-            bullets = None
+            self.game_time = MAX_TIME - int((pygame.time.get_ticks() - self.time_delay) / 1000)
+            self.bullets = self.P1.get_bullets()
 
             # Check loss conditions
             if not self.P1.alive():
                 return
-            if game_time == 0:
+            if self.game_time == 0:
                 return
 
             # Pause menu open
@@ -235,8 +288,6 @@ class SurvGame:
                         if event.key == pygame.K_ESCAPE:
                             self.handle_pause_option('Resume')
             else:
-                bullets = self.P1.get_bullets()
-
                 if self.level_up_menu:
                     self.time_delay += time_update
                     self.cursor.move()
@@ -300,7 +351,7 @@ class SurvGame:
                         mod = self.P1.get_scroll_dist()
                         for enemy in self.enemies:
                             enemy.scroll(mod)
-                        for bullet in bullets:
+                        for bullet in self.bullets:
                             bullet.scroll(mod)
                         for pickup in self.pickups:
                             pickup.scroll(mod)
@@ -337,21 +388,13 @@ class SurvGame:
                                 pickup.collect(self.P1)
                             pickup.kill()
 
-                    '''
-                    # Handle player landing
-                    plat_hits = pygame.sprite.spritecollide(self.P1, self.platforms, False)
-                    if plat_hits:
-                        for plat in plat_hits:
-                            self.P1.handle_platform_collision(plat)
-                    '''
-
                     # Handle damage from enemies
                     enemy_hits = pygame.sprite.spritecollide(self.P1, self.enemies, False)
                     if enemy_hits:
                         self.P1.take_hit(enemy_hits[0])
 
                     # Handle player shooting enemies
-                    for bullet in bullets:
+                    for bullet in self.bullets:
                         proj_hits = pygame.sprite.spritecollide(bullet, self.enemies, False)
                         for enemy in proj_hits:
                             crit_chance = self.P1.get_crit_chance()
@@ -386,53 +429,7 @@ class SurvGame:
                             if event.key == pygame.K_SPACE:
                                 self.P1.cancel_jump()
 
-            # Display timer as MM:SS
-            minutes = int(game_time / 60)
-            seconds = int(game_time - minutes * 60)
-            if minutes < 10:
-                minutes = '0' + str(minutes)
-            if seconds < 10:
-                seconds = '0' + str(seconds)
-
-            text_time = self.font.render(f'Time: {minutes}:{seconds}', True, TEXTCOLOR)
-            text_time = pygame.transform.scale_by(text_time, DISP_SCALE)
-            hp = self.P1.get_health()
-            mhp = self.P1.get_max_health()
-            text_health = self.font.render(f'Health: {hp}/{mhp}', True, TEXTCOLOR)
-            text_health = pygame.transform.scale_by(text_health, DISP_SCALE)
-            level_pct = round(100 * self.p_exp / self.to_next_level, 2)
-            text_level = self.font.render(f'Level: {self.p_level} [{level_pct}%]', True, TEXTCOLOR)
-            text_level = pygame.transform.scale_by(text_level, DISP_SCALE)
-
-            # Display sprites
-            self.displaysurface.fill(BGCOLOR)
-            for obj in self.environment:
-                self.displaysurface.blit(obj.surf, obj.rect)
-            for door in self.doors:
-                door.display_lock()
-            for enemy in self.enemies:
-                self.displaysurface.blit(enemy.surf, enemy.rect)
-            self.displaysurface.blit(self.P1.surf, self.P1.rect)
-            if bullets:
-                for bullet in bullets:
-                    self.displaysurface.blit(bullet.surf, bullet.rect)
-            self.displaysurface.blit(text_time, (0, 0))
-            self.displaysurface.blit(text_health, (0, TEXTBOXHT))
-            self.displaysurface.blit(text_level, (0, 2 * TEXTBOXHT))
-            if self.level_up_menu:
-                self.displaysurface.blit(self.level_up_menu.surf, self.level_up_menu.rect)
-                self.level_up_menu.display()
-                self.displaysurface.blit(self.cursor.surf, self.cursor.rect)
-            elif self.pause_menu:
-                self.displaysurface.blit(self.pause_menu.surf, self.pause_menu.rect)
-                self.pause_menu.display()
-                height = 3 * TEXTBOXHT
-                for entity in self.pause_text_sprites:
-                    self.displaysurface.blit(entity, (0, height))
-                    height += TEXTSTATHT
-                self.displaysurface.blit(self.cursor.surf, self.cursor.rect)
-
-            pygame.display.update()
+            self.display()
 
 
 if __name__ == '__main__':

@@ -60,6 +60,14 @@ class Enemy(Actor):
     '''
 
 
+class GroundEnemy(Enemy):
+    def __init__(self, enemydata):
+        super().__init__(enemydata)
+
+    def update(self, ppos):
+        super().update(ppos)
+
+
 class FlyingEnemy(Enemy):
     def __init__(self, enemydata):
         super().__init__(enemydata)

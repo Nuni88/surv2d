@@ -3,7 +3,7 @@ import os
 from constants import HEIGHT, FONT, DISP_SCALE
 
 # Modifiable values
-TEXTCOLOR = (0, 0, 0)   # (R, G, B)
+TEXTCOLOR = pygame.Color('black')
 BUTTON_FONT_SIZE = HEIGHT // 40
 TEXT_OFFSET_X = 0.22
 TEXT_OFFSET_Y = 0.24

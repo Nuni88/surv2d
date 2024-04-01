@@ -13,7 +13,7 @@ WEAPONTYPES = {
 # Modifiable values
 BASE_SHOT_DELAY = 1000
 BASE_DIMS = (100, 100)  # (W, H)
-BGCOLOR = (0, 0, 0)     # (R, G, B)
+BGCOLOR = pygame.Color('black')
 
 # TODO: Read weapon attributes from file
 

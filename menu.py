@@ -8,7 +8,7 @@ vec = pygame.math.Vector2
 MENU_TRANSPARENCY = 255
 BUTTON_HEIGHT = HEIGHT // 21
 BUTTON_WIDTH = WIDTH // 6
-BGCOLOR = (0, 0, 0)         # (R, G, B)
+BGCOLOR = pygame.Color('black')
 
 
 class Menu(pygame.sprite.Sprite):
