@@ -130,7 +130,6 @@ class SurvGame:
             self.platforms.add(door)
 
         heart = MaxHealthPickup(vec(WIDTH * 0.2, HEIGHT * 0.93))
-        self.environment.add(heart)
         self.pickups.add(heart)
 
         pygame.mouse.set_visible(False)
@@ -283,34 +282,30 @@ class SurvGame:
 
     def display_menus(self):
         if self.level_up_menu:
-            self.displaysurface.blit(self.level_up_menu.surf, self.level_up_menu.rect)
+            self.displaysurface.blit(self.level_up_menu.image, self.level_up_menu.rect)
             self.level_up_menu.display()
-            self.displaysurface.blit(self.cursor.surf, self.cursor.rect)
+            self.displaysurface.blit(self.cursor.image, self.cursor.rect)
         elif self.pause_menu:
-            self.displaysurface.blit(self.pause_menu.surf, self.pause_menu.rect)
+            self.displaysurface.blit(self.pause_menu.image, self.pause_menu.rect)
             self.pause_menu.display()
             height = 3 * TEXTBOXHT
             for entity in self.pause_text_sprites:
                 self.displaysurface.blit(entity, (0, height))
                 height += TEXTSTATHT
-            self.displaysurface.blit(self.cursor.surf, self.cursor.rect)
+            self.displaysurface.blit(self.cursor.image, self.cursor.rect)
 
     def display(self):
         # Display objects
         self.displaysurface.fill(BGCOLOR)
-        for obj in self.environment:
-            self.displaysurface.blit(obj.surf, obj.rect)
+        self.environment.draw(self.displaysurface)
         for door in self.doors:
             door.display_lock()
-        for enemy in self.enemies:
-            self.displaysurface.blit(enemy.surf, enemy.rect)
-        self.displaysurface.blit(self.P1.surf, self.P1.rect)
-        for bullet in self.bullets:
-            self.displaysurface.blit(bullet.surf, bullet.rect)
-
+        self.pickups.draw(self.displaysurface)
+        self.enemies.draw(self.displaysurface)
+        self.players.draw(self.displaysurface)
+        self.bullets.draw(self.displaysurface)
         self.display_menus()
         self.display_text()
-
         pygame.display.update()
 
     def handle_player_movement(self):
@@ -402,7 +397,6 @@ class SurvGame:
                     else:
                         loot_type = LOOT_TABLE[enemy.get_name()]
                         drop = loot_type(enemy_pos)
-                    self.environment.add(drop)
                     self.pickups.add(drop)
 
     def update_objects(self, time_update):

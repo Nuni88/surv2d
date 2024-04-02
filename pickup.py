@@ -7,10 +7,10 @@ from constants import STAT_STRS, DISP_SCALE
 
 
 class Pickup(pygame.sprite.Sprite):
-    def __init__(self, pos, surf):
+    def __init__(self, pos, image):
         super().__init__()
-        self.surf = pygame.transform.scale_by(surf, DISP_SCALE)
-        self.rect = self.surf.get_rect(center=pos)
+        self.image = pygame.transform.scale_by(image, DISP_SCALE)
+        self.rect = self.image.get_rect(center=pos)
         self.value = 0
 
     def update(self, offset):
@@ -23,12 +23,12 @@ class Pickup(pygame.sprite.Sprite):
         pass
 
     def scale_to_screen(self, scale):
-        self.surf = pygame.transform.scale_by(self.surf, scale)
+        self.image = pygame.transform.scale_by(self.image, scale)
 
 
 class ExpPickup(Pickup):
-    def __init__(self, pos, surf):
-        super().__init__(pos, surf)
+    def __init__(self, pos, image):
+        super().__init__(pos, image)
         self.value = 0
 
 

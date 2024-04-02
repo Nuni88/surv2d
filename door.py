@@ -41,39 +41,39 @@ LOCK_DIST = 0.32
 
 
 class Door(Platform):
-    def __init__(self, c, surf, req, lvl):
-        super().__init__(c, surf)
-        self.lock_base_surf = pygame.transform.scale_by(pygame.image.load(LOCK_IMG_PATHS['Base']), DISP_SCALE)
-        self.lock_req_surf = pygame.transform.scale_by(pygame.image.load(LOCK_IMG_PATHS[req]), DISP_SCALE)
-        self.lock_lvl_surf = pygame.transform.scale_by(pygame.image.load(LOCK_NUM_PATHS[lvl]), DISP_SCALE)
+    def __init__(self, c, image, req, lvl):
+        super().__init__(c, image)
+        self.lock_base_image = pygame.transform.scale_by(pygame.image.load(LOCK_IMG_PATHS['Base']), DISP_SCALE)
+        self.lock_req_image = pygame.transform.scale_by(pygame.image.load(LOCK_IMG_PATHS[req]), DISP_SCALE)
+        self.lock_lvl_image = pygame.transform.scale_by(pygame.image.load(LOCK_NUM_PATHS[lvl]), DISP_SCALE)
         self.lock = {
             'req': req,
             'lvl': lvl
         }
 
     def display_lock(self):
-        base_width = self.lock_base_surf.get_width()
-        base_height = self.lock_base_surf.get_height()
-        req_width = self.lock_req_surf.get_width()
-        lvl_width = self.lock_lvl_surf.get_width()
-        lvl_height = self.lock_lvl_surf.get_height()
+        base_width = self.lock_base_image.get_width()
+        base_height = self.lock_base_image.get_height()
+        req_width = self.lock_req_image.get_width()
+        lvl_width = self.lock_lvl_image.get_width()
+        lvl_height = self.lock_lvl_image.get_height()
 
         # Display locks centered on door with equal space above top lock and below bottom lock
         # Space above and below is LOCK_DIST * door height
         h = self.rect.height * LOCK_DIST
-        self.surf.blit(self.lock_req_surf, (self.rect.width * 0.5 - req_width * 0.5, h))
+        self.image.blit(self.lock_req_image, (self.rect.width * 0.5 - req_width * 0.5, h))
         h = self.rect.height - self.rect.height * LOCK_DIST - base_height
-        self.surf.blit(self.lock_base_surf, (self.rect.width * 0.5 - base_width * 0.5, h))
+        self.image.blit(self.lock_base_image, (self.rect.width * 0.5 - base_width * 0.5, h))
         h = h + base_height * 0.5 - lvl_height * 0.5
-        self.surf.blit(self.lock_lvl_surf, (self.rect.width * 0.5 - lvl_width * 0.5, h))
+        self.image.blit(self.lock_lvl_image, (self.rect.width * 0.5 - lvl_width * 0.5, h))
 
     def handle_lock_check(self, player):
         pass
 
 
 class WeapDoor(Door):
-    def __init__(self, c, surf, req, lvl):
-        super().__init__(c, surf, req, lvl)
+    def __init__(self, c, image, req, lvl):
+        super().__init__(c, image, req, lvl)
 
     def handle_lock_check(self, player):
         if player.has_req_weapon(self.lock['req'], self.lock['lvl']):
@@ -81,8 +81,8 @@ class WeapDoor(Door):
 
 
 class StatDoor(Door):
-    def __init__(self, c, surf, req, lvl):
-        super().__init__(c, surf, req, lvl)
+    def __init__(self, c, image, req, lvl):
+        super().__init__(c, image, req, lvl)
 
     def handle_lock_check(self, player):
         if player.has_req_stat(self.lock['req'], self.lock['lvl']):

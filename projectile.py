@@ -12,10 +12,10 @@ ACC_ANGLE = math.pi
 
 
 class Projectile(pygame.sprite.Sprite):
-    def __init__(self, pos, acc_mod, surf, scale):
+    def __init__(self, pos, acc_mod, image, scale):
         super().__init__()
-        self.surf = pygame.transform.scale_by(surf, scale * DISP_SCALE)
-        self.rect = self.surf.get_rect(center=pos)
+        self.image = pygame.transform.scale_by(image, scale * DISP_SCALE)
+        self.rect = self.image.get_rect(center=pos)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
         self.acc.x *= acc_mod.x
@@ -53,13 +53,13 @@ class Projectile(pygame.sprite.Sprite):
         return self.damage
 
     def scale_to_screen(self, scale):
-        self.surf = pygame.transform.scale_by(self.surf, scale)
+        self.image = pygame.transform.scale_by(self.image, scale)
 
 
 class Fireball(Projectile):
     def __init__(self, pos, acc_mod, mods):
-        surf = pygame.image.load(os.path.join('images\\projectiles', 'fire.png'))
-        super().__init__(pos, acc_mod, surf, mods[STAT_STRS['PROJSZ']]['value'])
+        image = pygame.image.load(os.path.join('images\\projectiles', 'fire.png'))
+        super().__init__(pos, acc_mod, image, mods[STAT_STRS['PROJSZ']]['value'])
         self.acc_angle = ACC_ANGLE
         self.acc = vec(0, -0.1)
         self.vel = vec(0, -0.1)
@@ -85,8 +85,8 @@ class Fireball(Projectile):
 
 class Iceball(Projectile):
     def __init__(self, pos, acc_mod, mods):
-        surf = pygame.image.load(os.path.join('images\\projectiles', 'ice.png'))
-        super().__init__(pos, acc_mod, surf, mods[STAT_STRS['PROJSZ']]['value'])
+        image = pygame.image.load(os.path.join('images\\projectiles', 'ice.png'))
+        super().__init__(pos, acc_mod, image, mods[STAT_STRS['PROJSZ']]['value'])
         self.acc = vec(0, 0)
         self.damage = int(5 * mods[STAT_STRS['DMG']]['value'])
         self.crit = 0
@@ -95,8 +95,8 @@ class Iceball(Projectile):
 
 class Lightning(Projectile):
     def __init__(self, pos, acc_mod, mods):
-        surf = pygame.image.load(os.path.join('images\\projectiles', 'lit.png'))
-        super().__init__(pos, acc_mod, surf, mods[STAT_STRS['PROJSZ']]['value'])
+        image = pygame.image.load(os.path.join('images\\projectiles', 'lit.png'))
+        super().__init__(pos, acc_mod, image, mods[STAT_STRS['PROJSZ']]['value'])
         self.acc = vec(0.1, 0.1)
         self.acc.x *= acc_mod.x
         self.acc.y *= acc_mod.y

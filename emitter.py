@@ -21,10 +21,10 @@ BGCOLOR = pygame.Color('black')
 class Emitter(pygame.sprite.Sprite):
     def __init__(self, pos, acc_mod):
         super().__init__()
-        self.surf = pygame.transform.scale_by(pygame.Surface(BASE_DIMS), DISP_SCALE)
-        self.surf.fill(BGCOLOR)
-        self.surf.set_alpha(0)
-        self.rect = self.surf.get_rect(center=pos)
+        self.image = pygame.transform.scale_by(pygame.Surface(BASE_DIMS), DISP_SCALE)
+        self.image.fill(BGCOLOR)
+        self.image.set_alpha(0)
+        self.rect = self.image.get_rect(center=pos)
         self.shot_timer = 0
         self.delay = BASE_SHOT_DELAY
         self.acc_mod = acc_mod
@@ -52,7 +52,7 @@ class Emitter(pygame.sprite.Sprite):
         return self.level
 
     def scale_to_screen(self, scale):
-        self.surf = pygame.transform.scale_by(self.surf, scale)
+        self.image = pygame.transform.scale_by(self.image, scale)
 
 
 class FireShooter(Emitter):

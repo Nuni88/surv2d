@@ -32,10 +32,10 @@ class Enemy(Actor):
         # Sets enemy movement and sprite relative to player position
         if self.pos.x > ppos.x:
             self.acc.x = -ACC * self.speed_mod
-            self.surf = self.frame_left
+            self.image = self.frame_left
         else:
             self.acc.x = ACC * self.speed_mod
-            self.surf = self.frame_right
+            self.image = self.frame_right
 
     def take_damage(self, amt):
         if amt > 0:

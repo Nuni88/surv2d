@@ -50,7 +50,7 @@ class Player(Actor):
             return
 
         if self.dodging and self.invincible:
-            self.surf = self.frame_dodge
+            self.image = self.frame_dodge
         # print(f'Player pos: {self.pos}')
 
         # Time between dodges determined by dodge stat
@@ -69,7 +69,7 @@ class Player(Actor):
                 self.invincible = False
                 self.invul_timer = 0
                 if self.dodging:
-                    self.surf = self.frame_left
+                    self.image = self.frame_left
 
         self.shooters.update(self.rect.center, self.get_scroll_dist(), time_update, self.mods)
 
@@ -78,10 +78,10 @@ class Player(Actor):
         pressed_keys = pygame.key.get_pressed()
         if pressed_keys[K_LEFT]:
             self.acc.x = -ACC * self.stats[STAT_STRS['MSPD']]['value']
-            self.surf = self.frame_left
+            self.image = self.frame_left
         if pressed_keys[K_RIGHT]:
             self.acc.x = ACC * self.stats[STAT_STRS['MSPD']]['value']
-            self.surf = self.frame_right
+            self.image = self.frame_right
 
         self.acc.x += self.vel.x * FRIC
         self.vel.x += self.acc.x

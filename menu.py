@@ -19,10 +19,10 @@ class Menu(pygame.sprite.Sprite):
         surface = vec(BUTTON_WIDTH, height)
         center = vec(self.adjust_pos(center.x, center.y, surface.x, surface.y))
         
-        self.surf = pygame.Surface(surface)
-        self.surf.fill(BGCOLOR)
-        self.surf.set_alpha(MENU_TRANSPARENCY)
-        self.rect = self.surf.get_rect(center=center)
+        self.image = pygame.Surface(surface)
+        self.image.fill(BGCOLOR)
+        self.image.set_alpha(MENU_TRANSPARENCY)
+        self.rect = self.image.get_rect(center=center)
         
         self.options = []
         height = 0
@@ -34,7 +34,7 @@ class Menu(pygame.sprite.Sprite):
     def display(self):
         height = 0
         for option in self.options:
-            self.surf.blit(option.surf, (0, height))
+            self.image.blit(option.image, (0, height))
             option.show_text()
             height += BUTTON_HEIGHT
 
@@ -50,7 +50,7 @@ class Menu(pygame.sprite.Sprite):
         return self.options[button_num].text
 
     def scale_to_screen(self, scale):
-        self.surf = pygame.transform.scale_by(self.surf, scale)
+        self.image = pygame.transform.scale_by(self.image, scale)
 
     @staticmethod
     def adjust_pos(x, y, width, height) -> (int, int):

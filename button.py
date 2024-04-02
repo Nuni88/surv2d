@@ -14,15 +14,15 @@ class Button(pygame.sprite.Sprite):
         super().__init__()
         
         self.text = text
-        self.surf = pygame.transform.scale_by(pygame.image.load(os.path.join('images', 'button.png')), DISP_SCALE)
-        self.rect = self.surf.get_rect(center=center)
+        self.image = pygame.transform.scale_by(pygame.image.load(os.path.join('images', 'button.png')), DISP_SCALE)
+        self.rect = self.image.get_rect(center=center)
         
     def show_text(self):
         pygame.font.init()
         game_font = pygame.font.SysFont(FONT, BUTTON_FONT_SIZE)
         
         text_render = game_font.render(self.text, False, TEXTCOLOR)
-        self.surf.blit(text_render, (self.rect.width * TEXT_OFFSET_X, self.rect.height * TEXT_OFFSET_Y))
+        self.image.blit(text_render, (self.rect.width * TEXT_OFFSET_X, self.rect.height * TEXT_OFFSET_Y))
 
     def scale_to_screen(self, scale):
-        self.surf = pygame.transform.scale_by(self.surf, scale)
+        self.image = pygame.transform.scale_by(self.image, scale)

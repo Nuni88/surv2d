@@ -5,10 +5,10 @@ vec = pygame.math.Vector2
 
 
 class Actor(pygame.sprite.Sprite):
-    def __init__(self, surf):
+    def __init__(self, image):
         super().__init__()
-        self.surf = pygame.transform.scale_by(surf, DISP_SCALE)
-        self.rect = self.surf.get_rect()
+        self.image = pygame.transform.scale_by(image, DISP_SCALE)
+        self.rect = self.image.get_rect()
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
         self.pos = vec(0, 0)
@@ -30,7 +30,7 @@ class Actor(pygame.sprite.Sprite):
         return self.rect.center
 
     def scale_to_screen(self, scale):
-        self.surf = pygame.transform.scale_by(self.surf, scale)
+        self.image = pygame.transform.scale_by(self.image, scale)
 
     '''
     def handle_collision_x(self, plat):
