@@ -78,7 +78,6 @@ class SurvGame:
         self.cursor = Cursor()
         self.game_time = MAX_TIME
         self.time_delay = 0
-        self.bullets = None
 
         # Create sprite groups
         self.environment = pygame.sprite.Group()
@@ -87,6 +86,7 @@ class SurvGame:
         self.platforms = pygame.sprite.Group()
         self.doors = pygame.sprite.Group()
         self.pickups = pygame.sprite.Group()
+        self.bullets = pygame.sprite.Group()
         self.pause_text_sprites = []
 
         # Add player data from JSON file and create player object
@@ -410,8 +410,6 @@ class SurvGame:
         ppos = vec(self.P1.get_pos())
         offset = self.P1.get_scroll_dist()
         self.enemies.update(ppos, offset)
-        for bullet in self.bullets:         # TODO: Refactor bullets to sprite group
-            bullet.update(offset)
         self.pickups.update(offset)
         self.platforms.update(offset)
         self.floor.recenter(ppos)

@@ -33,18 +33,18 @@ class Player(Actor):
         self.invincible = False
         self.invul_timer = 0
 
-        self.shooters = []
+        self.shooters = pygame.sprite.Group()
         shooter1 = FireShooter(self.rect.center, vec(1, 1))
         shooter2 = LitShooter(self.rect.center, vec(1, 1))
         shooter3 = IceShooter(self.rect.center, vec(1, 1))
-        self.shooters.append(shooter1)
-        self.shooters.append(shooter2)
-        self.shooters.append(shooter3)
+        self.shooters.add(shooter1)
+        self.shooters.add(shooter2)
+        self.shooters.add(shooter3)
 
         # self.jump_sfx = pygame.mixer.Sound(os.path.join('sound', 'jump.wav'))
         # self.jump_sfx.set_volume(0.1)
 
-    def update(self, ms):
+    def update(self, time_update):
         if self.health <= 0:
             self.kill()
             return
@@ -56,7 +56,7 @@ class Player(Actor):
         # Time between dodges determined by dodge stat
         # Turn dodge cooldown off and reset tracking
         if self.dodging:
-            self.dodge_timer += ms
+            self.dodge_timer += time_update
             if self.dodge_timer >= self.stats[STAT_STRS['DODGE']]['value'] * 1000:
                 self.dodging = False
                 self.dodge_timer = 0
@@ -64,16 +64,14 @@ class Player(Actor):
         # Invulnerability wears off after seconds determined by invulnerability stat
         # Turn player invincibility off and reset invulnerability tracking
         if self.invincible:
-            self.invul_timer += ms
+            self.invul_timer += time_update
             if self.invul_timer >= self.stats[STAT_STRS['INVUL']]['value'] * 1000:
                 self.invincible = False
                 self.invul_timer = 0
                 if self.dodging:
                     self.surf = self.frame_left
 
-        for shooter in self.shooters:
-            shooter.move(self.rect.center)
-            shooter.update_timers(ms, self.mods)
+        self.shooters.update(self.rect.center, self.get_scroll_dist(), time_update, self.mods)
 
     def move_x(self):
         self.acc.x = 0
@@ -155,11 +153,11 @@ class Player(Actor):
                     self.kill()
                 self.invincible = True
 
-    def get_bullets(self) -> list:
-        bullets = []
+    def get_bullets(self) -> pygame.sprite.Group:
+        bullets = pygame.sprite.Group()
         for shooter in self.shooters:
             for bullet in shooter.get_bullets():
-                bullets.append(bullet)
+                bullets.add(bullet)
         return bullets
 
     def get_scroll_dist(self) -> float:

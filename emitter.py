@@ -25,32 +25,25 @@ class Emitter(pygame.sprite.Sprite):
         self.surf.fill(BGCOLOR)
         self.surf.set_alpha(0)
         self.rect = self.surf.get_rect(center=pos)
-        self.bullets = []
         self.shot_timer = 0
         self.delay = BASE_SHOT_DELAY
         self.acc_mod = acc_mod
         self.level = 1
+        self.bullets = pygame.sprite.Group()
 
-    def move(self, loc):
+    def update(self, loc, offset, time_update, mods):
         self.rect.center = loc
-        for bullet in self.bullets:
-            bullet.move()
-            if bullet.out_of_bounds():
-                self.bullets.remove(bullet)
+        self.bullets.update(offset, time_update)
+        self.shot_timer += time_update
+        if self.shot_timer >= self.delay:
+            self.shoot(mods)
+            self.shot_timer -= self.delay
 
     def shoot(self, mods):
         pass
 
-    def get_bullets(self) -> list:
+    def get_bullets(self) -> pygame.sprite.Group:
         return self.bullets
-
-    def update_timers(self, ms, mods):
-        for bullet in self.bullets:
-            bullet.update_timers(ms)
-        self.shot_timer += ms
-        if self.shot_timer >= self.delay:
-            self.shoot(mods)
-            self.shot_timer -= self.delay
 
     def level_up(self):
         self.level += 1
@@ -69,10 +62,7 @@ class FireShooter(Emitter):
 
     def shoot(self, mods):
         bullet = Fireball(self.rect.center + vec(-50, 0), self.acc_mod, mods)
-        self.bullets.append(bullet)
-        if len(self.bullets) > self.max_proj:
-            self.bullets = self.bullets[1::]
-        # print(f'Fire! Bullets fired: {len(self.bullets)}')
+        self.bullets.add(bullet)
 
 
 class LitShooter(Emitter):
@@ -82,10 +72,7 @@ class LitShooter(Emitter):
 
     def shoot(self, mods):
         bullet = Lightning(self.rect.center, self.acc_mod, mods)
-        self.bullets.append(bullet)
-        if len(self.bullets) > self.max_proj:
-            self.bullets = self.bullets[1::]
-        # print(f'Lit! Bullets lited: {len(self.bullets)}')
+        self.bullets.add(bullet)
 
 
 class IceShooter(Emitter):
@@ -98,7 +85,4 @@ class IceShooter(Emitter):
 
     def shoot(self, mods):
         bullet = Iceball(self.rect.center, self.acc_mod, mods)
-        self.bullets.append(bullet)
-        if len(self.bullets) > self.max_proj:
-            self.bullets = self.bullets[1::]
-        # print(f'Ice! Bullets iced: {len(self.bullets)}')
+        self.bullets.add(bullet)

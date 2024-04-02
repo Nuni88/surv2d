@@ -23,20 +23,27 @@ class Projectile(pygame.sprite.Sprite):
         self.timer = 0
         self.damage = 0
         self.crit = 0
+        self.duration = 0
+        self.dur_timer = 0
 
-    def move(self):
+    def update(self, offset, time_update):
+        # Projectile lasts for limited time
+        self.dur_timer += time_update
+        if self.dur_timer > self.duration:
+            self.kill()
+            return
+
+        self.rect.centerx -= offset
+        self.timer += time_update
         self.vel += self.acc
         self.rect.center += self.vel
+        self.check_bounds()
 
-    def update_timers(self, ms):
-        self.timer += ms
-
-    def out_of_bounds(self) -> bool:
+    def check_bounds(self):
         if self.rect.left > WIDTH or self.rect.right < 0:
-            return True
-        if self.rect.top > HEIGHT or self.rect.bottom < 0:
-            return True
-        return False
+            self.kill()
+        elif self.rect.top > HEIGHT or self.rect.bottom < 0:
+            self.kill()
 
     def get_damage(self, crit_chance, crit_mod) -> int:
         roll = random.randint(0, 99)
@@ -44,9 +51,6 @@ class Projectile(pygame.sprite.Sprite):
             # print('Critical hit!')
             return int(self.damage * crit_mod)
         return self.damage
-
-    def update(self, offset):
-        self.rect.centerx -= offset
 
     def scale_to_screen(self, scale):
         self.surf = pygame.transform.scale_by(self.surf, scale)
@@ -64,21 +68,15 @@ class Fireball(Projectile):
         self.speed_mod = 0.001
         self.rot_delay = 20
         self.degrees = 0
+        self.duration = 8000
 
-    def update_timers(self, ms):
-        super().update_timers(ms)
+    def update(self, offset, time_update):
+        super().update(offset, time_update)
         while self.timer >= self.rot_delay:
             self.degrees += 4
             self.timer -= self.rot_delay
         self.vel.rotate_ip(self.degrees)
         self.degrees = 0
-        '''
-        while self.timer >= self.rot_delay:
-            self.acc_angle += ACC_ANGLE
-            self.timer -= self.rot_delay
-        self.acc.x += self.speed_mod * math.cos(self.acc_angle)
-        self.acc.y += -self.speed_mod * math.sin(self.acc_angle)
-        '''
 
     def move(self):
         self.vel += self.acc
@@ -92,6 +90,7 @@ class Iceball(Projectile):
         self.acc = vec(0, 0)
         self.damage = int(5 * mods[STAT_STRS['DMG']]['value'])
         self.crit = 0
+        self.duration = 10000
 
 
 class Lightning(Projectile):
@@ -104,10 +103,12 @@ class Lightning(Projectile):
         self.acc *= mods[STAT_STRS['PROJSPD']]['value']
         self.damage = int(2 * mods[STAT_STRS['DMG']]['value'])
         self.crit = 10
+        self.wobble_delay = 200
+        self.duration = 5000
 
-    def update_timers(self, ms):
-        super().update_timers(ms)
-        if self.timer > 200:
+    def update(self, offset, time_update):
+        super().update(offset, time_update)
+        if self.timer > self.wobble_delay:
             self.acc.y = -self.acc.y
             self.vel.y = -self.vel.y
-            self.timer -= 200
+            self.timer -= self.wobble_delay
