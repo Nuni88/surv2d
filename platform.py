@@ -12,12 +12,6 @@ class Platform(pygame.sprite.Sprite):
         self.rect = self.surf.get_rect(center=c)
         self.pos = vec(self.rect.midbottom)
 
-    '''
-    def scroll(self, offset):
-        self.pos.x -= offset
-        self.rect.midbottom = self.pos
-    '''
-
     def update(self, offset):
         self.pos.x -= offset
         self.rect.midbottom = self.pos

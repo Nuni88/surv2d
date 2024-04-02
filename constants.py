@@ -1,8 +1,8 @@
 # Values related to screen height and width
 BASE_HEIGHT = 480
 BASE_WIDTH = 854
-HEIGHT = 720
-WIDTH = 1280
+HEIGHT = 1080
+WIDTH = 1920
 DISP_SCALE = HEIGHT / BASE_HEIGHT
 
 FPS = 60

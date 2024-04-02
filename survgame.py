@@ -405,6 +405,17 @@ class SurvGame:
                     self.environment.add(drop)
                     self.pickups.add(drop)
 
+    def update_objects(self, time_update):
+        self.P1.update(time_update)
+        ppos = vec(self.P1.get_pos())
+        offset = self.P1.get_scroll_dist()
+        self.enemies.update(ppos, offset)
+        for bullet in self.bullets:         # TODO: Refactor bullets to sprite group
+            bullet.update(offset)
+        self.pickups.update(offset)
+        self.platforms.update(offset)
+        self.floor.recenter(ppos)
+
     def run(self):
         pygame.time.set_timer(SPAWNENEMIES, SPAWN_DELAY)
 
@@ -426,23 +437,12 @@ class SurvGame:
                     self.handle_level_up_screen(time_update)
                 else:                                           # Game is active
                     self.handle_player_movement()
-
-                    # Update objects, scroll screen
-                    self.P1.update(time_update)
-                    ppos = vec(self.P1.get_pos())
-                    offset = self.P1.get_scroll_dist()
-                    self.enemies.update(ppos, offset)
-                    for bullet in self.bullets:         # TODO: Refactor bullets to sprite group
-                        bullet.update(offset)
-                    self.pickups.update(offset)
-                    self.platforms.update(offset)
-                    self.floor.recenter(ppos)
-
-                    self.handle_enemy_collisions()  # Handle enemies colliding with walls and platforms
-                    self.handle_item_pickups()      # Handle player grabbing pickups
-                    self.handle_player_hits()       # Handle player taking hits
-                    self.handle_enemy_hits()        # Handle player shooting enemies
-                    self.handle_game_events()
+                    self.update_objects(time_update)    # Update objects and scroll screen
+                    self.handle_enemy_collisions()      # Handle enemies colliding with walls and platforms
+                    self.handle_item_pickups()          # Handle player grabbing pickups
+                    self.handle_player_hits()           # Handle player taking hits
+                    self.handle_enemy_hits()            # Handle player shooting enemies
+                    self.handle_game_events()           # Handle events (timers, keyboard events, etc.)
 
             self.display()
 
