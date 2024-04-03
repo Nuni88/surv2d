@@ -1,6 +1,8 @@
+import os
+import json
 import pygame
 from pygame.locals import *
-from emitter import FireShooter, LitShooter, IceShooter
+from shooter import Shooter
 from actor import Actor
 from constants import WIDTH, HEIGHT, STAT_STRS, ACC, FRIC, DISP_SCALE
 
@@ -33,13 +35,13 @@ class Player(Actor):
         self.invincible = False
         self.invul_timer = 0
 
+        shooterdatafile = open(os.path.join('data', 'shooterdata.json'), 'r')
+        self.shooterdata = json.loads(str(shooterdatafile.read()))
+        shooterdatafile.close()
         self.shooters = pygame.sprite.Group()
-        shooter1 = FireShooter(self.rect.center, vec(1, 1))
-        shooter2 = LitShooter(self.rect.center, vec(1, 1))
-        shooter3 = IceShooter(self.rect.center, vec(1, 1))
-        self.shooters.add(shooter1)
-        self.shooters.add(shooter2)
-        self.shooters.add(shooter3)
+        for s_type in self.shooterdata:
+            shooter = Shooter(self.rect.center, self.shooterdata[s_type])
+            self.shooters.add(shooter)
 
         # self.jump_sfx = pygame.mixer.Sound(os.path.join('sound', 'jump.wav'))
         # self.jump_sfx.set_volume(0.1)

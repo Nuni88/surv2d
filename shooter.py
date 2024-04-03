@@ -3,32 +3,34 @@ from projectile import Fireball, Iceball, Lightning
 from constants import DISP_SCALE
 
 vec = pygame.math.Vector2
-'''
+
+# Modifiable values
+BASE_SHOT_DELAY = 1000
+BASE_DIMS = (100, 100)  # (W, H)
+BGCOLOR = pygame.Color('black')
 WEAPONTYPES = {
     'Fireball': Fireball,
     'Iceball': Iceball,
     'Lightning': Lightning
 }
-'''
-# Modifiable values
-BASE_SHOT_DELAY = 1000
-BASE_DIMS = (100, 100)  # (W, H)
-BGCOLOR = pygame.Color('black')
 
 # TODO: Read weapon attributes from file
 
 
-class Emitter(pygame.sprite.Sprite):
-    def __init__(self, pos, acc_mod):
+class Shooter(pygame.sprite.Sprite):
+    def __init__(self, pos, data):
         super().__init__()
         self.image = pygame.transform.scale_by(pygame.Surface(BASE_DIMS), DISP_SCALE)
         self.image.fill(BGCOLOR)
         self.image.set_alpha(0)
         self.rect = self.image.get_rect(center=pos)
         self.shot_timer = 0
-        self.delay = BASE_SHOT_DELAY
-        self.acc_mod = acc_mod
         self.level = 1
+        self.name = data['name']
+        self.delay = BASE_SHOT_DELAY * data['delay_mod']
+        self.acc_mod = vec(data['a0_x'], data['a0_y'])
+        self.offset = vec(data['p0_x'], data['p0_y'])
+        self.proj_type = data['proj_type']
         self.bullets = pygame.sprite.Group()
 
     def update(self, loc, offset, time_update, mods):
@@ -40,7 +42,8 @@ class Emitter(pygame.sprite.Sprite):
             self.shot_timer -= self.delay
 
     def shoot(self, mods):
-        pass
+        bullet = WEAPONTYPES[self.proj_type](self.rect.center + self.offset, self.acc_mod, mods)
+        self.bullets.add(bullet)
 
     def get_bullets(self) -> pygame.sprite.Group:
         return self.bullets
@@ -53,36 +56,3 @@ class Emitter(pygame.sprite.Sprite):
 
     def scale_to_screen(self, scale):
         self.image = pygame.transform.scale_by(self.image, scale)
-
-
-class FireShooter(Emitter):
-    def __init__(self, pos, acc_mod):
-        super().__init__(pos, acc_mod)
-        self.max_proj = 6
-
-    def shoot(self, mods):
-        bullet = Fireball(self.rect.center + vec(-50, 0), self.acc_mod, mods)
-        self.bullets.add(bullet)
-
-
-class LitShooter(Emitter):
-    def __init__(self, pos, acc_mod):
-        super().__init__(pos, acc_mod)
-        self.max_proj = 6
-
-    def shoot(self, mods):
-        bullet = Lightning(self.rect.center, self.acc_mod, mods)
-        self.bullets.add(bullet)
-
-
-class IceShooter(Emitter):
-    def __init__(self, pos, acc_mod):
-        super().__init__(pos, acc_mod)
-        self.life_timer = 0
-        self.delay = 1500
-        self.proj_dur = 3000
-        self.max_proj = 6
-
-    def shoot(self, mods):
-        bullet = Iceball(self.rect.center, self.acc_mod, mods)
-        self.bullets.add(bullet)
