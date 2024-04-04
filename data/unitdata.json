@@ -30,6 +30,10 @@
 			"Invulnerability": {
 				"value": 0.5,
 				"level": 1
+			},
+			"Pickup Range": {
+				"value": 100.0,
+				"level": 1
 			}
 		},
 		"mods": {

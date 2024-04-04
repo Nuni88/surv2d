@@ -218,6 +218,9 @@ class Player(Actor):
     def get_crit_mod(self) -> float:
         return self.mods[STAT_STRS['CRITD']]['value']
 
+    def get_pickup_range(self) -> float:
+        return self.stats[STAT_STRS['PRANGE']]['value']
+
     def get_stats(self) -> dict:
         stats = self.stats
         for mod in self.mods:

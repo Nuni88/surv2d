@@ -19,6 +19,7 @@ STAT_STRS = {
     'JUMPH': 'Jump Height',
     'DODGE': 'Dodge Cooldown',
     'INVUL': 'Invulnerability',
+    'PRANGE': 'Pickup Range',
     'DMG': 'Damage',
     'CRITD': 'Crit Damage',
     'PROJSPD': 'Projectile Speed',

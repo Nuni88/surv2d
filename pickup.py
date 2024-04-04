@@ -1,8 +1,9 @@
 import os
+import math
 import pygame
-from constants import STAT_STRS, DISP_SCALE
+from constants import FPS, STAT_STRS, DISP_SCALE
 
-
+vec = pygame.math.Vector2
 # TODO: Read pickup attributes from file
 
 
@@ -10,11 +11,13 @@ class Pickup(pygame.sprite.Sprite):
     def __init__(self, pos, image):
         super().__init__()
         self.image = pygame.transform.scale_by(image, DISP_SCALE)
+        self.pos = vec(pos)
         self.rect = self.image.get_rect(center=pos)
         self.value = 0
 
-    def update(self, offset):
-        self.rect.centerx -= offset
+    def update(self, ppos, range, offset):
+        self.pos.x -= offset
+        self.rect.center = self.pos
 
     def get_value(self) -> int:
         return self.value
@@ -30,6 +33,15 @@ class ExpPickup(Pickup):
     def __init__(self, pos, image):
         super().__init__(pos, image)
         self.value = 0
+        self.vel = vec(0, 0)
+
+    def update(self, ppos, range, offset):
+        self.pos.x -= offset
+        if self.pos.distance_to(ppos) <= range * DISP_SCALE:
+            dx, dy = (ppos.x - self.pos.x, ppos.y - self.pos.y)
+            self.vel = vec(dx / FPS, dy / FPS)
+            self.pos += self.vel
+        self.rect.center = self.pos
 
 
 class ExpSmall(ExpPickup):

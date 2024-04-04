@@ -48,6 +48,7 @@ LEVEL_BONUSES = {
     STAT_STRS['JUMPH']: 1,
     STAT_STRS['DODGE']: -0.05,
     STAT_STRS['INVUL']: 0.01,
+    STAT_STRS['PRANGE']: 10.0,
     STAT_STRS['DMG']: 0.05,
     STAT_STRS['CRITD']: 0.1,
     STAT_STRS['PROJSPD']: 0.05,
@@ -402,9 +403,10 @@ class SurvGame:
     def update_objects(self, time_update):
         self.P1.update(time_update)
         ppos = vec(self.P1.get_pos())
+        range = self.P1.get_pickup_range()
         offset = self.P1.get_scroll_dist()
         self.enemies.update(ppos, offset)
-        self.pickups.update(offset)
+        self.pickups.update(ppos, range, offset)
         self.platforms.update(offset)
         self.floor.recenter(ppos)
 
