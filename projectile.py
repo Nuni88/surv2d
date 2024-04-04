@@ -1,4 +1,5 @@
 import os
+import json
 import math
 import random
 import pygame
@@ -9,21 +10,24 @@ vec = pygame.math.Vector2
 # TODO: Read projectile attributes from file
 # Modifiable values
 ACC_ANGLE = math.pi
+bulletdatafile = open(os.path.join('data', 'bulletdata.json'), 'r')
+BULLETDATA = json.loads(str(bulletdatafile.read()))
+bulletdatafile.close()
+BASE_IMG_PATH = 'images\\projectiles'
 
 
 class Projectile(pygame.sprite.Sprite):
-    def __init__(self, pos, acc_mod, image, scale):
+    def __init__(self, pos, mods, data):
         super().__init__()
-        self.image = pygame.transform.scale_by(image, scale * DISP_SCALE)
+        image = pygame.image.load(os.path.join(BASE_IMG_PATH, data['image']))
+        self.image = pygame.transform.scale_by(image, mods[STAT_STRS['PROJSZ']]['value'] * DISP_SCALE)
         self.rect = self.image.get_rect(center=pos)
-        self.vel = vec(0, 0)
-        self.acc = vec(0, 0)
-        self.acc.x *= acc_mod.x
-        self.acc.y *= acc_mod.y
-        self.timer = 0
-        self.damage = 0
-        self.crit = 0
-        self.duration = 0
+        self.vel = vec(data['v0_x'], data['v0_y'])
+        self.acc = vec(data['a0_x'], data['a0_y'])
+        self.acc *= mods[STAT_STRS['PROJSPD']]['value']
+        self.crit = data['base_crit']
+        self.damage = int(data['damage'] * mods[STAT_STRS['DMG']]['value'])
+        self.duration = data['duration']
         self.dur_timer = 0
 
     def update(self, offset, time_update):
@@ -34,7 +38,6 @@ class Projectile(pygame.sprite.Sprite):
             return
 
         self.rect.centerx -= offset
-        self.timer += time_update
         self.vel += self.acc
         self.rect.center += self.vel
         self.check_bounds()
@@ -57,24 +60,19 @@ class Projectile(pygame.sprite.Sprite):
 
 
 class Fireball(Projectile):
-    def __init__(self, pos, acc_mod, mods):
-        image = pygame.image.load(os.path.join('images\\projectiles', 'fire.png'))
-        super().__init__(pos, acc_mod, image, mods[STAT_STRS['PROJSZ']]['value'])
+    def __init__(self, pos, mods):
+        super().__init__(pos, mods, BULLETDATA['Fireball'])
         self.acc_angle = ACC_ANGLE
-        self.acc = vec(0, -0.1)
-        self.vel = vec(0, -0.1)
-        self.damage = int(1 * mods[STAT_STRS['DMG']]['value'])
-        self.crit = 20
-        self.speed_mod = 0.001
         self.rot_delay = 20
         self.degrees = 0
-        self.duration = 8000
+        self.rot_timer = 0
 
     def update(self, offset, time_update):
+        self.rot_timer += time_update
         super().update(offset, time_update)
-        while self.timer >= self.rot_delay:
+        while self.rot_timer >= self.rot_delay:
             self.degrees += 4
-            self.timer -= self.rot_delay
+            self.rot_timer -= self.rot_delay
         self.vel.rotate_ip(self.degrees)
         self.degrees = 0
 
@@ -84,31 +82,20 @@ class Fireball(Projectile):
 
 
 class Iceball(Projectile):
-    def __init__(self, pos, acc_mod, mods):
-        image = pygame.image.load(os.path.join('images\\projectiles', 'ice.png'))
-        super().__init__(pos, acc_mod, image, mods[STAT_STRS['PROJSZ']]['value'])
-        self.acc = vec(0, 0)
-        self.damage = int(5 * mods[STAT_STRS['DMG']]['value'])
-        self.crit = 0
-        self.duration = 10000
+    def __init__(self, pos, mods):
+        super().__init__(pos, mods, BULLETDATA['Iceball'])
 
 
 class Lightning(Projectile):
-    def __init__(self, pos, acc_mod, mods):
-        image = pygame.image.load(os.path.join('images\\projectiles', 'lit.png'))
-        super().__init__(pos, acc_mod, image, mods[STAT_STRS['PROJSZ']]['value'])
-        self.acc = vec(0.1, 0.1)
-        self.acc.x *= acc_mod.x
-        self.acc.y *= acc_mod.y
-        self.acc *= mods[STAT_STRS['PROJSPD']]['value']
-        self.damage = int(2 * mods[STAT_STRS['DMG']]['value'])
-        self.crit = 10
+    def __init__(self, pos, mods):
+        super().__init__(pos, mods, BULLETDATA['Lightning'])
         self.wobble_delay = 200
-        self.duration = 5000
+        self.wobble_timer = 0
 
     def update(self, offset, time_update):
+        self.wobble_timer += time_update
         super().update(offset, time_update)
-        if self.timer > self.wobble_delay:
+        if self.wobble_timer > self.wobble_delay:
             self.acc.y = -self.acc.y
             self.vel.y = -self.vel.y
-            self.timer -= self.wobble_delay
+            self.wobble_timer -= self.wobble_delay

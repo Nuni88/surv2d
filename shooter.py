@@ -14,8 +14,6 @@ WEAPONTYPES = {
     'Lightning': Lightning
 }
 
-# TODO: Read weapon attributes from file
-
 
 class Shooter(pygame.sprite.Sprite):
     def __init__(self, pos, data):
@@ -28,7 +26,6 @@ class Shooter(pygame.sprite.Sprite):
         self.level = 1
         self.name = data['name']
         self.delay = BASE_SHOT_DELAY * data['delay_mod']
-        self.acc_mod = vec(data['a0_x'], data['a0_y'])
         self.offset = vec(data['p0_x'], data['p0_y'])
         self.proj_type = data['proj_type']
         self.bullets = pygame.sprite.Group()
@@ -42,7 +39,7 @@ class Shooter(pygame.sprite.Sprite):
             self.shot_timer -= self.delay
 
     def shoot(self, mods):
-        bullet = WEAPONTYPES[self.proj_type](self.rect.center + self.offset, self.acc_mod, mods)
+        bullet = WEAPONTYPES[self.proj_type](self.rect.center + self.offset, mods)
         self.bullets.add(bullet)
 
     def get_bullets(self) -> pygame.sprite.Group:

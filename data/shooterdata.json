@@ -2,8 +2,6 @@
 	"Fire": {
 		"name": "FireShooter",
 		"delay_mod": 1.0,
-		"a0_x": 1.0,
-		"a0_y": 1.0,
 		"p0_x": -50.0,
 		"p0_y": 0.0,
 		"proj_type": "Fireball"
@@ -11,8 +9,6 @@
 	"Lit": {
 		"name": "LitShooter",
 		"delay_mod": 0.8,
-		"a0_x": 1.0,
-		"a0_y": 1.0,
 		"p0_x": 0.0,
 		"p0_y": 0.0,
 		"proj_type": "Lightning"
@@ -20,8 +16,6 @@
 	"Ice": {
 		"name": "IceShooter",
 		"delay_mod": 1.5,
-		"a0_x": 1.0,
-		"a0_y": 1.0,
 		"p0_x": 0.0,
 		"p0_y": 0.0,
 		"proj_type": "Iceball"
