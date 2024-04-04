@@ -7,7 +7,6 @@ from constants import WIDTH, HEIGHT, STAT_STRS, DISP_SCALE
 
 vec = pygame.math.Vector2
 
-# TODO: Read projectile attributes from file
 # Modifiable values
 ACC_ANGLE = math.pi
 bulletdatafile = open(os.path.join('data', 'bulletdata.json'), 'r')
@@ -68,8 +67,8 @@ class Fireball(Projectile):
         self.rot_timer = 0
 
     def update(self, offset, time_update):
-        self.rot_timer += time_update
         super().update(offset, time_update)
+        self.rot_timer += time_update
         while self.rot_timer >= self.rot_delay:
             self.degrees += 4
             self.rot_timer -= self.rot_delay
@@ -93,8 +92,8 @@ class Lightning(Projectile):
         self.wobble_timer = 0
 
     def update(self, offset, time_update):
-        self.wobble_timer += time_update
         super().update(offset, time_update)
+        self.wobble_timer += time_update
         if self.wobble_timer > self.wobble_delay:
             self.acc.y = -self.acc.y
             self.vel.y = -self.vel.y

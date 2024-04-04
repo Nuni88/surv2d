@@ -1,6 +1,6 @@
 import pygame
 from projectile import Fireball, Iceball, Lightning
-from constants import DISP_SCALE
+from constants import STAT_STRS, DISP_SCALE
 
 vec = pygame.math.Vector2
 
@@ -28,6 +28,7 @@ class Shooter(pygame.sprite.Sprite):
         self.delay = BASE_SHOT_DELAY * data['delay_mod']
         self.offset = vec(data['p0_x'], data['p0_y'])
         self.proj_type = data['proj_type']
+        self.carryover = 0
         self.bullets = pygame.sprite.Group()
 
     def update(self, loc, offset, time_update, mods):
@@ -35,7 +36,11 @@ class Shooter(pygame.sprite.Sprite):
         self.bullets.update(offset, time_update)
         self.shot_timer += time_update
         if self.shot_timer >= self.delay:
-            self.shoot(mods)
+            num_bullets = mods[STAT_STRS['PROJNUM']]['value'] + self.carryover
+            while num_bullets >= 1:
+                self.shoot(mods)
+                num_bullets -= 1
+            self.carryover = num_bullets
             self.shot_timer -= self.delay
 
     def shoot(self, mods):
