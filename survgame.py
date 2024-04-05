@@ -9,7 +9,7 @@ from enemy import GroundEnemy, FlyingEnemy
 from player import Player
 from platform import Platform
 from door import WeapDoor, StatDoor
-from pickup import ExpPickup, ExpSmall, ExpMed, ExpLarge, MaxHealthPickup, HealthPickup
+from pickup import ExpPickup, StatPickup, HealthPickup
 from menu import Menu
 from cursor import Cursor
 from constants import WIDTH, HEIGHT, FONT, STAT_STRS, FPS, DISP_SCALE, EVENTS
@@ -17,10 +17,10 @@ from constants import WIDTH, HEIGHT, FONT, STAT_STRS, FPS, DISP_SCALE, EVENTS
 vec = pygame.math.Vector2
 
 LOOT_TABLE = {
-    'EnemyOne': ExpSmall,
-    'EnemyTwo': ExpMed,
-    'EnemyThree': ExpLarge,
-    'FlyingEnemyOne': ExpSmall
+    'EnemyOne': 'ExpS',
+    'EnemyTwo': 'ExpM',
+    'EnemyThree': 'ExpL',
+    'FlyingEnemyOne': 'ExpS'
 }
 
 # Modifiable values
@@ -129,7 +129,7 @@ class SurvGame:
             self.doors.add(door)
             self.platforms.add(door)
 
-        heart = MaxHealthPickup(vec(WIDTH * 0.2, HEIGHT * 0.93))
+        heart = StatPickup(vec(WIDTH * 0.2, HEIGHT * 0.93), STAT_STRS['MAXHP'])
         self.pickups.add(heart)
 
         pygame.mouse.set_visible(False)
@@ -394,10 +394,17 @@ class SurvGame:
                     enemy_pos = enemy.get_pos()
                     hp_chance = random.randint(1, 100)
                     if hp_chance <= POT_DROP_RT:
-                        drop = HealthPickup(enemy_pos)
+                        size = random.randint(1, 100)
+                        if size <= 20:
+                            pot = 'HealL'
+                        elif size <= 50:
+                            pot = 'HealM'
+                        else:
+                            pot = 'HealS'
+                        drop = HealthPickup(enemy_pos, pot)
                     else:
-                        loot_type = LOOT_TABLE[enemy.get_name()]
-                        drop = loot_type(enemy_pos)
+                        loot = LOOT_TABLE[enemy.get_name()]
+                        drop = ExpPickup(enemy_pos, loot)
                     self.pickups.add(drop)
 
     def update_objects(self, time_update):

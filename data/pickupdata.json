@@ -1,0 +1,36 @@
+{
+	"EXP": {
+		"ExpS": {
+			"value": 5,
+			"image": "exp_small.png"
+		},
+		"ExpM": {
+			"value": 20,
+			"image": "exp_med.png"
+		},
+		"ExpL": {
+			"value": 50,
+			"image": "exp_large.png"
+		}
+	},
+	"HEAL": {
+		"HealS": {
+			"value": 0.10,
+			"image": "potion_small.png"
+		},
+		"HealM": {
+			"value": 0.25,
+			"image": "potion_med.png"
+		},
+		"HealL": {
+			"value": 0.40,
+			"image": "potion_large.png"
+		}
+	},
+	"STATS": {
+		"Max HP": {
+			"value": 10,
+			"image": "maxhp.png"
+		}
+	}
+}

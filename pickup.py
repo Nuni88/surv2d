@@ -1,26 +1,28 @@
 import os
-import math
+import json
 import pygame
 from constants import FPS, STAT_STRS, DISP_SCALE, EVENTS
 
 vec = pygame.math.Vector2
 # TODO: Read pickup attributes from file
+pickupdatafile = open(os.path.join('data', 'pickupdata.json'), 'r')
+PICKUPDATA = json.loads(str(pickupdatafile.read()))
+pickupdatafile.close()
+BASE_IMG_PATH = 'images\\pickups'
 
 
 class Pickup(pygame.sprite.Sprite):
-    def __init__(self, pos, image):
+    def __init__(self, pos, data):
         super().__init__()
+        image = pygame.image.load(os.path.join(BASE_IMG_PATH, data['image']))
         self.image = pygame.transform.scale_by(image, DISP_SCALE)
         self.pos = vec(pos)
         self.rect = self.image.get_rect(center=pos)
-        self.value = 0
+        self.value = data['value']
 
     def update(self, ppos, range, offset):
         self.pos.x -= offset
         self.rect.center = self.pos
-
-    def get_value(self) -> int:
-        return self.value
 
     def collect(self):
         pass
@@ -30,9 +32,8 @@ class Pickup(pygame.sprite.Sprite):
 
 
 class ExpPickup(Pickup):
-    def __init__(self, pos, image):
-        super().__init__(pos, image)
-        self.value = 0
+    def __init__(self, pos, ptype):
+        super().__init__(pos, PICKUPDATA['EXP'][ptype])
         self.vel = vec(0, 0)
 
     def update(self, ppos, range, offset):
@@ -49,41 +50,22 @@ class ExpPickup(Pickup):
         self.kill()
 
 
-class ExpSmall(ExpPickup):
-    def __init__(self, pos):
-        super().__init__(pos, pygame.image.load(os.path.join('images\\pickups', 'exp_small.png')))
-        self.value = 5
-
-
-class ExpMed(ExpPickup):
-    def __init__(self, pos):
-        super().__init__(pos, pygame.image.load(os.path.join('images\\pickups', 'exp_med.png')))
-        self.value = 20
-
-
-class ExpLarge(ExpPickup):
-    def __init__(self, pos):
-        super().__init__(pos, pygame.image.load(os.path.join('images\\pickups', 'exp_large.png')))
-        self.value = 50
-
-
-class MaxHealthPickup(Pickup):
-    def __init__(self, pos):
-        super().__init__(pos, pygame.image.load(os.path.join('images\\pickups', 'maxhp.png')))
-        self.value = 10
+class HealthPickup(Pickup):
+    def __init__(self, pos, ptype):
+        super().__init__(pos, PICKUPDATA['HEAL'][ptype])
 
     def collect(self):
-        e = pygame.event.Event(EVENTS['GAINSTAT'], {'stat': STAT_STRS['MAXHP'], 'value': self.value})
+        e = pygame.event.Event(EVENTS['PLAYERHEAL'], {'value': self.value})
         pygame.event.post(e)
         self.kill()
 
 
-class HealthPickup(Pickup):
-    def __init__(self, pos):
-        super().__init__(pos, pygame.image.load(os.path.join('images\\pickups', 'potion_small.png')))
-        self.value = 0.2
+class StatPickup(Pickup):
+    def __init__(self, pos, ptype):
+        super().__init__(pos, PICKUPDATA['STATS'][ptype])
+        self.stat = ptype
 
     def collect(self):
-        e = pygame.event.Event(EVENTS['PLAYERHEAL'], {'value': self.value})
+        e = pygame.event.Event(EVENTS['GAINSTAT'], {'stat': self.stat, 'value': self.value})
         pygame.event.post(e)
         self.kill()
