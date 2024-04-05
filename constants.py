@@ -1,3 +1,5 @@
+import pygame
+
 # Values related to screen height and width
 BASE_HEIGHT = 480
 BASE_WIDTH = 854
@@ -25,4 +27,12 @@ STAT_STRS = {
     'PROJSPD': 'Projectile Speed',
     'PROJSZ': 'Weapon Size',
     'PROJNUM': 'Projectile Count'
+}
+
+# Custom Events
+EVENTS = {
+    'SPAWNENEMIES': pygame.USEREVENT,
+    'GAINEXP': pygame.USEREVENT + 1,
+    'GAINSTAT': pygame.USEREVENT + 2,
+    'PLAYERHEAL': pygame.USEREVENT + 3
 }

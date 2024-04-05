@@ -29,7 +29,7 @@ class Projectile(pygame.sprite.Sprite):
         self.duration = data['duration']
         self.dur_timer = 0
 
-    def update(self, offset, time_update):
+    def update(self, offset, time_update, dist):
         # Projectile lasts for limited time
         self.dur_timer += time_update
         if self.dur_timer > self.duration:
@@ -62,18 +62,18 @@ class Fireball(Projectile):
     def __init__(self, pos, mods):
         super().__init__(pos, mods, BULLETDATA['Fireball'])
         self.acc_angle = ACC_ANGLE
-        self.rot_delay = 20
-        self.degrees = 0
+        self.rot_delay = 60
         self.rot_timer = 0
 
-    def update(self, offset, time_update):
-        super().update(offset, time_update)
+    def update(self, offset, time_update, dist):
+        super().update(offset, time_update, dist)
+        self.rect.centerx += dist
         self.rot_timer += time_update
+        degrees = 0
         while self.rot_timer >= self.rot_delay:
-            self.degrees += 4
+            degrees += 3
             self.rot_timer -= self.rot_delay
-        self.vel.rotate_ip(self.degrees)
-        self.degrees = 0
+        self.vel.rotate_ip(degrees)
 
     def move(self):
         self.vel += self.acc
@@ -91,8 +91,8 @@ class Lightning(Projectile):
         self.wobble_delay = 200
         self.wobble_timer = 0
 
-    def update(self, offset, time_update):
-        super().update(offset, time_update)
+    def update(self, offset, time_update, dist):
+        super().update(offset, time_update, dist)
         self.wobble_timer += time_update
         if self.wobble_timer > self.wobble_delay:
             self.acc.y = -self.acc.y

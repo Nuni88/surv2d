@@ -2,7 +2,7 @@
 	"Fire": {
 		"name": "FireShooter",
 		"delay_mod": 1.0,
-		"p0_x": -50.0,
+		"p0_x": -30.0,
 		"p0_y": 0.0,
 		"proj_type": "Fireball"
 	},

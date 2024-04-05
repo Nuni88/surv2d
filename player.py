@@ -73,7 +73,7 @@ class Player(Actor):
                 if self.dodging:
                     self.image = self.frame_left
 
-        self.shooters.update(self.rect.center, self.get_scroll_dist(), time_update, self.mods)
+        self.shooters.update(self.rect.center, self.get_scroll_dist(), time_update, self.mods, self.get_move_dist())
 
     def move_x(self):
         self.acc.x = 0
@@ -167,6 +167,9 @@ class Player(Actor):
             return self.vel.x + self.acc.x * 0.5
         else:
             return 0
+
+    def get_move_dist(self) -> float:
+        return self.vel.x + self.acc.x * 0.5
 
     def gain_stat_bonus(self, stat, amt):
         if stat in self.stats:

@@ -3,9 +3,9 @@
 		"damage": 1,
 		"base_crit": 20,
 		"a0_x": 0.0,
-		"a0_y": -0.1,
+		"a0_y": 0.0,
 		"v0_x": 0.0,
-		"v0_y": -0.1,
+		"v0_y": -1.0,
 		"duration": 8000,
 		"image": "fire.png"
 	},

@@ -12,7 +12,7 @@ from door import WeapDoor, StatDoor
 from pickup import ExpPickup, ExpSmall, ExpMed, ExpLarge, MaxHealthPickup, HealthPickup
 from menu import Menu
 from cursor import Cursor
-from constants import WIDTH, HEIGHT, FONT, STAT_STRS, FPS, DISP_SCALE
+from constants import WIDTH, HEIGHT, FONT, STAT_STRS, FPS, DISP_SCALE, EVENTS
 
 vec = pygame.math.Vector2
 
@@ -62,7 +62,6 @@ PAUSE_MENU_OPTIONS = [
     'Return to Title',
     'Quit'
 ]
-SPAWNENEMIES = pygame.USEREVENT
 
 
 # noinspection PyTypeChecker,PyPep8Naming
@@ -337,8 +336,6 @@ class SurvGame:
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == SPAWNENEMIES:
-                self.spawn_enemies()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     self.P1.jump()
@@ -349,6 +346,16 @@ class SurvGame:
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_SPACE:
                     self.P1.cancel_jump()
+            if event.type == EVENTS['SPAWNENEMIES']:
+                self.spawn_enemies()
+            if event.type == EVENTS['GAINEXP']:
+                self.p_exp += event.value
+                if self.p_exp >= self.to_next_level:
+                    self.add_level_up_menu()
+            if event.type == EVENTS['GAINSTAT']:
+                self.P1.gain_stat_bonus(event.stat, event.value)
+            if event.type == EVENTS['PLAYERHEAL']:
+                self.P1.heal_percent(event.value)
 
     def handle_enemy_collisions(self):
         pass
@@ -369,14 +376,7 @@ class SurvGame:
         hits = pygame.sprite.spritecollide(self.P1, self.pickups, False)
         if hits:
             for pickup in hits:
-                # TODO: Rewrite cleaner
-                if isinstance(pickup, ExpPickup):
-                    self.p_exp += pickup.get_value()
-                    if self.p_exp >= self.to_next_level:
-                        self.add_level_up_menu()
-                else:
-                    pickup.collect(self.P1)
-                pickup.kill()
+                pickup.collect()
 
     def handle_player_hits(self):
         hits = pygame.sprite.spritecollide(self.P1, self.enemies, False)
@@ -403,15 +403,15 @@ class SurvGame:
     def update_objects(self, time_update):
         self.P1.update(time_update)
         ppos = vec(self.P1.get_pos())
-        range = self.P1.get_pickup_range()
+        prange = self.P1.get_pickup_range()
         offset = self.P1.get_scroll_dist()
         self.enemies.update(ppos, offset)
-        self.pickups.update(ppos, range, offset)
+        self.pickups.update(ppos, prange, offset)
         self.platforms.update(offset)
         self.floor.recenter(ppos)
 
     def run(self):
-        pygame.time.set_timer(SPAWNENEMIES, SPAWN_DELAY)
+        pygame.time.set_timer(EVENTS['SPAWNENEMIES'], SPAWN_DELAY)
 
         while True:
             time_update = self.clock.tick(FPS)

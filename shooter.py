@@ -26,14 +26,14 @@ class Shooter(pygame.sprite.Sprite):
         self.level = 1
         self.name = data['name']
         self.delay = BASE_SHOT_DELAY * data['delay_mod']
-        self.offset = vec(data['p0_x'], data['p0_y'])
+        self.offset = vec(data['p0_x'] * DISP_SCALE, data['p0_y'] * DISP_SCALE)
         self.proj_type = data['proj_type']
         self.carryover = 0
         self.bullets = pygame.sprite.Group()
 
-    def update(self, loc, offset, time_update, mods):
+    def update(self, loc, offset, time_update, mods, dist):
         self.rect.center = loc
-        self.bullets.update(offset, time_update)
+        self.bullets.update(offset, time_update, dist)
         self.shot_timer += time_update
         if self.shot_timer >= self.delay:
             num_bullets = mods[STAT_STRS['PROJNUM']]['value'] + self.carryover
