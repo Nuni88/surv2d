@@ -19,6 +19,7 @@ LOCK_IMG_PATHS = {
     STAT_STRS['JUMPH']: os.path.join(LOCK_PATH, 'jumph.png'),
     STAT_STRS['DODGE']: os.path.join(LOCK_PATH, 'dodge.png'),
     STAT_STRS['INVUL']: os.path.join(LOCK_PATH, 'invul.png'),
+    STAT_STRS['PRANGE']: os.path.join(LOCK_PATH, 'prange.png'),
     STAT_STRS['DMG']: os.path.join(LOCK_PATH, 'dmg.png'),
     STAT_STRS['CRITD']: os.path.join(LOCK_PATH, 'critd.png'),
     STAT_STRS['PROJSPD']: os.path.join(LOCK_PATH, 'projspd.png'),

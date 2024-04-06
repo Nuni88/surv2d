@@ -4,7 +4,7 @@ import pygame
 from constants import FPS, STAT_STRS, DISP_SCALE, EVENTS
 
 vec = pygame.math.Vector2
-# TODO: Read pickup attributes from file
+
 pickupdatafile = open(os.path.join('data', 'pickupdata.json'), 'r')
 PICKUPDATA = json.loads(str(pickupdatafile.read()))
 pickupdatafile.close()

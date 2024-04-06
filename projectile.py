@@ -12,7 +12,7 @@ ACC_ANGLE = math.pi
 bulletdatafile = open(os.path.join('data', 'bulletdata.json'), 'r')
 BULLETDATA = json.loads(str(bulletdatafile.read()))
 bulletdatafile.close()
-BASE_IMG_PATH = 'images\\projectiles'
+BASE_IMG_PATH = 'images\\weapons'
 
 
 class Projectile(pygame.sprite.Sprite):
@@ -30,11 +30,11 @@ class Projectile(pygame.sprite.Sprite):
         self.dur_timer = 0
 
     def update(self, offset, time_update, dist):
-        # Projectile lasts for limited time
-        self.dur_timer += time_update
-        if self.dur_timer > self.duration:
-            self.kill()
-            return
+        if self.duration > 0:                       # Limited time weapons
+            self.dur_timer += time_update
+            if self.dur_timer > self.duration:
+                self.kill()
+                return
 
         self.rect.centerx -= offset
         self.vel += self.acc
@@ -98,3 +98,8 @@ class Lightning(Projectile):
             self.acc.y = -self.acc.y
             self.vel.y = -self.vel.y
             self.wobble_timer -= self.wobble_delay
+
+
+class Katana(Projectile):
+    def __init__(self, pos, mods):
+        super().__init__(pos, mods, BULLETDATA['Katana'])

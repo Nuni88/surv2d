@@ -53,7 +53,7 @@ LEVEL_BONUSES = {
     STAT_STRS['CRITD']: 0.1,
     STAT_STRS['PROJSPD']: 0.05,
     STAT_STRS['PROJSZ']: 0.1,
-    STAT_STRS['PROJNUM']: 0.1
+    STAT_STRS['PROJNUM']: 0.5
 }
 PAUSE_MENU_OPTIONS = [
     'Resume',
@@ -124,7 +124,7 @@ class SurvGame:
             if i == 1:
                 door = WeapDoor(vec(WIDTH * (i + 0.13), HEIGHT * 0.85), 'door.png', 'FireShooter', 2)
             else:
-                door = StatDoor(vec(WIDTH * (i + 0.13), HEIGHT * 0.85), 'door.png', 'Max HP', 2)
+                door = StatDoor(vec(WIDTH * (i + 0.13), HEIGHT * 0.85), 'door.png', STATS[roll], 2)
             self.environment.add(door)
             self.doors.add(door)
             self.platforms.add(door)

@@ -6,7 +6,7 @@
 		"a0_y": 0.0,
 		"v0_x": 0.0,
 		"v0_y": -1.0,
-		"duration": 8000,
+		"duration": 0,
 		"image": "fire.png"
 	},
 	"Lightning": {
@@ -26,7 +26,17 @@
 		"a0_y": 0.0,
 		"v0_x": 0.0,
 		"v0_y": 0.0,
-		"duration": 10000,
+		"duration": 0,
 		"image": "ice.png"
+	},
+	"Katana": {
+		"damage": 3,
+		"base_crit": 25,
+		"a0_x": 0.0,
+		"a0_y": 0.0,
+		"v0_x": 0.0,
+		"v0_y": 1.0,
+		"duration": 1000,
+		"image": "katana.png"
 	}
 }
