@@ -387,9 +387,11 @@ class SurvGame:
         hits = pygame.sprite.groupcollide(self.enemies, self.bullets, False, False)
         for enemy in hits:
             for bullet in hits[enemy]:
+                # TODO: Rewrite code
                 crit_chance = self.P1.get_crit_chance()
                 crit_mod = self.P1.get_crit_mod()
                 enemy.take_damage(bullet.get_damage(crit_chance, crit_mod))
+                bullet.handle_collision()
                 if not enemy.alive():
                     enemy_pos = enemy.get_pos()
                     hp_chance = random.randint(1, 100)
@@ -418,7 +420,7 @@ class SurvGame:
         self.floor.recenter(ppos)
 
     def run(self):
-        pygame.time.set_timer(EVENTS['SPAWNENEMIES'], SPAWN_DELAY)
+        # pygame.time.set_timer(EVENTS['SPAWNENEMIES'], SPAWN_DELAY)
 
         while True:
             time_update = self.clock.tick(FPS)

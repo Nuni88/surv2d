@@ -34,14 +34,17 @@ class Player(Actor):
         self.dodge_timer = 0
         self.invincible = False
         self.invul_timer = 0
+        self.last_pos = self.pos
 
         shooterdatafile = open(os.path.join('data', 'shooterdata.json'), 'r')
         self.shooterdata = json.loads(str(shooterdatafile.read()))
         shooterdatafile.close()
         self.shooters = pygame.sprite.Group()
-        for s_type in self.shooterdata:
-            shooter = Shooter(self.rect.center, self.shooterdata[s_type])
-            self.shooters.add(shooter)
+        shooter = Shooter(self.rect.center, self.shooterdata['Fire'])
+        self.shooters.add(shooter)
+        # for s_type in self.shooterdata:
+        #     shooter = Shooter(self.rect.center, self.shooterdata[s_type])
+        #     self.shooters.add(shooter)
 
         # self.jump_sfx = pygame.mixer.Sound(os.path.join('sound', 'jump.wav'))
         # self.jump_sfx.set_volume(0.1)
@@ -73,9 +76,10 @@ class Player(Actor):
                 if self.dodging:
                     self.image = self.frame_left
 
-        self.shooters.update(self.rect.center, self.get_scroll_dist(), time_update, self.mods, self.get_move_dist())
+        self.shooters.update(self.rect.center, self.get_scroll_dist(), time_update, self.mods, self.pos - self.last_pos)
 
     def move_x(self):
+        self.last_pos.x = self.pos.x
         self.acc.x = 0
         pressed_keys = pygame.key.get_pressed()
         if pressed_keys[K_LEFT]:
@@ -97,6 +101,7 @@ class Player(Actor):
         self.rect.midbottom = self.pos
 
     def move_y(self):
+        self.last_pos.y = self.pos.y
         self.acc.y = GRAVITY
         self.vel.y += self.acc.y
         self.pos.y += self.vel.y + self.acc.y * 0.5
@@ -167,9 +172,6 @@ class Player(Actor):
             return self.vel.x + self.acc.x * 0.5
         else:
             return 0
-
-    def get_move_dist(self) -> float:
-        return self.vel.x + self.acc.x * 0.5
 
     def gain_stat_bonus(self, stat, amt):
         if stat in self.stats:

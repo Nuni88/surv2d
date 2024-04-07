@@ -1,6 +1,5 @@
 import os
 import json
-import math
 import random
 import pygame
 from constants import WIDTH, HEIGHT, STAT_STRS, DISP_SCALE
@@ -8,7 +7,6 @@ from constants import WIDTH, HEIGHT, STAT_STRS, DISP_SCALE
 vec = pygame.math.Vector2
 
 # Modifiable values
-ACC_ANGLE = math.pi
 bulletdatafile = open(os.path.join('data', 'bulletdata.json'), 'r')
 BULLETDATA = json.loads(str(bulletdatafile.read()))
 bulletdatafile.close()
@@ -30,21 +28,19 @@ class Projectile(pygame.sprite.Sprite):
         self.dur_timer = 0
 
     def update(self, offset, time_update, dist):
-        if self.duration > 0:                       # Limited time weapons
-            self.dur_timer += time_update
-            if self.dur_timer > self.duration:
-                self.kill()
-                return
-
         self.rect.centerx -= offset
         self.vel += self.acc
         self.rect.center += self.vel
-        self.check_bounds()
 
     def check_bounds(self):
         if self.rect.left > WIDTH or self.rect.right < 0:
             self.kill()
         elif self.rect.top > HEIGHT or self.rect.bottom < 0:
+            self.kill()
+
+    def check_duration(self, time_update):
+        self.dur_timer += time_update
+        if self.dur_timer > self.duration:
             self.kill()
 
     def get_damage(self, crit_chance, crit_mod) -> int:
@@ -57,21 +53,24 @@ class Projectile(pygame.sprite.Sprite):
     def scale_to_screen(self, scale):
         self.image = pygame.transform.scale_by(self.image, scale)
 
+    def handle_collision(self) -> bool:
+        pass
+
 
 class Fireball(Projectile):
     def __init__(self, pos, mods):
         super().__init__(pos, mods, BULLETDATA['Fireball'])
-        self.acc_angle = ACC_ANGLE
-        self.rot_delay = 60
+        self.rot_delay = 120
         self.rot_timer = 0
 
     def update(self, offset, time_update, dist):
         super().update(offset, time_update, dist)
-        self.rect.centerx += dist
+        self.rect.centerx += offset
+        self.rect.center += dist
         self.rot_timer += time_update
         degrees = 0
         while self.rot_timer >= self.rot_delay:
-            degrees += 3
+            degrees += 6
             self.rot_timer -= self.rot_delay
         self.vel.rotate_ip(degrees)
 
@@ -83,6 +82,12 @@ class Fireball(Projectile):
 class Iceball(Projectile):
     def __init__(self, pos, mods):
         super().__init__(pos, mods, BULLETDATA['Iceball'])
+        self.durability = 15
+
+    def handle_collision(self):
+        self.durability -= 1
+        if self.durability <= 0:
+            self.kill()
 
 
 class Lightning(Projectile):
@@ -90,6 +95,7 @@ class Lightning(Projectile):
         super().__init__(pos, mods, BULLETDATA['Lightning'])
         self.wobble_delay = 200
         self.wobble_timer = 0
+        self.durability = 30
 
     def update(self, offset, time_update, dist):
         super().update(offset, time_update, dist)
@@ -98,8 +104,19 @@ class Lightning(Projectile):
             self.acc.y = -self.acc.y
             self.vel.y = -self.vel.y
             self.wobble_timer -= self.wobble_delay
+        self.check_bounds()
+        self.check_duration(time_update)
+
+    def handle_collision(self):
+        self.durability -= 1
+        if self.durability <= 0:
+            self.kill()
 
 
 class Katana(Projectile):
     def __init__(self, pos, mods):
         super().__init__(pos, mods, BULLETDATA['Katana'])
+
+    def update(self, offset, time_update, dist):
+        super().update(offset, time_update, dist)
+        self.check_duration(time_update)
