@@ -9,9 +9,10 @@ from constants import STAT_STRS, DISP_SCALE
 LOCK_PATH = 'images\\environment\\locks'
 LOCK_IMG_PATHS = {
     'Base': os.path.join(LOCK_PATH, 'lock_base.png'),
-    'FireShooter': os.path.join(LOCK_PATH, 'fire.png'),
-    'LitShooter': os.path.join(LOCK_PATH, 'lit.png'),
-    'IceShooter': os.path.join(LOCK_PATH, 'ice.png'),
+    'FireWheel': os.path.join(LOCK_PATH, 'fire.png'),
+    'LitStrike': os.path.join(LOCK_PATH, 'lit.png'),
+    'IceMine': os.path.join(LOCK_PATH, 'ice.png'),
+    'KatanaW': os.path.join(LOCK_PATH, 'katana.png'),
     STAT_STRS['MAXHP']: os.path.join(LOCK_PATH, 'maxhp.png'),
     STAT_STRS['CRITC']: os.path.join(LOCK_PATH, 'critc.png'),
     STAT_STRS['ASPD']: os.path.join(LOCK_PATH, 'aspd.png'),

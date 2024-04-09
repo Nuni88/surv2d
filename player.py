@@ -39,11 +39,11 @@ class Player(Actor):
         self.invul_timer = 0
         self.last_pos = self.pos
 
-        self.shooters = pygame.sprite.Group()
-        self.shooters.add(FireWheel(self.rect.center))
-        self.shooters.add(KatanaW(self.rect.center))
-        self.shooters.add(LitStrike(self.rect.center))
-        self.shooters.add(IceMine(self.rect.center))
+        self.weapons = pygame.sprite.Group()
+        self.weapons.add(FireWheel(self.rect.center))
+        self.weapons.add(KatanaW(self.rect.center))
+        self.weapons.add(LitStrike(self.rect.center))
+        self.weapons.add(IceMine(self.rect.center))
 
         # self.jump_sfx = pygame.mixer.Sound(os.path.join('sound', 'jump.wav'))
         # self.jump_sfx.set_volume(0.1)
@@ -75,7 +75,7 @@ class Player(Actor):
                 if self.dodging:
                     self.image = self.frame_left
 
-        self.shooters.update(self.rect.center, self.get_scroll_dist(), time_update, self.mods, self.pos - self.last_pos)
+        self.weapons.update(self.rect.center, self.get_scroll_dist(), time_update, self.mods, self.pos - self.last_pos)
 
     def move_x(self):
         self.last_pos.x = self.pos.x
@@ -161,7 +161,7 @@ class Player(Actor):
 
     def get_bullets(self) -> pygame.sprite.Group:
         bullets = pygame.sprite.Group()
-        for shooter in self.shooters:
+        for shooter in self.weapons:
             for bullet in shooter.get_bullets():
                 bullets.add(bullet)
         return bullets
@@ -199,7 +199,7 @@ class Player(Actor):
             self.health = self.stats[STAT_STRS['MAXHP']]['value']
 
     def has_req_weapon(self, req, lvl) -> bool:
-        for shooter in self.shooters:
+        for shooter in self.weapons:
             if shooter.__class__.__name__ == req and shooter.get_level() >= lvl:
                 return True
         return False

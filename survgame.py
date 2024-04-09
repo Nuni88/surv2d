@@ -121,8 +121,9 @@ class SurvGame:
             self.environment.add(plat)
             self.platforms.add(plat)
             roll = random.randint(0, len(STATS) - 1)
-            if i == 1:
-                door = WeapDoor(vec(WIDTH * (i + 0.13), HEIGHT * 0.85), 'door.png', 'FireShooter', 2)
+            if 0 <= i < len(self.P1.weapons):
+                lock_type = type(self.P1.weapons.sprites()[i]).__name__
+                door = WeapDoor(vec(WIDTH * (i + 0.13), HEIGHT * 0.85), 'door.png', lock_type, 2)
             else:
                 door = StatDoor(vec(WIDTH * (i + 0.13), HEIGHT * 0.85), 'door.png', STATS[roll], 2)
             self.environment.add(door)

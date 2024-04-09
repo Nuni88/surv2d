@@ -1,29 +1,16 @@
-import os
-import json
 import pygame
-from projectile import Fireball, Iceball, Lightning, Katana
 from constants import STAT_STRS, DISP_SCALE
 
 vec = pygame.math.Vector2
-
-weapondatafile = open(os.path.join('data', 'weapondata.json'), 'r')
-WEAPONDATA = json.loads(str(weapondatafile.read()))
-weapondatafile.close()
 
 # Modifiable values
 BASE_SHOT_DELAY = 1000
 BASE_DIMS = (100, 100)
 BGCOLOR = pygame.Color('black')
-WEAPONTYPES = {
-    'Fireball': Fireball,
-    'Iceball': Iceball,
-    'Lightning': Lightning,
-    'Katana': Katana
-}
 
 
 class Weapon(pygame.sprite.Sprite):
-    def __init__(self, pos, data):
+    def __init__(self, pos, ptype, delay_mod):
         super().__init__()
         self.image = pygame.transform.scale_by(pygame.Surface(BASE_DIMS), DISP_SCALE)
         self.image.fill(BGCOLOR)
@@ -31,11 +18,10 @@ class Weapon(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=pos)
         self.shot_timer = 0
         self.level = 1
-        self.name = data['name']
-        self.delay = BASE_SHOT_DELAY * data['delay_mod']
-        self.nodes = data['nodes']
-        self.proj_type = data['proj_type']
-        self.max_proj = data['max_proj']
+        self.proj_type = ptype
+        self.delay = BASE_SHOT_DELAY * delay_mod
+        self.nodes = []
+        self.max_proj = 0
         self.carryover = 0
         self.bullets = pygame.sprite.Group()
 
@@ -50,14 +36,13 @@ class Weapon(pygame.sprite.Sprite):
             while num_bullets >= 1 and len(self.bullets) < max_proj:
                 for node in self.nodes:
                     if num_bullets >= 1 and len(self.bullets) < max_proj:
-                        self.shoot(mods, self.nodes[node])
+                        self.shoot(mods, node)
                         num_bullets -= 1
             self.carryover = num_bullets
             self.shot_timer -= self.delay
 
     def shoot(self, mods, node):
-        offset = vec(node['x'] * DISP_SCALE, node['y'] * DISP_SCALE)
-        bullet = WEAPONTYPES[self.proj_type](self.rect.center + offset, mods)
+        bullet = self.proj_type(self.rect.center + node, mods)
         self.bullets.add(bullet)
 
     def get_bullets(self) -> pygame.sprite.Group:
