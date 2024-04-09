@@ -1,8 +1,14 @@
+import os
+import json
 import pygame
 from projectile import Fireball, Iceball, Lightning, Katana
 from constants import STAT_STRS, DISP_SCALE
 
 vec = pygame.math.Vector2
+
+weapondatafile = open(os.path.join('data', 'weapondata.json'), 'r')
+WEAPONDATA = json.loads(str(weapondatafile.read()))
+weapondatafile.close()
 
 # Modifiable values
 BASE_SHOT_DELAY = 1000
@@ -16,7 +22,7 @@ WEAPONTYPES = {
 }
 
 
-class Shooter(pygame.sprite.Sprite):
+class Weapon(pygame.sprite.Sprite):
     def __init__(self, pos, data):
         super().__init__()
         self.image = pygame.transform.scale_by(pygame.Surface(BASE_DIMS), DISP_SCALE)

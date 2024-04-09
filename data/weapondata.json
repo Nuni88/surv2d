@@ -1,0 +1,78 @@
+{
+	"Melee": {
+		"Fire": {
+			"name": "FireShooter",
+			"delay_mod": 1.0,
+			"nodes": {
+				"one": {
+					"x": -35.0,
+					"y": 0.0
+				},
+				"two": {
+					"x": -70.0,
+					"y": 0.0
+				}
+			},
+			"proj_type": "Fireball",
+			"max_proj": 1
+		},
+		"Kat": {
+			"name": "Katana",
+			"delay_mod": 1.5,
+			"nodes": {
+				"one": {
+					"x": -20.0,
+					"y": -20.0
+				},
+				"two": {
+					"x": 20.0,
+					"y": -20.0
+				}
+			},
+			"proj_type": "Katana",
+			"max_proj": 1
+		}
+	},
+	"Homing": {
+		"Lit": {
+			"name": "LitShooter",
+			"delay_mod": 0.8,
+			"nodes": {
+				"one": {
+					"x": 0.0,
+					"y": 0.0
+				},
+				"two": {
+					"x": 0.0,
+					"y": -30.0
+				},
+				"three": {
+					"x": 0.0,
+					"y": 30.0
+				}
+			},
+			"proj_type": "Lightning",
+			"max_proj": 7
+		}
+	},
+	"Proj": {
+	},
+	"Static": {
+		"Ice": {
+			"name": "IceShooter",
+			"delay_mod": 1.5,
+			"nodes": {
+				"one": {
+					"x": -30.0,
+					"y": 20.0
+				},
+				"two": {
+					"x": 30.0,
+					"y": 20.0
+				}
+			},
+			"proj_type": "Iceball",
+			"max_proj": 5
+		}
+	}
+}

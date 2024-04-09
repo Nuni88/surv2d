@@ -2,7 +2,10 @@ import os
 import json
 import pygame
 from pygame.locals import *
-from shooter import Shooter
+from weapon import Weapon
+from meleeweapon import FireWheel, KatanaW
+from homingweapon import LitStrike
+from staticweapon import IceMine
 from actor import Actor
 from constants import WIDTH, HEIGHT, STAT_STRS, ACC, FRIC, DISP_SCALE
 
@@ -36,15 +39,11 @@ class Player(Actor):
         self.invul_timer = 0
         self.last_pos = self.pos
 
-        shooterdatafile = open(os.path.join('data', 'shooterdata.json'), 'r')
-        self.shooterdata = json.loads(str(shooterdatafile.read()))
-        shooterdatafile.close()
         self.shooters = pygame.sprite.Group()
-        shooter = Shooter(self.rect.center, self.shooterdata['Fire'])
-        self.shooters.add(shooter)
-        # for s_type in self.shooterdata:
-        #     shooter = Shooter(self.rect.center, self.shooterdata[s_type])
-        #     self.shooters.add(shooter)
+        self.shooters.add(FireWheel(self.rect.center))
+        self.shooters.add(KatanaW(self.rect.center))
+        self.shooters.add(LitStrike(self.rect.center))
+        self.shooters.add(IceMine(self.rect.center))
 
         # self.jump_sfx = pygame.mixer.Sound(os.path.join('sound', 'jump.wav'))
         # self.jump_sfx.set_volume(0.1)
