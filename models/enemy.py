@@ -8,7 +8,7 @@ vec = pygame.math.Vector2
 
 
 class Enemy(Actor):
-    def __init__(self, enemydata):
+    def __init__(self, enemydata: dict):
         super().__init__(pygame.image.load(enemydata['frame_left']))
         self.frame_left = pygame.transform.scale_by(pygame.image.load(enemydata['frame_left']), DISP_SCALE)
         self.frame_right = pygame.transform.scale_by(pygame.image.load(enemydata['frame_right']), DISP_SCALE)
@@ -26,7 +26,7 @@ class Enemy(Actor):
         self.pos = vec(x, HEIGHT * 0.95)
         self.rect.midbottom = self.pos
 
-    def update(self, ppos, offset):
+    def update(self, ppos: pygame.math.Vector2, offset: float):
         self.pos.x -= offset
         super().move()
         # Sets enemy movement and sprite relative to player position
@@ -37,7 +37,7 @@ class Enemy(Actor):
             self.acc.x = ACC * self.speed_mod
             self.image = self.frame_right
 
-    def take_damage(self, amt):
+    def take_damage(self, amt: float):
         if amt > 0:
             # print(f'Enemy took {amt} damage.')
             self.health -= amt
@@ -62,20 +62,20 @@ class Enemy(Actor):
 
 
 class GroundEnemy(Enemy):
-    def __init__(self, enemydata):
+    def __init__(self, enemydata: dict):
         super().__init__(enemydata)
 
-    def update(self, ppos, offset):
+    def update(self, ppos: pygame.math.Vector2, offset: float):
         super().update(ppos, offset)
 
 
 class FlyingEnemy(Enemy):
-    def __init__(self, enemydata):
+    def __init__(self, enemydata: dict):
         super().__init__(enemydata)
         self.pos.y = HEIGHT * round(random.uniform(0.1, 0.7), 2)
         self.rect.center = self.pos
 
-    def update(self, ppos, offset):
+    def update(self, ppos: pygame.math.Vector2, offset: float):
         self.pos.x -= offset
         # Move toward player directly
         dx, dy = (ppos.x - self.pos.x, ppos.y - self.pos.y)

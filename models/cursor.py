@@ -14,5 +14,5 @@ class Cursor(pygame.sprite.Sprite):
     def move(self):
         self.rect.topleft = pygame.mouse.get_pos()
 
-    def scale_to_screen(self, scale):
+    def scale_to_screen(self, scale: float):
         self.image = pygame.transform.scale_by(self.image, scale)

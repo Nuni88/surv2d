@@ -4,6 +4,7 @@ from meleeweapon import FireWheel, KatanaW
 from homingweapon import LitStrike
 from staticweapon import IceMine
 from actor import Actor
+from enemy import Enemy
 from constants import WIDTH, HEIGHT, STAT_STRS, ACC, FRIC, DISP_SCALE
 
 vec = pygame.math.Vector2
@@ -16,7 +17,7 @@ JUMP_CANCEL_HT = -3 * DISP_SCALE
 
 
 class Player(Actor):
-    def __init__(self, chardata):
+    def __init__(self, chardata: dict):
         super().__init__(pygame.image.load(chardata['frame_left']))
         self.pos = vec((WIDTH / 2, HEIGHT * 0.94))
         self.rect.midbottom = self.pos
@@ -45,7 +46,7 @@ class Player(Actor):
         # self.jump_sfx = pygame.mixer.Sound(os.path.join('sound', 'jump.wav'))
         # self.jump_sfx.set_volume(0.1)
 
-    def update(self, time_update):
+    def update(self, time_update: int):
         if self.health <= 0:
             self.kill()
             return
@@ -104,7 +105,7 @@ class Player(Actor):
 
         self.rect.midbottom = self.pos
 
-    def handle_collision_x(self, plat):
+    def handle_collision_x(self, plat: pygame.sprite.Sprite):
         # Moving left
         if self.vel.x < 0:
             self.rect.left = plat.rect.right
@@ -114,7 +115,7 @@ class Player(Actor):
         self.vel.x = 0
         self.pos = vec(self.rect.midbottom)
 
-    def handle_collision_y(self, plat):
+    def handle_collision_y(self, plat: pygame.sprite.Sprite):
         # Moving up
         if self.vel.y < 0:
             self.rect.top = plat.rect.bottom
@@ -147,7 +148,7 @@ class Player(Actor):
             self.dodging = True
             self.invincible = True
 
-    def take_hit(self, enemy):
+    def take_hit(self, enemy: Enemy):
         if enemy.damage > 0:
             if not self.invincible:
                 print(f'Took {enemy.damage} damage.')
@@ -169,7 +170,7 @@ class Player(Actor):
         else:
             return 0
 
-    def gain_stat_bonus(self, stat, amt):
+    def gain_stat_bonus(self, stat: str, amt: float):
         if stat in self.stats:
             self.stats[stat]['value'] += amt
             self.stats[stat]['level'] += 1
@@ -183,25 +184,25 @@ class Player(Actor):
         if stat == STAT_STRS['MAXHP']:
             self.heal(amt)
 
-    def heal(self, amt):
+    def heal(self, amt: float):
         if amt > 0:
             self.health += amt
         if self.health > self.stats[STAT_STRS['MAXHP']]['value']:
             self.health = self.stats[STAT_STRS['MAXHP']]['value']
 
-    def heal_percent(self, mod):
+    def heal_percent(self, mod: float):
         if mod > 0:
             self.health += int(self.stats[STAT_STRS['MAXHP']]['value'] * mod)
         if self.health > self.stats[STAT_STRS['MAXHP']]['value']:
             self.health = self.stats[STAT_STRS['MAXHP']]['value']
 
-    def has_req_weapon(self, req, lvl) -> bool:
+    def has_req_weapon(self, req: str, lvl: int) -> bool:
         for shooter in self.weapons:
             if shooter.__class__.__name__ == req and shooter.get_level() >= lvl:
                 return True
         return False
 
-    def has_req_stat(self, req, lvl) -> bool:
+    def has_req_stat(self, req: str, lvl: int) -> bool:
         if req in self.stats:
             if self.stats[req]['level'] >= lvl:
                 return True

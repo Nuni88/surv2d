@@ -10,7 +10,7 @@ TEXT_OFFSET_Y = 0.24
 
 
 class Button(pygame.sprite.Sprite):
-    def __init__(self, text, center):
+    def __init__(self, text: str, center: pygame.math.Vector2):
         super().__init__()
         
         self.text = text
@@ -24,5 +24,5 @@ class Button(pygame.sprite.Sprite):
         text_render = game_font.render(self.text, False, TEXTCOLOR)
         self.image.blit(text_render, (self.rect.width * TEXT_OFFSET_X, self.rect.height * TEXT_OFFSET_Y))
 
-    def scale_to_screen(self, scale):
+    def scale_to_screen(self, scale: float):
         self.image = pygame.transform.scale_by(self.image, scale)

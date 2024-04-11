@@ -1,6 +1,7 @@
 import os
 import pygame
 from obstacle import Obstacle
+from player import Player
 from constants import STAT_STRS, DISP_SCALE
 
 
@@ -43,7 +44,7 @@ LOCK_DIST = 0.32
 
 
 class Door(Obstacle):
-    def __init__(self, c, image, req, lvl):
+    def __init__(self, c: pygame.math.Vector2, image: str, req: str, lvl: int):
         super().__init__(c, image)
         self.lock_base_image = pygame.transform.scale_by(pygame.image.load(LOCK_IMG_PATHS['Base']), DISP_SCALE)
         self.lock_req_image = pygame.transform.scale_by(pygame.image.load(LOCK_IMG_PATHS[req]), DISP_SCALE)
@@ -69,23 +70,23 @@ class Door(Obstacle):
         h = h + base_height * 0.5 - lvl_height * 0.5
         self.image.blit(self.lock_lvl_image, (self.rect.width * 0.5 - lvl_width * 0.5, h))
 
-    def handle_lock_check(self, player):
+    def handle_lock_check(self, player: Player):
         pass
 
 
 class WeapDoor(Door):
-    def __init__(self, c, image, req, lvl):
+    def __init__(self, c: pygame.math.Vector2, image: str, req: str, lvl: int):
         super().__init__(c, image, req, lvl)
 
-    def handle_lock_check(self, player):
+    def handle_lock_check(self, player: Player):
         if player.has_req_weapon(self.lock['req'], self.lock['lvl']):
             self.kill()
 
 
 class StatDoor(Door):
-    def __init__(self, c, image, req, lvl):
+    def __init__(self, c: pygame.math.Vector2, image: str, req: str, lvl: int):
         super().__init__(c, image, req, lvl)
 
-    def handle_lock_check(self, player):
+    def handle_lock_check(self, player: Player):
         if player.has_req_stat(self.lock['req'], self.lock['lvl']):
             self.kill()

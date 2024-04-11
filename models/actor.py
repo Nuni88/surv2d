@@ -5,7 +5,7 @@ vec = pygame.math.Vector2
 
 
 class Actor(pygame.sprite.Sprite):
-    def __init__(self, image):
+    def __init__(self, image: pygame.surface.Surface):
         super().__init__()
         self.image = pygame.transform.scale_by(image, DISP_SCALE)
         self.rect = self.image.get_rect()
@@ -14,7 +14,7 @@ class Actor(pygame.sprite.Sprite):
         self.pos = vec(0, 0)
         self.health = 0
 
-    def pos_greater_x(self, other):
+    def pos_greater_x(self, other: pygame.sprite.Sprite):
         return self.pos.x > other.pos.x
 
     def move(self):
@@ -29,7 +29,7 @@ class Actor(pygame.sprite.Sprite):
     def get_pos(self) -> (float, float):
         return self.rect.center
 
-    def scale_to_screen(self, scale):
+    def scale_to_screen(self, scale: float):
         self.image = pygame.transform.scale_by(self.image, scale)
 
     '''

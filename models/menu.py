@@ -1,5 +1,6 @@
 import pygame
 from button import Button
+from cursor import Cursor
 from constants import HEIGHT, WIDTH
 
 vec = pygame.math.Vector2
@@ -12,7 +13,7 @@ BGCOLOR = pygame.Color('black')
 
 
 class Menu(pygame.sprite.Sprite):
-    def __init__(self, options, center):
+    def __init__(self, options: list[str], center: pygame.math.Vector2):
         super().__init__()
         height = len(options) * BUTTON_HEIGHT
         # height = len(options) * (BUTTON_HEIGHT + 1)
@@ -39,21 +40,21 @@ class Menu(pygame.sprite.Sprite):
             height += BUTTON_HEIGHT
 
     # TODO: Modify loop
-    def get_option(self, cursor) -> str:
+    def get_option(self, cursor: Cursor) -> str:
         for option in self.options:
             hit = pygame.sprite.collide_rect(cursor, option)
             if hit:
                 return option.text
         return ''
 
-    def get_button_text(self, button_num) -> str:
+    def get_button_text(self, button_num: int) -> str:
         return self.options[button_num].text
 
-    def scale_to_screen(self, scale):
+    def scale_to_screen(self, scale: float):
         self.image = pygame.transform.scale_by(self.image, scale)
 
     @staticmethod
-    def adjust_pos(x, y, width, height) -> (int, int):
+    def adjust_pos(x: float, y: float, width: float, height: float) -> (int, int):
         if x + width / 2 > WIDTH:
             x = WIDTH - width / 2
         elif x - width / 2 < 0:
