@@ -1,29 +1,29 @@
 import pygame
 from weapon import Weapon
-from projectile import Fireball, Katana
+from projectile import Projectile, Fireball, Katana
 from constants import DISP_SCALE
 
 vec = pygame.math.Vector2
 
 
 class MeleeWeapon(Weapon):
-    def __init__(self, pos, ptype, delay_mod):
+    def __init__(self, pos: pygame.math.Vector2, ptype: Projectile, delay_mod: float):
         super().__init__(pos, ptype, delay_mod)
         self.max_proj = 1
 
-    def update(self, loc, offset, time_update, mods, dist):
+    def update(self, loc: pygame.math.Vector2, offset: float, time_update: int, mods: dict, dist: pygame.math.Vector2):
         super().update(loc, offset, time_update, mods, dist)
 
 
 class FireWheel(MeleeWeapon):
-    def __init__(self, pos):
+    def __init__(self, pos: pygame.math.Vector2):
         super().__init__(pos, Fireball, 1.0)
         self.nodes.append(vec(-35.0, 0.0) * DISP_SCALE)
         self.nodes.append(vec(-70.0, 0.0) * DISP_SCALE)
 
 
 class KatanaW(MeleeWeapon):
-    def __init__(self, pos):
+    def __init__(self, pos: pygame.math.Vector2):
         super().__init__(pos, Katana, 1.5)
         self.nodes.append(vec(-20.0, -20.0) * DISP_SCALE)
         self.nodes.append(vec(20.0, -20.0) * DISP_SCALE)

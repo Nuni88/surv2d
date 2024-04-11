@@ -12,7 +12,7 @@ BASE_IMG_PATH = 'images/pickups'
 
 
 class Pickup(pygame.sprite.Sprite):
-    def __init__(self, pos, data):
+    def __init__(self, pos: pygame.math.Vector2, data: dict):
         super().__init__()
         image = pygame.image.load(os.path.join(BASE_IMG_PATH, data['image']))
         self.image = pygame.transform.scale_by(image, DISP_SCALE)
@@ -20,25 +20,25 @@ class Pickup(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=pos)
         self.value = data['value']
 
-    def update(self, ppos, range, offset):
+    def update(self, ppos: pygame.math.Vector2, prange: float, offset: float):
         self.pos.x -= offset
         self.rect.center = self.pos
 
     def collect(self):
         pass
 
-    def scale_to_screen(self, scale):
+    def scale_to_screen(self, scale: float):
         self.image = pygame.transform.scale_by(self.image, scale)
 
 
 class ExpPickup(Pickup):
-    def __init__(self, pos, ptype):
+    def __init__(self, pos: pygame.math.Vector2, ptype: str):
         super().__init__(pos, PICKUPDATA['EXP'][ptype])
         self.vel = vec(0, 0)
 
-    def update(self, ppos, range, offset):
+    def update(self, ppos: pygame.math.Vector2, prange: float, offset: float):
         self.pos.x -= offset
-        if self.pos.distance_to(ppos) <= range * DISP_SCALE:
+        if self.pos.distance_to(ppos) <= prange * DISP_SCALE:
             dx, dy = (ppos.x - self.pos.x, ppos.y - self.pos.y)
             self.vel = vec(dx / FPS, dy / FPS)
             self.pos += self.vel

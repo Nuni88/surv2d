@@ -4,7 +4,7 @@
 		"desc": "First character.",
 		"stats": {
 			"Max HP": {
-				"value": 100,
+				"value": 10000,
 				"level": 1
 			},
 			"Crit Chance": {

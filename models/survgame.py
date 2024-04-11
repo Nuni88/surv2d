@@ -24,7 +24,7 @@ LOOT_TABLE = {
 }
 
 # Modifiable values
-MAX_TIME = 300
+MAX_TIME = 3000
 SPAWN_DELAY = 2000
 FONT_SZ = 24
 PLAT_RANGE = 20
@@ -156,7 +156,7 @@ class SurvGame:
                 print(f'{STATS[roll]}')
         self.level_up_menu = Menu(options, vec(self.displaysurface.get_rect().center))
 
-    def handle_level_up_screen(self, time_update):
+    def handle_level_up_screen(self, time_update: int):
         self.time_delay += time_update
         self.cursor.move()
         for event in pygame.event.get():
@@ -192,7 +192,7 @@ class SurvGame:
                     option = self.level_up_menu.get_button_text(5)
                     self.handle_level_option(option)
 
-    def handle_level_option(self, option):
+    def handle_level_option(self, option: str):
         if option == '':
             return
         self.P1.gain_stat_bonus(option, LEVEL_BONUSES[option])
@@ -211,7 +211,7 @@ class SurvGame:
             text = pygame.transform.scale_by(text, DISP_SCALE)
             self.pause_text_sprites.append(text)
 
-    def handle_pause_screen(self, time_update):
+    def handle_pause_screen(self, time_update: int):
         self.time_delay += time_update
         self.cursor.move()
         for event in pygame.event.get():
@@ -229,7 +229,7 @@ class SurvGame:
                 if event.key == pygame.K_ESCAPE:
                     self.handle_pause_option('Resume')
 
-    def handle_pause_option(self, option):
+    def handle_pause_option(self, option: str):
         if option == '':
             return
         if option == 'Resume':
@@ -351,8 +351,8 @@ class SurvGame:
                 self.spawn_enemies()
             if event.type == EVENTS['GAINEXP']:
                 self.p_exp += event.value
-                if self.p_exp >= self.to_next_level:
-                    self.add_level_up_menu()
+                # if self.p_exp >= self.to_next_level:
+                #     self.add_level_up_menu()
             if event.type == EVENTS['GAINSTAT']:
                 self.P1.gain_stat_bonus(event.stat, event.value)
             if event.type == EVENTS['PLAYERHEAL']:
@@ -410,7 +410,7 @@ class SurvGame:
                         drop = ExpPickup(enemy_pos, loot)
                     self.pickups.add(drop)
 
-    def update_objects(self, time_update):
+    def update_objects(self, time_update: int):
         self.P1.update(time_update)
         ppos = vec(self.P1.get_pos())
         prange = self.P1.get_pickup_range()

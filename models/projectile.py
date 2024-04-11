@@ -14,7 +14,7 @@ BASE_IMG_PATH = 'images/weapons'
 
 
 class Projectile(pygame.sprite.Sprite):
-    def __init__(self, pos, mods, data):
+    def __init__(self, pos: pygame.math.Vector2, mods: dict, data: dict):
         super().__init__()
         image = pygame.image.load(os.path.join(BASE_IMG_PATH, data['image']))
         self.image = pygame.transform.scale_by(image, mods[STAT_STRS['PROJSZ']]['value'] * DISP_SCALE)
@@ -27,7 +27,7 @@ class Projectile(pygame.sprite.Sprite):
         self.duration = data['duration']
         self.dur_timer = 0
 
-    def update(self, offset, time_update, dist):
+    def update(self, offset: float, time_update: int, dist: pygame.math.Vector2):
         self.rect.centerx -= offset
         self.vel += self.acc
         self.rect.center += self.vel
@@ -38,19 +38,19 @@ class Projectile(pygame.sprite.Sprite):
         elif self.rect.top > HEIGHT or self.rect.bottom < 0:
             self.kill()
 
-    def check_duration(self, time_update):
+    def check_duration(self, time_update: int):
         self.dur_timer += time_update
         if self.dur_timer > self.duration:
             self.kill()
 
-    def get_damage(self, crit_chance, crit_mod) -> int:
+    def get_damage(self, crit_chance: float, crit_mod: float) -> int:
         roll = random.randint(0, 99)
         if roll < crit_chance + self.crit:
             # print('Critical hit!')
             return int(self.damage * crit_mod)
         return self.damage
 
-    def scale_to_screen(self, scale):
+    def scale_to_screen(self, scale: float):
         self.image = pygame.transform.scale_by(self.image, scale)
 
     def handle_collision(self) -> bool:
@@ -58,12 +58,12 @@ class Projectile(pygame.sprite.Sprite):
 
 
 class Fireball(Projectile):
-    def __init__(self, pos, mods):
+    def __init__(self, pos: pygame.math.Vector2, mods: dict):
         super().__init__(pos, mods, BULLETDATA['Fireball'])
         self.rot_delay = 120
         self.rot_timer = 0
 
-    def update(self, offset, time_update, dist):
+    def update(self, offset: float, time_update: int, dist: pygame.math.Vector2):
         super().update(offset, time_update, dist)
         self.rect.centerx += offset
         self.rect.center += dist
@@ -80,7 +80,7 @@ class Fireball(Projectile):
 
 
 class Iceball(Projectile):
-    def __init__(self, pos, mods):
+    def __init__(self, pos: pygame.math.Vector2, mods: dict):
         super().__init__(pos, mods, BULLETDATA['Iceball'])
         self.durability = 15
 
@@ -91,13 +91,13 @@ class Iceball(Projectile):
 
 
 class Lightning(Projectile):
-    def __init__(self, pos, mods):
+    def __init__(self, pos: pygame.math.Vector2, mods: dict):
         super().__init__(pos, mods, BULLETDATA['Lightning'])
         self.wobble_delay = 200
         self.wobble_timer = 0
         self.durability = 30
 
-    def update(self, offset, time_update, dist):
+    def update(self, offset: float, time_update: int, dist: pygame.math.Vector2):
         super().update(offset, time_update, dist)
         self.wobble_timer += time_update
         if self.wobble_timer > self.wobble_delay:
@@ -114,9 +114,9 @@ class Lightning(Projectile):
 
 
 class Katana(Projectile):
-    def __init__(self, pos, mods):
+    def __init__(self, pos: pygame.math.Vector2, mods: dict):
         super().__init__(pos, mods, BULLETDATA['Katana'])
 
-    def update(self, offset, time_update, dist):
+    def update(self, offset: float, time_update: int, dist: pygame.math.Vector2):
         super().update(offset, time_update, dist)
         self.check_duration(time_update)
