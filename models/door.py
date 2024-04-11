@@ -1,12 +1,12 @@
 import os
 import pygame
-from platform import Platform
+from obstacle import Obstacle
 from constants import STAT_STRS, DISP_SCALE
 
 
 # Modifiable values
 # Paths to lock icons for locked doors
-LOCK_PATH = '../images/environment/locks'
+LOCK_PATH = 'images/environment/locks'
 LOCK_IMG_PATHS = {
     'Base': os.path.join(LOCK_PATH, 'lock_base.png'),
     'FireWheel': os.path.join(LOCK_PATH, 'fire.png'),
@@ -42,7 +42,7 @@ LOCK_NUM_PATHS = {
 LOCK_DIST = 0.32
 
 
-class Door(Platform):
+class Door(Obstacle):
     def __init__(self, c, image, req, lvl):
         super().__init__(c, image)
         self.lock_base_image = pygame.transform.scale_by(pygame.image.load(LOCK_IMG_PATHS['Base']), DISP_SCALE)

@@ -5,10 +5,10 @@ from constants import DISP_SCALE
 vec = pygame.math.Vector2
 
 
-class Platform(pygame.sprite.Sprite):
+class Obstacle(pygame.sprite.Sprite):
     def __init__(self, c, image):
         super().__init__()
-        self.image = pygame.transform.scale_by(pygame.image.load(os.path.join('../images/environment', image)), DISP_SCALE)
+        self.image = pygame.transform.scale_by(pygame.image.load(os.path.join('images/environment', image)), DISP_SCALE)
         self.rect = self.image.get_rect(center=c)
         self.pos = vec(self.rect.midbottom)
 

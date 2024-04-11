@@ -14,7 +14,7 @@ class Button(pygame.sprite.Sprite):
         super().__init__()
         
         self.text = text
-        self.image = pygame.transform.scale_by(pygame.image.load(os.path.join('../images', 'button.png')), DISP_SCALE)
+        self.image = pygame.transform.scale_by(pygame.image.load(os.path.join('images', 'button.png')), DISP_SCALE)
         self.rect = self.image.get_rect(center=center)
         
     def show_text(self):

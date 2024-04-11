@@ -7,7 +7,7 @@ import pygame
 from pygame.locals import *
 from enemy import GroundEnemy, FlyingEnemy
 from player import Player
-from platform import Platform
+from obstacle import Obstacle
 from door import WeapDoor, StatDoor
 from pickup import ExpPickup, StatPickup, HealthPickup
 from menu import Menu
@@ -24,7 +24,6 @@ LOOT_TABLE = {
 }
 
 # Modifiable values
-DATA_PATH = '../data'
 MAX_TIME = 300
 SPAWN_DELAY = 2000
 FONT_SZ = 24
@@ -91,7 +90,7 @@ class SurvGame:
         self.pause_text_sprites = []
 
         # Add player data from JSON file and create player object
-        unitdatafile = open(os.path.join(DATA_PATH, 'unitdata.json'), 'r')
+        unitdatafile = open(os.path.join('data', 'unitdata.json'), 'r')
         unitdata = json.loads(str(unitdatafile.read()))
         unitdatafile.close()
         self.P1 = Player(unitdata['Char1'])
@@ -101,24 +100,24 @@ class SurvGame:
         self.to_next_level = BASE_EXP_REQ
 
         # Add enemy data from JSON file for spawning enemies
-        enemydatafile = open(os.path.join(DATA_PATH, 'enemydata.json'), 'r')
+        enemydatafile = open(os.path.join('data', 'enemydata.json'), 'r')
         self.enemydata = json.loads(str(enemydatafile.read()))
         enemydatafile.close()
 
         # Generate platforms, walls, and doors
-        self.floor = Platform(vec(WIDTH * 0.5, HEIGHT), 'plat_floor.png')
+        self.floor = Obstacle(vec(WIDTH * 0.5, HEIGHT), 'plat_floor.png')
         self.platforms.add(self.floor)
         self.environment.add(self.floor)
         for i in range(-PLAT_RANGE, PLAT_RANGE):
-            plat = Platform(vec(WIDTH * (i - 0.5), HEIGHT * 0.65), 'plat_med.png')
+            plat = Obstacle(vec(WIDTH * (i - 0.5), HEIGHT * 0.65), 'plat_med.png')
             self.environment.add(plat)
             self.platforms.add(plat)
-            plat = Platform(vec(WIDTH * i, HEIGHT * 0.77), 'plat_med.png')
+            plat = Obstacle(vec(WIDTH * i, HEIGHT * 0.77), 'plat_med.png')
             self.environment.add(plat)
             self.platforms.add(plat)
 
         for i in range(-PLAT_RANGE, PLAT_RANGE):
-            plat = Platform(vec(WIDTH * (i - 0.13), HEIGHT * 0.85), 'wall_med.png')
+            plat = Obstacle(vec(WIDTH * (i - 0.13), HEIGHT * 0.85), 'wall_med.png')
             self.environment.add(plat)
             self.platforms.add(plat)
             roll = random.randint(0, len(STATS) - 1)
@@ -422,7 +421,7 @@ class SurvGame:
         self.floor.recenter(ppos)
 
     def run(self):
-        # pygame.time.set_timer(EVENTS['SPAWNENEMIES'], SPAWN_DELAY)
+        pygame.time.set_timer(EVENTS['SPAWNENEMIES'], SPAWN_DELAY)
 
         while True:
             time_update = self.clock.tick(FPS)

@@ -58,8 +58,8 @@
 				"level": 1
 			}
 		},
-		"frame_left": "..\\images\\player\\player_left.gif",
-		"frame_right": "..\\images\\player\\player_right.gif",
-		"frame_dodge": "..\\images\\player\\player_dodge.gif"
+		"frame_left": "images\\player\\player_left.gif",
+		"frame_right": "images\\player\\player_right.gif",
+		"frame_dodge": "images\\player\\player_dodge.gif"
 	}
 }

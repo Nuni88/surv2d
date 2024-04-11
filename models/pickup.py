@@ -5,10 +5,10 @@ from constants import FPS, STAT_STRS, DISP_SCALE, EVENTS
 
 vec = pygame.math.Vector2
 
-pickupdatafile = open(os.path.join('../data', 'pickupdata.json'), 'r')
+pickupdatafile = open(os.path.join('data', 'pickupdata.json'), 'r')
 PICKUPDATA = json.loads(str(pickupdatafile.read()))
 pickupdatafile.close()
-BASE_IMG_PATH = '../images/pickups'
+BASE_IMG_PATH = 'images/pickups'
 
 
 class Pickup(pygame.sprite.Sprite):
