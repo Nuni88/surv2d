@@ -7,10 +7,10 @@ from constants import WIDTH, HEIGHT, STAT_STRS, DISP_SCALE
 vec = pygame.math.Vector2
 
 # Modifiable values
-bulletdatafile = open(os.path.join('data', 'bulletdata.json'), 'r')
+bulletdatafile = open(os.path.join('../data', 'bulletdata.json'), 'r')
 BULLETDATA = json.loads(str(bulletdatafile.read()))
 bulletdatafile.close()
-BASE_IMG_PATH = 'images\\weapons'
+BASE_IMG_PATH = '../images/weapons'
 
 
 class Projectile(pygame.sprite.Sprite):

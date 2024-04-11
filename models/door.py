@@ -6,7 +6,7 @@ from constants import STAT_STRS, DISP_SCALE
 
 # Modifiable values
 # Paths to lock icons for locked doors
-LOCK_PATH = 'images\\environment\\locks'
+LOCK_PATH = '../images/environment/locks'
 LOCK_IMG_PATHS = {
     'Base': os.path.join(LOCK_PATH, 'lock_base.png'),
     'FireWheel': os.path.join(LOCK_PATH, 'fire.png'),

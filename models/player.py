@@ -1,8 +1,5 @@
-import os
-import json
 import pygame
 from pygame.locals import *
-from weapon import Weapon
 from meleeweapon import FireWheel, KatanaW
 from homingweapon import LitStrike
 from staticweapon import IceMine
