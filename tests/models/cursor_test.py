@@ -1,53 +1,33 @@
-# import unittest
 import pytest
 import pygame
 from models.cursor import Cursor
 
-pygame.init()
+@pytest.fixture
+def cursor():
+    """Return a new Cursor object."""
+    return Cursor()
 
-def test_create(self):
-    cur = Cursor()
-    self.assertIsInstance(cur, Cursor)
-    self.assertIsInstance(cur.image, pygame.surface.Surface)
-    self.assertEqual(cur.rect, cur.image.get_rect())
+def test_pygame_not_init(cursor):
+    with pytest.raises(RuntimeError):
+        cursor.move()
 
+def test_create(cursor):
+    pygame.init()
+    assert isinstance(cursor, Cursor)
+    assert isinstance(cursor.image, pygame.surface.Surface)
+    assert cursor.rect == cursor.image.get_rect()
 
-def test_move(self):
-    cur = Cursor()
-    cur.move()
-    self.assertEqual(cur.rect.topleft, pygame.mouse.get_pos())
-    self.assertIsInstance(cur.rect.topleft, tuple)
+def test_move(cursor):
+    cursor.move()
+    assert cursor.rect.topleft == pygame.mouse.get_pos()
+    assert isinstance(cursor.rect.topleft, tuple)
 
+def test_scale(cursor):
+    w, h = cursor.image.get_width(), cursor.image.get_height()
+    cursor.scale_to_screen(5.0)
+    assert w * 5 == cursor.image.get_width()
+    assert h * 5 == cursor.image.get_height()
 
-def test_scale(self):
-    cur = Cursor()
-    w, h = cur.image.get_width(), cur.image.get_height()
-    cur.scale_to_screen(5)
-    self.assertEqual(w * 5, cur.image.get_width())
-    self.assertEqual(h * 5, cur.image.get_height())
-
-'''
-class TestCursor(unittest.TestCase):
-    def test_create(self):
-        cur = Cursor()
-        self.assertIsInstance(cur, Cursor)
-        self.assertIsInstance(cur.image, pygame.surface.Surface)
-        self.assertEqual(cur.rect, cur.image.get_rect())
-    
-    def test_move(self):
-        cur = Cursor()
-        cur.move()
-        self.assertEqual(cur.rect.topleft, pygame.mouse.get_pos())
-        self.assertIsInstance(cur.rect.topleft, tuple)
-    
-    def test_scale(self):
-        cur = Cursor()
-        w, h = cur.image.get_width(), cur.image.get_height()
-        cur.scale_to_screen(5)
-        self.assertEqual(w * 5, cur.image.get_width())
-        self.assertEqual(h * 5, cur.image.get_height())
-'''
-
-
-if __name__ == '__main__':
-    unittest.main()
+def test_scale_bad_type(cursor):
+    with pytest.raises(TypeError):
+        cursor.scale_to_screen('Hello')

@@ -12,7 +12,21 @@ class Cursor(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
     def move(self):
-        self.rect.topleft = pygame.mouse.get_pos()
+        try:
+            if not pygame.get_init():
+                raise RuntimeError
+            else:
+                self.rect.topleft = pygame.mouse.get_pos()
+
+        except RuntimeError as e:
+            raise
 
     def scale_to_screen(self, scale: float):
-        self.image = pygame.transform.scale_by(self.image, scale)
+        try:
+            if type(scale) is not float:
+                raise TypeError
+            else:
+                self.image = pygame.transform.scale_by(self.image, scale)
+
+        except TypeError as e:
+            raise
