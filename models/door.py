@@ -1,8 +1,8 @@
 import os
 import pygame
-from obstacle import Obstacle
-from player import Player
-from constants import STAT_STRS, DISP_SCALE
+from models.obstacle import Obstacle
+from models.player import Player
+from models.constants import STAT_STRS, DISP_SCALE
 
 
 # Modifiable values

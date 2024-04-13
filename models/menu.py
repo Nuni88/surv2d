@@ -1,7 +1,7 @@
 import pygame
-from button import Button
-from cursor import Cursor
-from constants import HEIGHT, WIDTH
+from models.button import Button
+from models.cursor import Cursor
+from models.constants import HEIGHT, WIDTH
 
 vec = pygame.math.Vector2
 

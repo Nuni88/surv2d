@@ -5,14 +5,14 @@ import os
 import json
 import pygame
 from pygame.locals import *
-from enemy import GroundEnemy, FlyingEnemy
-from player import Player
-from obstacle import Obstacle
-from door import WeapDoor, StatDoor
-from pickup import ExpPickup, StatPickup, HealthPickup
-from menu import Menu
-from cursor import Cursor
-from constants import WIDTH, HEIGHT, FONT, STAT_STRS, FPS, DISP_SCALE, EVENTS
+from models.enemy import GroundEnemy, FlyingEnemy
+from models.player import Player
+from models.obstacle import Obstacle
+from models.door import WeapDoor, StatDoor
+from models.pickup import ExpPickup, StatPickup, HealthPickup
+from models.menu import Menu
+from models.cursor import Cursor
+from models.constants import WIDTH, HEIGHT, FONT, STAT_STRS, FPS, DISP_SCALE, EVENTS
 
 vec = pygame.math.Vector2
 

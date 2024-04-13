@@ -1,6 +1,6 @@
 import os
 import pygame
-from constants import DISP_SCALE
+from models.constants import DISP_SCALE
 
 vec = pygame.math.Vector2
 

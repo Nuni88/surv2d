@@ -1,11 +1,11 @@
 import pygame
 from pygame.locals import *
-from meleeweapon import FireWheel, KatanaW
-from homingweapon import LitStrike
-from staticweapon import IceMine
-from actor import Actor
-from enemy import Enemy
-from constants import WIDTH, HEIGHT, STAT_STRS, ACC, FRIC, DISP_SCALE
+from models.meleeweapon import FireWheel, KatanaW
+from models.homingweapon import LitStrike
+from models.staticweapon import IceMine
+from models.actor import Actor
+from models.enemy import Enemy
+from models.constants import WIDTH, HEIGHT, STAT_STRS, ACC, FRIC, DISP_SCALE
 
 vec = pygame.math.Vector2
 
@@ -18,34 +18,44 @@ JUMP_CANCEL_HT = -3 * DISP_SCALE
 
 class Player(Actor):
     def __init__(self, chardata: dict):
-        super().__init__(pygame.image.load(chardata['frame_left']))
-        self.pos = vec((WIDTH / 2, HEIGHT * 0.94))
-        self.rect.midbottom = self.pos
+        try:
+            if chardata is None:
+                raise ValueError
+            if type(chardata) is not dict:
+                raise TypeError
 
-        self.stats = chardata['stats']
-        self.mods = chardata['mods']
-        self.frame_left = pygame.transform.scale_by(pygame.image.load(chardata['frame_left']), DISP_SCALE)
-        self.frame_right = pygame.transform.scale_by(pygame.image.load(chardata['frame_right']), DISP_SCALE)
-        self.frame_dodge = pygame.transform.scale_by(pygame.image.load(chardata['frame_dodge']), DISP_SCALE)
-        self.health = self.stats[STAT_STRS['MAXHP']]['value']
+            super().__init__(pygame.image.load(chardata['frame_left']))
+            self.pos = vec((WIDTH / 2, HEIGHT * 0.94))
+            self.rect.midbottom = self.pos
 
-        self.jumping = False
-        self.midair_jumping = False
-        self.dodging = False
-        self.dodge_timer = 0
-        self.invincible = False
-        self.invul_timer = 0
-        self.last_pos = self.pos
+            self.stats = chardata['stats']
+            self.mods = chardata['mods']
+            self.frame_left = pygame.transform.scale_by(pygame.image.load(chardata['frame_left']), DISP_SCALE)
+            self.frame_right = pygame.transform.scale_by(pygame.image.load(chardata['frame_right']), DISP_SCALE)
+            self.frame_dodge = pygame.transform.scale_by(pygame.image.load(chardata['frame_dodge']), DISP_SCALE)
+            self.health = self.stats[STAT_STRS['MAXHP']]['value']
 
-        self.weapons = pygame.sprite.Group()
-        self.weapons.add(FireWheel(self.rect.center))
-        self.weapons.add(KatanaW(self.rect.center))
-        self.weapons.add(LitStrike(self.rect.center))
-        self.weapons.add(IceMine(self.rect.center))
+            self.jumping = False
+            self.midair_jumping = False
+            self.dodging = False
+            self.dodge_timer = 0
+            self.invincible = False
+            self.invul_timer = 0
+            self.last_pos = self.pos
 
-        # self.jump_sfx = pygame.mixer.Sound(os.path.join('sound', 'jump.wav'))
-        # self.jump_sfx.set_volume(0.1)
+            self.weapons = pygame.sprite.Group()
+            self.weapons.add(FireWheel(self.rect.center))
+            self.weapons.add(KatanaW(self.rect.center))
+            self.weapons.add(LitStrike(self.rect.center))
+            self.weapons.add(IceMine(self.rect.center))
 
+            # self.jump_sfx = pygame.mixer.Sound(os.path.join('sound', 'jump.wav'))
+            # self.jump_sfx.set_volume(0.1)
+
+        except (ValueError, TypeError) as e:
+            raise
+
+    # TODO: Add error handling
     def update(self, time_update: int):
         if self.health <= 0:
             self.kill()
@@ -75,6 +85,7 @@ class Player(Actor):
 
         self.weapons.update(self.rect.center, self.get_scroll_dist(), time_update, self.mods, self.pos - self.last_pos)
 
+    # TODO: Add error handling
     def move_x(self):
         self.last_pos.x = self.pos.x
         self.acc.x = 0
@@ -97,6 +108,7 @@ class Player(Actor):
 
         self.rect.midbottom = self.pos
 
+    # TODO: Add error handling
     def move_y(self):
         self.last_pos.y = self.pos.y
         self.acc.y = GRAVITY
@@ -105,6 +117,7 @@ class Player(Actor):
 
         self.rect.midbottom = self.pos
 
+    # TODO: Add error handling
     def handle_collision_x(self, plat: pygame.sprite.Sprite):
         # Moving left
         if self.vel.x < 0:
@@ -115,6 +128,7 @@ class Player(Actor):
         self.vel.x = 0
         self.pos = vec(self.rect.midbottom)
 
+    # TODO: Add error handling
     def handle_collision_y(self, plat: pygame.sprite.Sprite):
         # Moving up
         if self.vel.y < 0:
@@ -127,6 +141,7 @@ class Player(Actor):
         self.vel.y = 0
         self.pos = vec(self.rect.midbottom)
 
+    # TODO: Add error handling
     def jump(self):
         if not self.jumping:
             if self.vel.y == 0:
@@ -138,16 +153,19 @@ class Player(Actor):
             self.vel.y = -self.stats[STAT_STRS['JUMPH']]['value'] * 0.5 * DISP_SCALE
             # self.jump_sfx.play()
 
+    # TODO: Add error handling
     def cancel_jump(self):
         if self.jumping and self.vel.y < JUMP_CANCEL_HT:
             self.vel.y = JUMP_CANCEL_HT
 
+    # TODO: Add error handling
     def dodge(self):
         if not self.dodging and not self.jumping:
             print('Dodged!')
             self.dodging = True
             self.invincible = True
 
+    # TODO: Add error handling
     def take_hit(self, enemy: Enemy):
         if enemy.damage > 0:
             if not self.invincible:
@@ -157,6 +175,7 @@ class Player(Actor):
                     self.kill()
                 self.invincible = True
 
+    # TODO: Add error handling
     def get_bullets(self) -> pygame.sprite.Group:
         bullets = pygame.sprite.Group()
         for shooter in self.weapons:
@@ -164,12 +183,14 @@ class Player(Actor):
                 bullets.add(bullet)
         return bullets
 
+    # TODO: Add error handling
     def get_scroll_dist(self) -> float:
         if not (MOVE_EDGE_LEFT < self.pos.x < MOVE_EDGE_RIGHT):
             return self.vel.x + self.acc.x * 0.5
         else:
             return 0
 
+    # TODO: Add error handling
     def gain_stat_bonus(self, stat: str, amt: float):
         if stat in self.stats:
             self.stats[stat]['value'] += amt
@@ -184,6 +205,7 @@ class Player(Actor):
         if stat == STAT_STRS['MAXHP']:
             self.heal(amt)
 
+    # TODO: Add error handling
     def heal(self, amt: float):
         if amt > 0:
             self.health += amt
@@ -191,11 +213,20 @@ class Player(Actor):
             self.health = self.stats[STAT_STRS['MAXHP']]['value']
 
     def heal_percent(self, mod: float):
-        if mod > 0:
-            self.health += int(self.stats[STAT_STRS['MAXHP']]['value'] * mod)
-        if self.health > self.stats[STAT_STRS['MAXHP']]['value']:
-            self.health = self.stats[STAT_STRS['MAXHP']]['value']
+        try:
+            if mod <= 0:
+                raise ValueError
+            if type(mod) is not float:
+                raise TypeError
 
+            self.health += int(self.stats[STAT_STRS['MAXHP']]['value'] * mod)
+            if self.health > self.stats[STAT_STRS['MAXHP']]['value']:
+                self.health = self.stats[STAT_STRS['MAXHP']]['value']
+
+        except (ValueError, TypeError) as e:
+            raise
+
+    # TODO: Add error handling
     def has_req_weapon(self, req: str, lvl: int) -> bool:
         for shooter in self.weapons:
             if shooter.__class__.__name__ == req and shooter.get_level() >= lvl:
@@ -203,18 +234,27 @@ class Player(Actor):
         return False
 
     def has_req_stat(self, req: str, lvl: int) -> bool:
-        if req in self.stats:
-            if self.stats[req]['level'] >= lvl:
-                return True
-        elif req in self.mods:
-            if self.mods[req]['level'] >= lvl:
-                return True
-        return False
+        try:
+            if req not in self.stats and req not in self.mods:
+                raise ValueError
+            if lvl < 0:
+                raise ValueError
+
+            if req in self.stats:
+                if self.stats[req]['level'] >= lvl:
+                    return True
+            elif req in self.mods:
+                if self.mods[req]['level'] >= lvl:
+                    return True
+            return False
+
+        except ValueError as e:
+            raise
 
     def get_max_health(self) -> int:
         return self.stats[STAT_STRS['MAXHP']]['value']
 
-    def get_crit_chance(self) -> int:
+    def get_crit_chance(self) -> float:
         return self.stats[STAT_STRS['CRITC']]['value']
 
     def get_crit_mod(self) -> float:

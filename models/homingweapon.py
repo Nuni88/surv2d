@@ -1,7 +1,7 @@
 import pygame
-from weapon import Weapon
-from projectile import Projectile, Lightning
-from constants import DISP_SCALE
+from models.weapon import Weapon
+from models.projectile import Projectile, Lightning
+from models.constants import DISP_SCALE
 
 vec = pygame.math.Vector2
 

@@ -2,7 +2,7 @@ import os
 import json
 import random
 import pygame
-from constants import WIDTH, HEIGHT, STAT_STRS, DISP_SCALE
+from models.constants import WIDTH, HEIGHT, STAT_STRS, DISP_SCALE
 
 vec = pygame.math.Vector2
 

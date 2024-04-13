@@ -1,7 +1,7 @@
 import os
 import json
 import pygame
-from constants import FPS, STAT_STRS, DISP_SCALE, EVENTS
+from models.constants import FPS, STAT_STRS, DISP_SCALE, EVENTS
 
 vec = pygame.math.Vector2
 

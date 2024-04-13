@@ -1,8 +1,8 @@
 import os
 import random
 import pygame
-from actor import Actor
-from constants import WIDTH, HEIGHT, ACC, FPS, DISP_SCALE
+from models.actor import Actor
+from models.constants import WIDTH, HEIGHT, ACC, FPS, DISP_SCALE
 
 vec = pygame.math.Vector2
 
