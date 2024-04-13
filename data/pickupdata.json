@@ -29,7 +29,7 @@
 	},
 	"STATS": {
 		"Max HP": {
-			"value": 10,
+			"value": 10.0,
 			"image": "maxhp.png"
 		}
 	}

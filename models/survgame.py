@@ -41,11 +41,11 @@ STATS = []
 for stat in STAT_STRS:
     STATS.append(STAT_STRS[stat])
 LEVEL_BONUSES = {
-    STAT_STRS['MAXHP']: 10,
+    STAT_STRS['MAXHP']: 10.0,
     STAT_STRS['CRITC']: 0.05,
     STAT_STRS['ASPD']: 0.05,
     STAT_STRS['MSPD']: 0.05,
-    STAT_STRS['JUMPH']: 1,
+    STAT_STRS['JUMPH']: 1.0,
     STAT_STRS['DODGE']: -0.05,
     STAT_STRS['INVUL']: 0.01,
     STAT_STRS['PRANGE']: 10.0,
