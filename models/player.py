@@ -1,4 +1,5 @@
 import pygame
+import copy
 from pygame.locals import *
 from models.meleeweapon import FireWheel, KatanaW
 from models.homingweapon import LitStrike
@@ -29,8 +30,8 @@ class Player(Actor):
             self.pos = vec(int(WIDTH / 2), int(HEIGHT * 0.94))
             self.rect.midbottom = self.pos
 
-            self.stats = chardata['stats']
-            self.mods = chardata['mods']
+            self.stats = copy.deepcopy(chardata['stats'])
+            self.mods = copy.deepcopy(chardata['mods'])
             self.frame_left = pygame.transform.scale_by(pygame.image.load(chardata['frame_left']), DISP_SCALE)
             self.frame_right = pygame.transform.scale_by(pygame.image.load(chardata['frame_right']), DISP_SCALE)
             self.frame_dodge = pygame.transform.scale_by(pygame.image.load(chardata['frame_dodge']), DISP_SCALE)
