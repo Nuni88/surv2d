@@ -11,8 +11,8 @@ from models.constants import WIDTH, HEIGHT, STAT_STRS, ACC, FRIC, DISP_SCALE
 vec = pygame.math.Vector2
 
 # Modifiable values
-MOVE_EDGE_LEFT = WIDTH * 0.1
-MOVE_EDGE_RIGHT = WIDTH * 0.9
+MOVE_EDGE_LEFT = int(WIDTH * 0.1)
+MOVE_EDGE_RIGHT = int(WIDTH * 0.9)
 GRAVITY = 0.9 * DISP_SCALE
 JUMP_CANCEL_HT = -3 * DISP_SCALE
 
@@ -26,7 +26,7 @@ class Player(Actor):
                 raise TypeError
 
             super().__init__(pygame.image.load(chardata['frame_left']))
-            self.pos = vec((WIDTH / 2, HEIGHT * 0.94))
+            self.pos = vec(int(WIDTH / 2), int(HEIGHT * 0.94))
             self.rect.midbottom = self.pos
 
             self.stats = chardata['stats']
@@ -94,7 +94,6 @@ class Player(Actor):
         except (TypeError, ValueError) as e:
             raise
 
-    # TODO: Add tests
     def move_x(self):
         try:
             self.last_pos.x = self.pos.x
@@ -109,7 +108,7 @@ class Player(Actor):
 
             self.acc.x += self.vel.x * FRIC
             self.vel.x += self.acc.x
-            self.pos.x += self.vel.x + self.acc.x * 0.5
+            self.pos.x += int(self.vel.x + self.acc.x * 0.5)
 
             if self.pos.x < MOVE_EDGE_LEFT:
                 self.pos.x = MOVE_EDGE_LEFT
@@ -121,20 +120,18 @@ class Player(Actor):
         except Exception as e:
             raise
 
-    # TODO: Add tests
     def move_y(self):
         try:
             self.last_pos.y = self.pos.y
             self.acc.y = GRAVITY
             self.vel.y += self.acc.y
-            self.pos.y += self.vel.y + self.acc.y * 0.5
+            self.pos.y += int(self.vel.y + self.acc.y * 0.5)
 
             self.rect.midbottom = self.pos
 
         except Exception as e:
             raise
 
-    # TODO: Add tests
     def handle_collision_x(self, plat: Obstacle):
         try:
             if plat is None:
@@ -154,7 +151,6 @@ class Player(Actor):
         except (ValueError, TypeError) as e:
             raise
 
-    # TODO: Add tests
     def handle_collision_y(self, plat: Obstacle):
         try:
             if plat is None:
@@ -176,7 +172,6 @@ class Player(Actor):
         except (ValueError, TypeError) as e:
             raise
 
-    # TODO: Add tests
     def jump(self):
         try:
             if not self.jumping:

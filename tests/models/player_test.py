@@ -3,6 +3,10 @@ import json
 import pytest
 import pygame
 from models.player import Player
+from models.obstacle import Obstacle
+from models.door import Door
+
+vec = pygame.math.Vector2
 
 testfile = open(os.path.join('data', 'unitdata.json'), 'r')
 testdata = json.loads(str(testfile.read()))
@@ -12,6 +16,11 @@ testfile.close()
 def new_player():
     """Return a new Player object."""
     return Player(testdata['Char1'])
+
+@pytest.fixture
+def new_obs(new_player):
+    """Return a new Obstacle object."""
+    return Obstacle(vec(new_player.pos), 'plat_floor.png')
 
 def test_pygame_not_init(new_player):
     pass
@@ -30,6 +39,57 @@ def test_create_null_data(new_player):
 def test_create_bad_type(new_player):
     with pytest.raises(TypeError):
         p = Player('a')
+
+def test_update(new_player):
+    pass
+
+def test_update_bad_type(new_player):
+    with pytest.raises(TypeError):
+        new_player.update('a')
+
+def test_update_out_of_bounds(new_player):
+    with pytest.raises(ValueError):
+        new_player.update(-1)
+
+def test_move_x(new_player):
+    new_player.move_x()
+    assert new_player.rect.midbottom == new_player.pos
+
+def test_move_y(new_player):
+    new_player.move_y()
+    assert new_player.rect.midbottom == new_player.pos
+
+# TODO: Add to test
+def test_handle_collision_x(new_player, new_obs):
+    new_player.handle_collision_x(new_obs)
+    assert new_player.vel.x == 0
+    assert new_player.rect.midbottom == new_player.pos
+
+def test_handle_collision_x_bad_type(new_player, new_obs):
+    with pytest.raises(TypeError):
+        new_player.handle_collision_x(Player())
+
+def test_handle_collision_x_bad_value(new_player, new_obs):
+    with pytest.raises(ValueError):
+        new_player.handle_collision_x(None)
+
+# TODO: Add to test
+def test_handle_collision_y(new_player, new_obs):
+    new_player.handle_collision_y(new_obs)
+    assert new_player.vel.y == 0
+    assert new_player.rect.midbottom == new_player.pos
+
+def test_handle_collision_y_bad_type(new_player):
+    with pytest.raises(TypeError):
+        new_player.handle_collision_y(Player())
+
+def test_handle_collision_y_bad_value(new_player):
+    with pytest.raises(ValueError):
+        new_player.handle_collision_y(None)
+
+def test_jump(new_player):
+    new_player.jump()
+    assert new_player.jumping == True
 
 @pytest.mark.parametrize('healpct', [
     0.1,
