@@ -1,6 +1,6 @@
 import pygame
 from models.projectile import Projectile
-from models.constants import STAT_STRS, DISP_SCALE
+from globals.constants import STAT_STRS, DISP_SCALE
 
 vec = pygame.math.Vector2
 

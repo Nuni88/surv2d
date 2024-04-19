@@ -1,7 +1,7 @@
 import pygame
 from models.weapon import Weapon
 from models.projectile import Projectile, Iceball
-from models.constants import DISP_SCALE
+from globals.constants import DISP_SCALE
 
 vec = pygame.math.Vector2
 

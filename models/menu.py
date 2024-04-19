@@ -1,7 +1,7 @@
 import pygame
 from models.button import Button
 from models.cursor import Cursor
-from models.constants import HEIGHT, WIDTH
+from globals.constants import HEIGHT, WIDTH
 
 vec = pygame.math.Vector2
 
@@ -16,7 +16,6 @@ class Menu(pygame.sprite.Sprite):
     def __init__(self, options: list[str], center: pygame.math.Vector2):
         super().__init__()
         height = len(options) * BUTTON_HEIGHT
-        # height = len(options) * (BUTTON_HEIGHT + 1)
         surface = vec(BUTTON_WIDTH, height)
         center = vec(self.adjust_pos(center.x, center.y, surface.x, surface.y))
         

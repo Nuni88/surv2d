@@ -1,5 +1,5 @@
 import pygame
-from models.constants import DISP_SCALE, FRIC
+from globals.constants import DISP_SCALE, FRIC
 
 vec = pygame.math.Vector2
 

@@ -12,7 +12,7 @@ from models.door import WeapDoor, StatDoor
 from models.pickup import ExpPickup, StatPickup, HealthPickup
 from models.menu import Menu
 from models.cursor import Cursor
-from models.constants import WIDTH, HEIGHT, FONT, STAT_STRS, FPS, DISP_SCALE, EVENTS
+from globals.constants import WIDTH, HEIGHT, FONT, STAT_STRS, FPS, DISP_SCALE, EVENTS
 
 vec = pygame.math.Vector2
 

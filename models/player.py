@@ -7,7 +7,7 @@ from models.staticweapon import IceMine
 from models.actor import Actor
 from models.enemy import Enemy
 from models.obstacle import Obstacle
-from models.constants import WIDTH, HEIGHT, STAT_STRS, ACC, FRIC, DISP_SCALE
+from globals.constants import WIDTH, HEIGHT, STAT_STRS, ACC, FRIC, DISP_SCALE
 
 vec = pygame.math.Vector2
 

@@ -1,6 +1,6 @@
 import pygame
 import os
-from models.constants import HEIGHT, FONT, DISP_SCALE
+from globals.constants import HEIGHT, FONT, DISP_SCALE
 
 # Modifiable values
 TEXTCOLOR = pygame.Color('black')
