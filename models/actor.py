@@ -6,31 +6,51 @@ vec = pygame.math.Vector2
 
 class Actor(pygame.sprite.Sprite):
     def __init__(self, image: pygame.surface.Surface):
-        super().__init__()
-        self.image = pygame.transform.scale_by(image, DISP_SCALE)
-        self.rect = self.image.get_rect()
-        self.vel = vec(0, 0)
-        self.acc = vec(0, 0)
-        self.pos = vec(0, 0)
-        self.health = 0
+        try:
+            if image is None:
+                raise ValueError
+            if not isinstance(image, pygame.surface.Surface):
+                raise TypeError
+
+            super().__init__()
+            self.image = pygame.transform.scale_by(image, DISP_SCALE)
+            self.rect = self.image.get_rect()
+            self.vel = vec(0, 0)
+            self.acc = vec(0, 0)
+            self.pos = vec(0, 0)
+            self.health = 0
+
+        except (ValueError, TypeError) as e:
+            raise
 
     def pos_greater_x(self, other: pygame.sprite.Sprite):
         return self.pos.x > other.pos.x
 
     def move(self):
-        self.acc.x += self.vel.x * FRIC
-        self.vel += self.acc
-        self.pos += self.vel + 0.5 * self.acc
-        self.rect.midbottom = self.pos
+        try:
+            self.acc.x += self.vel.x * FRIC
+            self.vel += self.acc
+            self.pos += self.vel + 0.5 * self.acc
+            self.rect.midbottom = self.pos
+
+        except Exception as e:
+            raise
 
     def get_health(self) -> int:
         return self.health
 
-    def get_pos(self) -> (float, float):
+    def get_pos(self) -> tuple[float, float]:
         return self.rect.center
 
     def scale_to_screen(self, scale: float):
-        self.image = pygame.transform.scale_by(self.image, scale)
+        try:
+            if type(scale) is not float:
+                raise TypeError
+            else:
+                self.image = pygame.transform.scale_by(self.image, scale)
+
+        except TypeError as e:
+            raise
 
     '''
     def handle_collision_x(self, plat):
