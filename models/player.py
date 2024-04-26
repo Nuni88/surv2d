@@ -26,6 +26,10 @@ class Player(Actor):
             if type(chardata) is not dict:
                 raise TypeError
 
+        except (ValueError, TypeError) as e:
+            raise
+
+        else:
             super().__init__(pygame.image.load(chardata['frame_left']))
             self.pos = vec(int(WIDTH / 2), int(HEIGHT * 0.94))
             self.rect.midbottom = self.pos
@@ -54,9 +58,6 @@ class Player(Actor):
             # self.jump_sfx = pygame.mixer.Sound(os.path.join('sound', 'jump.wav'))
             # self.jump_sfx.set_volume(0.1)
 
-        except (ValueError, TypeError) as e:
-            raise
-
     def update(self, time_update: int):
         try:
             if type(time_update) is not int:
@@ -64,6 +65,10 @@ class Player(Actor):
             if time_update < 0:
                 raise ValueError
 
+        except (TypeError, ValueError) as e:
+            raise
+
+        else:
             if self.health <= 0:
                 self.kill()
                 return
@@ -92,46 +97,35 @@ class Player(Actor):
 
             self.weapons.update(self.rect.center, self.get_scroll_dist(), time_update, self.mods, self.pos - self.last_pos)
 
-        except (TypeError, ValueError) as e:
-            raise
-
     def move_x(self):
-        try:
-            self.last_pos.x = self.pos.x
-            self.acc.x = 0
-            pressed_keys = pygame.key.get_pressed()
-            if pressed_keys[K_LEFT]:
-                self.acc.x = -ACC * self.stats[STAT_STRS['MSPD']]['value']
-                self.image = self.frame_left
-            if pressed_keys[K_RIGHT]:
-                self.acc.x = ACC * self.stats[STAT_STRS['MSPD']]['value']
-                self.image = self.frame_right
+        self.last_pos.x = self.pos.x
+        self.acc.x = 0
+        pressed_keys = pygame.key.get_pressed()
+        if pressed_keys[K_LEFT]:
+            self.acc.x = -ACC * self.stats[STAT_STRS['MSPD']]['value']
+            self.image = self.frame_left
+        if pressed_keys[K_RIGHT]:
+            self.acc.x = ACC * self.stats[STAT_STRS['MSPD']]['value']
+            self.image = self.frame_right
 
-            self.acc.x += self.vel.x * FRIC
-            self.vel.x += self.acc.x
-            self.pos.x += int(self.vel.x + self.acc.x * 0.5)
+        self.acc.x += self.vel.x * FRIC
+        self.vel.x += self.acc.x
+        self.pos.x += int(self.vel.x + self.acc.x * 0.5)
 
-            if self.pos.x < MOVE_EDGE_LEFT:
-                self.pos.x = MOVE_EDGE_LEFT
-            elif self.pos.x > MOVE_EDGE_RIGHT:
-                self.pos.x = MOVE_EDGE_RIGHT
+        if self.pos.x < MOVE_EDGE_LEFT:
+            self.pos.x = MOVE_EDGE_LEFT
+        elif self.pos.x > MOVE_EDGE_RIGHT:
+            self.pos.x = MOVE_EDGE_RIGHT
 
-            self.rect.midbottom = self.pos
-
-        except Exception as e:
-            raise
+        self.rect.midbottom = self.pos
 
     def move_y(self):
-        try:
-            self.last_pos.y = self.pos.y
-            self.acc.y = GRAVITY
-            self.vel.y += self.acc.y
-            self.pos.y += int(self.vel.y + self.acc.y * 0.5)
+        self.last_pos.y = self.pos.y
+        self.acc.y = GRAVITY
+        self.vel.y += self.acc.y
+        self.pos.y += int(self.vel.y + self.acc.y * 0.5)
 
-            self.rect.midbottom = self.pos
-
-        except Exception as e:
-            raise
+        self.rect.midbottom = self.pos
 
     def handle_collision_x(self, plat: Obstacle):
         try:
@@ -140,6 +134,10 @@ class Player(Actor):
             if not isinstance(plat, Obstacle):
                 raise TypeError
 
+        except (ValueError, TypeError) as e:
+            raise
+
+        else:
             # Moving left
             if self.vel.x < 0:
                 self.rect.left = plat.rect.right
@@ -149,9 +147,6 @@ class Player(Actor):
             self.vel.x = 0
             self.pos = vec(self.rect.midbottom)
 
-        except (ValueError, TypeError) as e:
-            raise
-
     def handle_collision_y(self, plat: Obstacle):
         try:
             if plat is None:
@@ -159,6 +154,10 @@ class Player(Actor):
             if not isinstance(plat, Obstacle):
                 raise TypeError
 
+        except (ValueError, TypeError) as e:
+            raise
+
+        else:
             # Moving up
             if self.vel.y < 0:
                 self.rect.top = plat.rect.bottom
@@ -170,43 +169,28 @@ class Player(Actor):
             self.vel.y = 0
             self.pos = vec(self.rect.midbottom)
 
-        except (ValueError, TypeError) as e:
-            raise
-
     def jump(self):
-        try:
-            if not self.jumping:
-                if self.vel.y == 0:
-                    self.jumping = True
-                    self.vel.y = -self.stats[STAT_STRS['JUMPH']]['value'] * DISP_SCALE
-                    # self.jump_sfx.play()
-            elif not self.midair_jumping:
-                self.midair_jumping = True
-                self.vel.y = -self.stats[STAT_STRS['JUMPH']]['value'] * 0.5 * DISP_SCALE
+        if not self.jumping:
+            if self.vel.y == 0:
+                self.jumping = True
+                self.vel.y = -self.stats[STAT_STRS['JUMPH']]['value'] * DISP_SCALE
                 # self.jump_sfx.play()
-
-        except Exception as e:
-            raise
+        elif not self.midair_jumping:
+            self.midair_jumping = True
+            self.vel.y = -self.stats[STAT_STRS['JUMPH']]['value'] * 0.5 * DISP_SCALE
+            # self.jump_sfx.play()
 
     # TODO: Add tests
     def cancel_jump(self):
-        try:
-            if self.jumping and self.vel.y < JUMP_CANCEL_HT:
-                self.vel.y = JUMP_CANCEL_HT
-
-        except Exception as e:
-            raise
+        if self.jumping and self.vel.y < JUMP_CANCEL_HT:
+            self.vel.y = JUMP_CANCEL_HT
 
     # TODO: Add tests
     def dodge(self):
-        try:
-            if not self.dodging and not self.jumping:
-                print('Dodged!')
-                self.dodging = True
-                self.invincible = True
-
-        except Exception as e:
-            raise
+        if not self.dodging and not self.jumping:
+            print('Dodged!')
+            self.dodging = True
+            self.invincible = True
 
     # TODO: Add tests
     def take_hit(self, enemy: Enemy):
@@ -214,6 +198,10 @@ class Player(Actor):
             if not isinstance(enemy, Enemy):
                 raise TypeError
 
+        except TypeError as e:
+            raise
+
+        else:
             if enemy.damage > 0:
                 if not self.invincible:
                     print(f'Took {enemy.damage} damage.')
@@ -222,31 +210,20 @@ class Player(Actor):
                         self.kill()
                     self.invincible = True
 
-        except TypeError as e:
-            raise
-
     # TODO: Add tests
     def get_bullets(self) -> pygame.sprite.Group:
-        try:
-            bullets = pygame.sprite.Group()
-            for shooter in self.weapons:
-                for bullet in shooter.get_bullets():
-                    bullets.add(bullet)
-            return bullets
-
-        except Exception as e:
-            raise
+        bullets = pygame.sprite.Group()
+        for shooter in self.weapons:
+            for bullet in shooter.get_bullets():
+                bullets.add(bullet)
+        return bullets
 
     # TODO: Add tests
     def get_scroll_dist(self) -> float:
-        try:
-            if not (MOVE_EDGE_LEFT < self.pos.x < MOVE_EDGE_RIGHT):
-                return self.vel.x + self.acc.x * 0.5
-            else:
-                return 0
-
-        except Exception as e:
-            raise
+        if not (MOVE_EDGE_LEFT < self.pos.x < MOVE_EDGE_RIGHT):
+            return self.vel.x + self.acc.x * 0.5
+        else:
+            return 0
 
     # TODO: Add tests
     def gain_stat_bonus(self, stat: str, amt: float):
@@ -258,6 +235,10 @@ class Player(Actor):
             if amt <= 0:
                 raise ValueError
 
+        except (ValueError, TypeError) as e:
+            raise
+
+        else:
             if stat in self.stats:
                 self.stats[stat]['value'] += amt
                 self.stats[stat]['level'] += 1
@@ -272,9 +253,6 @@ class Player(Actor):
                 self.heal(int(amt))
                 self.stats[stat]['value'] = int(self.stats[stat]['value'])
 
-        except (ValueError, TypeError) as e:
-            raise
-
     # TODO: Add tests
     def heal(self, amt: int):
         try:
@@ -283,12 +261,13 @@ class Player(Actor):
             if amt <= 0:
                 raise ValueError
 
+        except (TypeError, ValueError) as e:
+            raise
+
+        else:
             self.health += amt
             if self.health > self.stats[STAT_STRS['MAXHP']]['value']:
                 self.health = self.stats[STAT_STRS['MAXHP']]['value']
-
-        except (TypeError, ValueError) as e:
-            raise
 
     def heal_percent(self, mod: float):
         try:
@@ -297,12 +276,13 @@ class Player(Actor):
             if type(mod) is not float:
                 raise TypeError
 
+        except (ValueError, TypeError) as e:
+            raise
+
+        else:
             self.health += int(self.stats[STAT_STRS['MAXHP']]['value'] * mod)
             if self.health > self.stats[STAT_STRS['MAXHP']]['value']:
                 self.health = self.stats[STAT_STRS['MAXHP']]['value']
-
-        except (ValueError, TypeError) as e:
-            raise
 
     # TODO: Add tests
     def has_req_weapon(self, req: str, lvl: int) -> bool:
@@ -314,13 +294,14 @@ class Player(Actor):
             if lvl < 0:
                 raise ValueError
 
+        except (TypeError, ValueError) as e:
+            raise
+
+        else:
             for shooter in self.weapons:
                 if shooter.__class__.__name__ == req and shooter.get_level() >= lvl:
                     return True
             return False
-
-        except (TypeError, ValueError) as e:
-            raise
 
     def has_req_stat(self, req: str, lvl: int) -> bool:
         try:
@@ -331,6 +312,10 @@ class Player(Actor):
             if lvl < 0:
                 raise ValueError
 
+        except (TypeError, ValueError) as e:
+            raise
+
+        else:
             if req in self.stats:
                 if self.stats[req]['level'] >= lvl:
                     return True
@@ -338,9 +323,6 @@ class Player(Actor):
                 if self.mods[req]['level'] >= lvl:
                     return True
             return False
-
-        except (TypeError, ValueError) as e:
-            raise
 
     def get_max_health(self) -> int:
         return self.stats[STAT_STRS['MAXHP']]['value']

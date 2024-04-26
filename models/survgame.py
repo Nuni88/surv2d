@@ -24,7 +24,7 @@ LOOT_TABLE = {
 }
 
 # Modifiable values
-MAX_TIME = 3000
+MAX_TIME = 300
 SPAWN_DELAY = 2000
 FONT_SZ = 24
 PLAT_RANGE = 20
@@ -351,8 +351,8 @@ class SurvGame:
                 self.spawn_enemies()
             if event.type == EVENTS['GAINEXP']:
                 self.p_exp += event.value
-                # if self.p_exp >= self.to_next_level:
-                #     self.add_level_up_menu()
+                if self.p_exp >= self.to_next_level:
+                    self.add_level_up_menu()
             if event.type == EVENTS['GAINSTAT']:
                 self.P1.gain_stat_bonus(event.stat, event.value)
             if event.type == EVENTS['PLAYERHEAL']:

@@ -15,18 +15,20 @@ class Cursor(pygame.sprite.Sprite):
         try:
             if not pygame.get_init():
                 raise RuntimeError
-            else:
-                self.rect.topleft = pygame.mouse.get_pos()
 
         except RuntimeError as e:
             raise
+
+        else:
+            self.rect.topleft = pygame.mouse.get_pos()
 
     def scale_to_screen(self, scale: float):
         try:
             if type(scale) is not float:
                 raise TypeError
-            else:
-                self.image = pygame.transform.scale_by(self.image, scale)
 
         except TypeError as e:
             raise
+
+        else:
+            self.image = pygame.transform.scale_by(self.image, scale)
