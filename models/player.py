@@ -16,6 +16,7 @@ MOVE_EDGE_LEFT = int(WIDTH * 0.1)
 MOVE_EDGE_RIGHT = int(WIDTH * 0.9)
 GRAVITY = 0.9 * DISP_SCALE
 JUMP_CANCEL_HT = -3 * DISP_SCALE
+BASE_DODGE_CD = 5.0
 
 
 class Player(Actor):
@@ -50,10 +51,10 @@ class Player(Actor):
             self.last_pos = self.pos
 
             self.weapons = pygame.sprite.Group()
-            self.weapons.add(FireWheel(self.rect.center))
+            # self.weapons.add(FireWheel(self.rect.center))
             self.weapons.add(KatanaW(self.rect.center))
-            self.weapons.add(LitStrike(self.rect.center))
-            self.weapons.add(IceMine(self.rect.center))
+            # self.weapons.add(LitStrike(self.rect.center))
+            # self.weapons.add(IceMine(self.rect.center))
 
             # self.jump_sfx = pygame.mixer.Sound(os.path.join('sound', 'jump.wav'))
             # self.jump_sfx.set_volume(0.1)
@@ -81,7 +82,7 @@ class Player(Actor):
             # Turn dodge cooldown off and reset tracking
             if self.dodging:
                 self.dodge_timer += time_update
-                if self.dodge_timer >= self.stats[STAT_STRS['DODGE']]['value'] * 1000:
+                if self.dodge_timer >= (BASE_DODGE_CD - self.stats[STAT_STRS['DODGE']]['value']) * 1000:
                     self.dodging = False
                     self.dodge_timer = 0
 
@@ -231,9 +232,9 @@ class Player(Actor):
             if type(stat) is not str or type(amt) is not float:
                 raise TypeError
             if stat not in self.stats and stat not in self.mods:
-                raise ValueError
+                raise ValueError(f'{stat} not found')
             if amt <= 0:
-                raise ValueError
+                raise ValueError(f'Amount is {amt}. Should be > 0.')
 
         except (ValueError, TypeError) as e:
             raise
