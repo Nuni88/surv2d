@@ -35,8 +35,8 @@
 		"a0_x": 0.0,
 		"a0_y": 0.0,
 		"v0_x": 0.0,
-		"v0_y": 1.0,
-		"duration": 1000,
+		"v0_y": 2.0,
+		"duration": 500,
 		"image": "katana.png"
 	}
 }

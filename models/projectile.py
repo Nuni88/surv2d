@@ -56,6 +56,10 @@ class Projectile(pygame.sprite.Sprite):
     def handle_collision(self) -> bool:
         pass
 
+    def rotate_ip(self, angle: float):
+        self.image = pygame.transform.rotate(self.image, angle)
+        self.rect = self.image.get_rect(center=self.rect.center)
+
 
 class Fireball(Projectile):
     def __init__(self, pos: pygame.math.Vector2, mods: dict):
@@ -116,7 +120,18 @@ class Lightning(Projectile):
 class Katana(Projectile):
     def __init__(self, pos: pygame.math.Vector2, mods: dict):
         super().__init__(pos, mods, BULLETDATA['Katana'])
+        self.rotate_ip(-45.0)
+        self.rot_delay = 120
+        self.rot_timer = 0
 
     def update(self, offset: float, time_update: int, dist: pygame.math.Vector2):
         super().update(offset, time_update, dist)
+        self.rect.centerx += offset
+        self.rect.center += dist
+        self.rot_timer += time_update
+        degrees = 0
+        while self.rot_timer >= self.rot_delay:
+            degrees += 36
+            self.rot_timer -= self.rot_delay
+        self.rotate_ip(degrees)
         self.check_duration(time_update)

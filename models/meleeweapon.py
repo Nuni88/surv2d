@@ -25,5 +25,5 @@ class FireWheel(MeleeWeapon):
 class KatanaW(MeleeWeapon):
     def __init__(self, pos: pygame.math.Vector2):
         super().__init__(pos, Katana, 1.5)
-        self.nodes.append(vec(-20.0, -20.0) * DISP_SCALE)
-        self.nodes.append(vec(20.0, -20.0) * DISP_SCALE)
+        self.nodes.append(vec(-18.0, -15.0) * DISP_SCALE)
+        self.nodes.append(vec(18.0, -15.0) * DISP_SCALE)

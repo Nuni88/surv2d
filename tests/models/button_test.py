@@ -16,7 +16,8 @@ def test_create(new_button):
     assert isinstance(new_button, Button), type_error(Button, type(new_button))
     assert isinstance(new_button.image, pygame.surface.Surface), type_error(pygame.surface.Surface, type(new_button.image))
     assert isinstance(new_button.text, str), type_error(str, type(new_button.text))
-    assert new_button.rect == new_button.image.get_rect(), val_not_equal_error(new_button.image.get_rect(), new_button.rect)
+    r = new_button.image.get_rect(center=vec(0, 0))
+    assert new_button.rect == r, val_not_equal_error(r, new_button.rect)
 
 
 def test_create_bad_type():
