@@ -9,7 +9,7 @@ from models.enemy import GroundEnemy, FlyingEnemy
 from models.player import Player
 from models.obstacle import Obstacle
 from models.door import WeapDoor, StatDoor
-from models.pickup import ExpPickup, StatPickup, HealthPickup
+from models.pickup import ExpPickup, StatPickup, HealthPickup, WeaponPickup
 from models.menu import Menu
 from models.cursor import Cursor
 from globals.constants import WIDTH, HEIGHT, FONT, STAT_STRS, FPS, DISP_SCALE, EVENTS
@@ -131,7 +131,11 @@ class SurvGame:
             self.platforms.add(door)
 
         heart = StatPickup(vec(WIDTH * 0.2, HEIGHT * 0.93), STAT_STRS['MAXHP'])
+        lit = WeaponPickup(vec(WIDTH * 0.8, HEIGHT * 0.93), 'LitStrike')
+        lit2 = WeaponPickup(vec(WIDTH * 0.85, HEIGHT * 0.93), 'LitStrike')
         self.pickups.add(heart)
+        self.pickups.add(lit)
+        self.pickups.add(lit2)
 
         pygame.mouse.set_visible(False)
 
@@ -355,6 +359,8 @@ class SurvGame:
                     self.add_level_up_menu()
             if event.type == EVENTS['GAINSTAT']:
                 self.P1.gain_stat_bonus(event.stat, event.value)
+            if event.type == EVENTS['GAINWEAPON']:
+                self.P1.gain_weapon(event.weapon)
             if event.type == EVENTS['PLAYERHEAL']:
                 self.P1.heal_percent(event.value)
 

@@ -34,5 +34,6 @@ EVENTS = {
     'SPAWNENEMIES': pygame.USEREVENT,
     'GAINEXP': pygame.USEREVENT + 1,
     'GAINSTAT': pygame.USEREVENT + 2,
-    'PLAYERHEAL': pygame.USEREVENT + 3
+    'GAINWEAPON': pygame.USEREVENT + 3,
+    'PLAYERHEAL': pygame.USEREVENT + 4
 }

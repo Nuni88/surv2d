@@ -69,3 +69,14 @@ class StatPickup(Pickup):
         e = pygame.event.Event(EVENTS['GAINSTAT'], {'stat': self.stat, 'value': self.value})
         pygame.event.post(e)
         self.kill()
+
+
+class WeaponPickup(Pickup):
+    def __init__(self, pos, ptype):
+        super().__init__(pos, PICKUPDATA['WEAPONS'][ptype])
+        self.weapon = ptype
+
+    def collect(self):
+        e = pygame.event.Event(EVENTS['GAINWEAPON'], {'weapon': self.weapon})
+        pygame.event.post(e)
+        self.kill()

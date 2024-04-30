@@ -17,6 +17,12 @@ MOVE_EDGE_RIGHT = int(WIDTH * 0.9)
 GRAVITY = 0.9 * DISP_SCALE
 JUMP_CANCEL_HT = -3 * DISP_SCALE
 BASE_DODGE_CD = 5.0
+WEAPON_TYPES = {
+    'LitStrike': LitStrike,
+    'FireWheel': FireWheel,
+    'KatanaW': KatanaW,
+    'IceMine': IceMine
+}
 
 
 class Player(Actor):
@@ -254,6 +260,23 @@ class Player(Actor):
                 self.heal(int(amt))
                 self.stats[stat]['value'] = int(self.stats[stat]['value'])
 
+    def gain_weapon(self, w: str):
+        try:
+            if type(w) is not str:
+                raise TypeError(f'Weapon type must be str.')
+            if w not in WEAPON_TYPES.keys():
+                raise ValueError(f'{w} is not a valid weapon type.')
+
+        except (ValueError, TypeError) as e:
+            raise
+
+        else:
+            for weapon in self.weapons:
+                if weapon.__class__.__name__ == w:
+                    weapon.level_up()
+                    return
+            self.weapons.add(WEAPON_TYPES[w](self.rect.center))
+
     # TODO: Add tests
     def heal(self, amt: int):
         try:
@@ -290,8 +313,8 @@ class Player(Actor):
         try:
             if type(req) is not str or type(lvl) is not int:
                 raise TypeError
-            # if req not in weapon types
-            #     raise ValueError
+            if req not in WEAPON_TYPES.keys():
+                raise ValueError
             if lvl < 0:
                 raise ValueError
 

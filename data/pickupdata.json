@@ -32,5 +32,23 @@
 			"value": 10.0,
 			"image": "maxhp.png"
 		}
+	},
+	"WEAPONS": {
+		"LitStrike": {
+			"value": 1,
+			"image": "lit.png"
+		},
+		"FireWheel": {
+			"value": 1,
+			"image": "fire.png"
+		},
+		"KatanaW": {
+			"value": 1,
+			"image": "katana.png"
+		},
+		"IceMine": {
+			"value": 1,
+			"image": "ice.png"
+		}
 	}
 }
