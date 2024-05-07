@@ -5,13 +5,14 @@ import os
 import json
 import pygame
 from pygame.locals import *
+from models.scene import Scene
 from models.enemy import GroundEnemy, FlyingEnemy
 from models.player import Player
 from models.obstacle import Obstacle
 from models.door import WeapDoor, StatDoor
 from models.pickup import ExpPickup, StatPickup, HealthPickup, WeaponPickup
 from models.menu import Menu
-from models.cursor import Cursor
+# from models.cursor import Cursor
 from globals.constants import WIDTH, HEIGHT, FONT, STAT_STRS, FPS, DISP_SCALE, EVENTS
 
 vec = pygame.math.Vector2
@@ -65,19 +66,15 @@ PAUSE_MENU_OPTIONS = [
 
 
 # noinspection PyTypeChecker,PyPep8Naming
-class SurvGame:
+class BattleScene(Scene):
     def __init__(self):
-        pygame.init()
-        pygame.font.init()
-        pygame.display.set_caption("2D Survivors")
-        self.displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
-        self.clock = pygame.time.Clock()
+        super().__init__()
         self.font = pygame.font.SysFont(FONT, FONT_SZ)
         self.level_up_menu = None
         self.pause_menu = None
-        self.cursor = Cursor()
         self.game_time = MAX_TIME
-        self.time_delay = 0
+        self.time_delay = pygame.time.get_ticks()
+        self.stage_over = False
 
         # Create sprite groups
         self.environment = pygame.sprite.Group()
@@ -246,7 +243,8 @@ class SurvGame:
             self.show_display_settings()
             return
         if option == 'Return to Title':
-            self.end_game()
+            self.stage_over = True
+            return
         if option == 'Quit':
             pygame.quit()
             sys.exit()
@@ -254,6 +252,7 @@ class SurvGame:
     def show_display_settings(self):
         pass
 
+    '''
     def end_game(self):
         time.sleep(1)
         self.displaysurface.fill(END_SCRN_COLOR)
@@ -261,6 +260,7 @@ class SurvGame:
         time.sleep(1)
         pygame.quit()
         sys.exit()
+    '''
 
     def display_text(self):
         # Display timer as MM:SS
@@ -434,12 +434,6 @@ class SurvGame:
             self.game_time = MAX_TIME - int((pygame.time.get_ticks() - self.time_delay) / 1000)
             self.bullets = self.P1.get_bullets()
 
-            # Check loss conditions
-            if not self.P1.alive():
-                return
-            if self.game_time == 0:
-                return
-
             if self.pause_menu:                                 # Pause menu open
                 self.handle_pause_screen(time_update)
             else:
@@ -456,8 +450,14 @@ class SurvGame:
 
             self.display()
 
-
-if __name__ == '__main__':
-    mygame = SurvGame()
-    mygame.run()
-    mygame.end_game()
+            # Check end conditions
+            if not self.P1.alive():
+                time.sleep(1)
+                self.displaysurface.fill(END_SCRN_COLOR)
+                pygame.display.update()
+                time.sleep(1)
+                return
+            if self.game_time == 0:
+                return
+            if self.stage_over:
+                return
